@@ -19,6 +19,7 @@ import {AuthService} from '../services/auth.service';
 import {UsersService} from '../services/users.service';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MapDialogComponent} from '../dialogs/map/map-dialog.component';
+import {ClipboardComponent} from '../dialogs/clipboard/clipboard.component';
 
 // https://fevgames.net/ifs/ifsathome/2021-03/17631729871888592910113823558419958.jpg
 
@@ -481,32 +482,16 @@ export class PixrComponent implements OnInit, AfterViewInit {
                 name,
                 url,
                 latLng,
+                scale: this.scale,
               };
-              let canOpen = true;
+              // const canOpen = true;
               if (this.projectService.clipboard && !latLng) {
-                const src = this.projectService.clipboard.colName + ':' +
-                  this.projectService.clipboard.index;
-                const dest = dlgData.colName + ':' + dlgData.index;
-                if (confirm('Do you want to PASTE [ ' + src + ' ] to [ ' + dest + ' ]')) {
-                  canOpen = false;
-                  dlgData.url = this.projectService.clipboard.url;
-                  dlgData.latLng = this.projectService.clipboard.latLng;
-                  dlgData.status = this.P_FULL;
-                  // TODO At this point we can do auto paste;
-                  // this.projectService.setLogMsg(this.rawData.id,
-                  //  this.ingressName + ' discovered ' + dlgData.colName + ':' + dlgData.index);
-                  this.projectService.setPortalRec(this.rawData.id, path, dlgData);
-                  dlgData.owner = this.ingressName;
-                  this.updatePortalRecs(dlgData);
-                  this.projectService.setLogMsg(
-                    this.rawData.id,
-                    this.ingressName + ' Pasted ' + src + ' to ' + dest,
-                    dlgData);
-                } else {
-                  canOpen = true;
-                }
-              }
-              if (canOpen) {
+                this.openClipBoardDialog(dlgData);
+                // this.columnRecMetaData.rawData = this.rawData;
+                // this.projectService.updateRawData(this.columnRecMetaData);
+                this.busy = false;
+                return;
+              } else {
                 dlgData.msg = ''; // use msg to comunicate info within the dialog
                 dlgData.rawDataId = this.rawData.id;
                 dlgData.user = this.ingressName;
@@ -651,10 +636,24 @@ export class PixrComponent implements OnInit, AfterViewInit {
     dialogRef.close(data);
   }
 
+  openClipBoardDialog(dialogData: PortalRec): void {
+    const clipboardDialogRef = this.dialog.open(ClipboardComponent, {
+      maxWidth: '740px',
+      data: dialogData,
+    });
+
+    clipboardDialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('updatePortalRecs: ', result);
+        this.updatePortalRecs(result);
+      } else {
+      }
+    });
+  }
+
   openPortalDialog(dialogData: PortalRec): void {
     this.portalDialogRef = this.dialog.open(PortalInfoDialogComponent, {
       width: '600px',
-      // height: '540px',
       data: dialogData
     });
 

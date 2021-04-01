@@ -1,0 +1,19 @@
+<div mat-dialog-content>
+  <div>
+    <div class="spanner">
+      <p>Paste this portal {{clipData.colName}}:{{clipData.index}}</p>
+      <app-canvas [portalRec]="clipData"></app-canvas>
+    </div>
+    <div class="spanner">
+      <p>To this location {{data.colName}}:{{data.index}}</p>
+      <app-canvas [portalRec]="data"></app-canvas>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="accent" (click)="paste(data)">Paste</button>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="clearClipBoard()">Clear Clipboard</button>
+  <button mat-button (click)="onCancelClick(data)">Cancel</button>
+</div>

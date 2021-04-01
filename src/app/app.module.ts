@@ -12,6 +12,7 @@ import { MapDialogComponent } from './dialogs/map/map-dialog.component';
 import {MapComponent} from './map/map.component';
 import { SpeedDialComponent } from './components/speed-dial/speed-dial.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
+import { ClipboardComponent } from './dialogs/clipboard/clipboard.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { CanvasComponent } from './components/canvas/canvas.component';
     MapDialogComponent,
     MapComponent,
     SpeedDialComponent,
-    CanvasComponent
+    CanvasComponent,
+    ClipboardComponent
   ],
   imports: [
     BrowserModule,
@@ -36,7 +38,8 @@ import { CanvasComponent } from './components/canvas/canvas.component';
   ],
   entryComponents: [
     PortalInfoDialogComponent,
-    MapDialogComponent],
+    MapDialogComponent,
+    ClipboardComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
