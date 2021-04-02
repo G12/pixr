@@ -3,7 +3,7 @@ import {ProjectService} from '../services/project.service';
 import {
   AdminList,
   BootParam,
-  CharDat,
+  CharDat, Column,
   ColumnChar,
   ColumnRecData,
   IngressNameData,
@@ -122,12 +122,20 @@ export class PixrComponent implements OnInit, AfterViewInit {
   imageLoaded = false;
   showDebug = true;
   waves = 'assets/waves.gif';
+  isMobile = false;
 
   constructor(public authService: AuthService,
               private projectService: ProjectService,
               private usersService: UsersService,
               public dialog: MatDialog) {
     this.rawData = {id: '', name: '', columns: []};
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+      // true for mobile device
+      this.isMobile = true;
+      console.log('Mobile Device');
+    } else {
+      console.log('NOT a Mobile Device!');
+    }
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -229,6 +237,7 @@ export class PixrComponent implements OnInit, AfterViewInit {
       colRecData.column = column;
       colRecData.portalRecs = portalRecs;
       colRecData.ingressName = this.ingressName;
+      colRecData.isMobile = this.isMobile;
       this.columnRecDataArray.push(colRecData);
       this.dataReady = true;
     });
@@ -447,6 +456,34 @@ export class PixrComponent implements OnInit, AfterViewInit {
     // End of MOUSE UP EVENT
   }
 
+  initPortalRec(column: Column, pr: PortalRec): PortalRec{
+    let name = '';
+    let url = '';
+    let latLng = null;
+    const path = column.name + ':' + pr.index;
+    const prtl: PortalRec = this.portalRecs.find(p => p.index === pr.index && p.colName === column.name);
+    let owner = '';
+    if (prtl) {
+      owner = prtl.owner ? prtl.owner : '';
+      name = prtl.name;
+      url = prtl.url;
+      latLng = prtl.latLng;
+    }
+    const dlgData: PortalRec = {
+      rawDataId: this.rawData.id,
+      colName: column.name,
+      user: this.ingressName,
+      owner,
+      index: pr.index, l: pr.l, r: pr.r, t: pr.t, b: pr.b,
+      name,
+      url,
+      latLng,
+      scale: this.scale,
+      isMobile: this.isMobile,
+    };
+    return dlgData;
+  }
+
   /// Mouse Events ( after canvas initialized
   handleMouseDown(e): void {
     if (!this.busy) {
@@ -461,6 +498,8 @@ export class PixrComponent implements OnInit, AfterViewInit {
         if (x > (column.offset - column.width) && x < column.offset) {
           column.portals.forEach(pr => {
             if ((y > pr.t && y < (pr.b + pr.t)) && (x < (pr.r + pr.l) && x > pr.l)) {
+              const dlgData = this.initPortalRec(column, pr);
+              /*
               let name = '';
               let url = '';
               let latLng = null;
@@ -484,8 +523,9 @@ export class PixrComponent implements OnInit, AfterViewInit {
                 latLng,
                 scale: this.scale,
               };
+               */
               // const canOpen = true;
-              if (this.projectService.clipboard && !latLng) {
+              if (this.projectService.clipboard && !dlgData.latLng) {
                 this.openClipBoardDialog(dlgData);
                 // this.columnRecMetaData.rawData = this.rawData;
                 // this.projectService.updateRawData(this.columnRecMetaData);
@@ -619,6 +659,11 @@ export class PixrComponent implements OnInit, AfterViewInit {
   }
 
   showColumnInfo(columnRecData: ColumnRecData): void {
+    if (columnRecData.column.portals.length === 0) {
+      alert('This column is under construction - please wait!');
+      return;
+    }
+
     // Pass the ingressName in to assign to ColumnChar.final if final Letter is picked
     // check to see if value for letter is being changed and change owner
     columnRecData.ingressName = this.ingressName;
@@ -658,7 +703,7 @@ export class PixrComponent implements OnInit, AfterViewInit {
     });
 
     this.portalDialogRef.afterOpened().subscribe(() => {
-      console.log('portalDialogRef.afterOpened');
+      // console.log('portalDialogRef.afterOpened');
     });
 
     this.portalDialogRef.afterClosed().subscribe(result => {
@@ -715,17 +760,25 @@ export class PixrComponent implements OnInit, AfterViewInit {
         this.projectService.setPortalRec(this.rawData.id, path, prtl);
         this.updatePortalRecs(prtl);
 
-        // Scroll into view
-        const target = document.getElementById(prtl.colName);
-        target.scrollIntoView();
-        // Try to scroll into view vertically
-        window.scrollTo({
-          // top: this.lastYOffset,
-          top: prtl.t
-        });
+        this.scrollIntoView(prtl);
 
       }
     });
+  }
+
+  scrollIntoView(prtl: PortalRec): void {
+    if (this.isMobile) {
+      console.log('Scroll into view');
+      const target = document.getElementById(prtl.colName);
+      target.scrollIntoView();
+      // Try to scroll into view vertically
+      window.scrollTo({
+        // top: this.lastYOffset,
+        top: prtl.t
+      });
+    } else {
+      console.log('No Scroll');
+    }
   }
 
   openMapDialog(columnRecData: ColumnRecData): void {
@@ -775,7 +828,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
   changeImgSize(scale: number): void {
     this.img.src = this.src;
     this.img.addEventListener('load', () => {
-      console.log('Loaded?');
       this.bannerWidth = this.bannerWidthO * scale;
       this.width = this.widthO * scale;
       this.height = this.heightO * scale;
@@ -784,15 +836,12 @@ export class PixrComponent implements OnInit, AfterViewInit {
       this.ctx = this.canvas.getContext('2d');
       setTimeout(e => {
         this.ctx.drawImage(this.img, 0, 0, this.width, this.height);
-        console.log('Image Done');
         this.drawPortalFrames(); // TODO TESTING TESTING
       }, 500);
     });
   }
 
   onSpeedDial($event: string): void {
-    // alert($event);
-    console.log($event);
     switch ($event) {
       case 'plus': {
         this.is30 = false; this.is50 = false; this.is100 = true;
@@ -831,15 +880,24 @@ export class PortalInfoDialogComponent {
               public projectService: ProjectService) {
   }
 
+  scrollIntoView(prtl: PortalRec): void {
+    if (prtl.isMobile) {
+      // console.log('Scroll into view');
+      const target = document.getElementById(prtl.colName);
+      target.scrollIntoView();
+      // Try to scroll into view vertically
+      window.scrollTo({
+        // top: this.lastYOffset,
+        top: prtl.t
+      });
+    } else {
+      // console.log('NO Scroll');
+    }
+  }
+
   onCancelClick(data: PortalRec): void {
     this.dialogRef.close();
-    // Scroll into view
-    const target = document.getElementById(data.colName);
-    target.scrollIntoView();
-    // Try to scroll into view vertically
-    window.scrollTo({
-      top: data.t,
-    });
+    this.scrollIntoView(data);
   }
 
   // TODO this is not usefull right now could be usefull for standalone dialog component
@@ -871,13 +929,6 @@ export class PortalInfoDialogComponent {
   validateUrl(url: string, data: PortalRec): void {
     if (this.isValidURL(url)) {
       this.dialogRef.close(data);
-      // Scroll into view
-      const target = document.getElementById(data.colName);
-      target.scrollIntoView();
-      // Try to scroll into view vertically
-      window.scrollTo({
-        top: data.t,
-      });
     } else {
       data.msg = 'Not a Valid intel URL!';
     }
@@ -892,26 +943,12 @@ export class PortalInfoDialogComponent {
       data.latLng = null;
       data.url = '';
       this.dialogRef.close(data);
-      // Scroll into view
-      const target = document.getElementById(data.colName);
-      target.scrollIntoView();
-      // Try to scroll into view vertically
-      window.scrollTo({
-        top: data.t,
-      });
     }
   }
 
   setClipboard(data: PortalRec): void {
     this.projectService.clipboard = data;
     this.dialogRef.close(data);
-    // Scroll into view
-    const target = document.getElementById(data.colName);
-    target.scrollIntoView();
-    // Try to scroll into view vertically
-    window.scrollTo({
-      top: data.t,
-    });
   }
 
 }

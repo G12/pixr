@@ -34,6 +34,7 @@ export interface ColumnRecData {
   portalRecs?: PortalRec[]; // used for passing data - striped before save to db
   columnChar: ColumnChar;
   ingressName?: string; // used for passing data - striped before save to db
+  isMobile?: boolean;
 }
 
 export interface LatLng {
@@ -60,6 +61,7 @@ export interface PortalRec {
   msg?: string;
   ctx?: CanvasRenderingContext2D;
   scale?: number;
+  isMobile?: boolean;
 }
 
 export interface Column{

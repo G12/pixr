@@ -23,7 +23,7 @@ export class MapDialogComponent {
       }
   }
 
-   onOkClick(result: ColumnRecData): void {
+  onOkClick(result: ColumnRecData): void {
      if (result) {
        const template: ColumnRecData = {
          rawDataId: result.rawDataId,
@@ -41,15 +41,19 @@ export class MapDialogComponent {
        }
        this.dialogRef.close();
        this.projectService.setColumnRecData(template);
-
-       // Scroll into view
-       const target = document.getElementById(result.column.name);
-       target.scrollIntoView();
-       // Try to scroll into view vertically
-       window.scrollTo({
-         top: 0
-       });
-
+       if (result.isMobile)
+       {
+         // console.log('Scroll into view');
+         // Scroll into view
+         const target = document.getElementById(result.column.name);
+         target.scrollIntoView();
+         // Try to scroll into view vertically
+         window.scrollTo({
+           top: 0
+         });
+       } else {
+         // console.log('NO Scroll');
+       }
      } else {
        // Should never Get here
        console.log('mapDialogComponent onOkClick NO result');
@@ -63,13 +67,18 @@ export class MapDialogComponent {
 
   onCancelClick(data: ColumnRecData): void {
     this.dialogRef.close();
-    // Scroll into view
-    const target = document.getElementById(data.column.name);
-    target.scrollIntoView();
-    // Try to scroll into view vertically
-    window.scrollTo({
-      top: 0
-    });
+    if (data.isMobile) {
+      // Scroll into view
+      // console.log('Scroll into view');
+      const target = document.getElementById(data.column.name);
+      target.scrollIntoView();
+      // Try to scroll into view vertically
+      window.scrollTo({
+        top: 0
+      });
+    } else {
+      // console.log('NO Scroll');
+    }
   }
 }
 

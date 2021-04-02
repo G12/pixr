@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {PortalRec} from '../../project.data';
 
 @Component({
@@ -8,20 +8,21 @@ import {PortalRec} from '../../project.data';
 })
 export class CanvasComponent implements OnInit, AfterViewInit {
 
+  @Output() ImageDone: EventEmitter<boolean> = new EventEmitter();
   @ViewChild('canvasElement') canvasElement: ElementRef;
   @Input() portalRec: PortalRec;
+  imgData: ImageData;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   width = 100;
   height = 100;
-  imgData: ImageData;
   imageDone = false;
   rec: PortalRec;
   d: number;
   scale: number;
   debugMsg = '';
 
-  constructor(private ngZone: NgZone) { }
+  constructor() { }
 
   ngOnInit(): void {
     this.scale = this.portalRec.scale;
@@ -38,20 +39,23 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     const sy = Math.round((this.rec.t + this.d) * this.scale);
     const sw = Math.round((this.rec.r - this.d) * this.scale);
     const sh = Math.round((this.rec.b - this.d) * this.scale);
-
     try {
       this.imgData = this.portalRec.ctx.getImageData(sx, sy, sw, sh);
     } catch (error) {
       this.debugMsg = 'NO Image? Some Browsers cause this error - working on a fix: ' +
-        JSON.stringify(error);
+          JSON.stringify(error);
+      // console.log(this.debugMsg);
+      this.canvas.style.display = 'none';
       return;
     }
     this.debugMsg = 'Happy Picture to you! imgData.width: '
       + this.imgData.width + ' imgData.height: ' + this.imgData.height;
-    console.log(this.debugMsg);
+    // console.log(this.debugMsg);
     setTimeout(() =>  {
       this.ctx.putImageData(this.imgData, 0, 0);
-    }, 500);
+      console.log('Image Done: ');
+      this.ImageDone.emit(true);
+    }, 1000);
   }
 
   drawImage(): void {

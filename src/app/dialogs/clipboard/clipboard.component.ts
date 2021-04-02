@@ -11,6 +11,8 @@ import {ProjectService} from '../../services/project.service';
 export class ClipboardComponent implements OnInit {
 
   clipData: PortalRec;
+  canvas1Done = false;
+
   constructor(public dialogRef: MatDialogRef<ClipboardComponent>,
               @Inject(MAT_DIALOG_DATA) public data: PortalRec,
               public projectService: ProjectService) {

@@ -29,7 +29,7 @@
       </strong></h1>
       </div>
       <span *ngIf="!imageLoaded">Image Loading...</span>
-      <span *ngIf="imageLoaded"><strong> beta:002.001</strong></span>
+      <span *ngIf="imageLoaded"><strong> beta:002.002</strong></span>
       <div class="button_row" *ngIf="isAdmin">
         <button *ngIf="isAdmin" mat-raised-button color="warn"
                 (click)="clearAllMessages()">
@@ -37,7 +37,7 @@
         </button>
       </div>
     </div>
-    <p *ngIf="isAdmin && showDebug">{{debugMsgs}}</p>
+    <!--<p *ngIf="isAdmin && showDebug">{{debugMsgs}}</p>-->
 
     <div class="example-button-row" *ngIf="!validated">
       <button *ngIf="authService.afAuth.user && imageLoaded" mat-raised-button color="primary"
@@ -50,20 +50,32 @@
 <div class="topbar"></div><!-- spacer -->
 <div class="container">
   <div>
-    <app-speed-dial *ngIf="dataReady && validated" (action)="onSpeedDial($event)"></app-speed-dial>
+    <app-speed-dial *ngIf="dataReady && validated && !isMobile" (action)="onSpeedDial($event)"></app-speed-dial>
     <div class="header" [style.width.px]="width">
       <div *ngIf="dataReady && validated && is30">
         <div [id]="colRec.column.name" class="column-32" [style.width.px]="(colRec.column.width * this.scale) - 1.2"
              *ngFor="let colRec of columnRecDataArray" (click)="showColumnInfo(colRec)">
+          <div *ngIf="colRec.columnChar.portalsLength !== 0">
           <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
           <h2 class="overflow"><strong>&nbsp;{{colRec.columnChar.final.char}}&nbsp;</strong></h2>
+          </div>
+          <div *ngIf="colRec.columnChar.portalsLength === 0">
+            <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
+            <h2 class="overflow"><strong>Null</strong></h2>
+          </div>
         </div>
       </div>
       <div *ngIf="dataReady && validated && is50">
         <div [id]="colRec.column.name" class="column-50" [style.width.px]="(colRec.column.width * this.scale) - 1.2"
              *ngFor="let colRec of columnRecDataArray" (click)="showColumnInfo(colRec)">
+          <div *ngIf="colRec.columnChar.portalsLength !== 0">
           <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
           <h1 class="overflow"><strong>&nbsp;{{colRec.columnChar.final.char}}&nbsp;</strong></h1>
+          </div>
+          <div *ngIf="colRec.columnChar.portalsLength === 0">
+            <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
+            <h1 class="overflow"><strong>Not Done</strong></h1>
+          </div>
         </div>
       </div>
       <div *ngIf="dataReady && validated && is100">
@@ -78,11 +90,14 @@
               undetermined
             </i></h1>
           <div>
-            <h1>
+            <h1 *ngIf="colRec.columnChar.portalsLength !== 0">
               <i class="overflow" [style.color]="grey" [style.font-size.em]=".7">
                 {{colRec.columnChar.portalCount}}/{{colRec.columnChar.portalsLength}}
                 found: {{colRec.columnChar.percentDone}}% done
               </i>
+            </h1>
+            <h1 *ngIf="colRec.columnChar.portalsLength === 0">
+              Under Construction
             </h1>
             <h1 class="overflow">
               <i [style.color]="grey" [style.font-size.em]=".7">
