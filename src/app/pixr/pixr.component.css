@@ -82,6 +82,7 @@
   border: lightgray solid 1px;
   width: 2em;
   text-align: center;
+  cursor: pointer;
 }
 .overflow {
   white-space: nowrap;

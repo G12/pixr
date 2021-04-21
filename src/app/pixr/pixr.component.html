@@ -14,17 +14,19 @@
   </div>
   <div>
     <div class="message_top" *ngIf="rawData">
-      <div *ngIf="isAdmin" class="button_row">
+      <div *ngIf="isAdmin && !validated" class="button_row">
         <button mat-button [matMenuTriggerFor]="menu">
           {{rawData.name}} <mat-icon>arrow_drop_down</mat-icon></button>
         <mat-menu #menu="matMenu">
-          <button mat-menu-item>Item 1</button>
-          <button mat-menu-item>Item 2</button>
+          <button mat-menu-item *ngFor="let project of projectList.projects"
+            (click)="selectProject(project)">
+            {{project.folder}}</button>
         </mat-menu>
       </div>
-      <div *ngIf="!isAdmin" class="button_row"><h1>{{rawData.name}}</h1></div>
+      <div *ngIf="!isAdmin || validated" class="button_row"><h1>{{rawData.name}}</h1></div>
       <div class="button_row"><h1><strong>
-        <span class="letter" *ngFor="let colRec of columnRecDataArray">
+        <span class="letter" *ngFor="let colRec of columnRecDataArray"
+        (click)="showPasscode(columnRecDataArray)">
           {{colRec.columnChar.final.char !== '' ? colRec.columnChar.final.char : '&nbsp;&nbsp;'}}</span>
       </strong></h1>
       </div>

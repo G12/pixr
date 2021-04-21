@@ -174,3 +174,6 @@ export interface BootParam {
   folder?: string;
 }
 
+export interface ProjectList {
+  projects: BootParam[];
+}

@@ -11,7 +11,7 @@ import {
   Messages,
   MetaData,
   MsgDat,
-  PortalRec,
+  PortalRec, ProjectList,
   RawData
 } from '../project.data';
 import {AngularFirestoreDocument} from '@angular/fire/firestore';
@@ -117,6 +117,10 @@ export class PixrComponent implements OnInit, AfterViewInit {
   adminList: AdminList;
   fsUser: BootParam;
   fsAdmin: BootParam;
+  folder: string; // current first saturday project name
+  id: string;
+
+  projectList: ProjectList;
 
   debugMsgs = 'START: ';
   imageLoaded = false;
@@ -291,6 +295,12 @@ export class PixrComponent implements OnInit, AfterViewInit {
     // TODO add UI procedure for assigning admin status this.setAdmin('G12mo', '1KYU0BdE0rXTly5Y5KZslOvxpow2');
     this.projectService.bootParamsCollection.get().subscribe(data => {
       if (!data.empty) {
+        const projLst = data.docs.find(d => d.id === 'project_list');
+        if (projLst) {
+          this.projectList = projLst.data() as ProjectList;
+        } else {
+          this.projectList = {projects: []};
+        }
         const admlst = data.docs.find(d => d.id === 'admin_list');
         if (admlst) {
           this.adminList = admlst.data() as AdminList;
@@ -305,27 +315,42 @@ export class PixrComponent implements OnInit, AfterViewInit {
         }
         const test = this.adminList.admins.find(a => a.uid === this.googleUID);
         this.isAdmin = !!test;
-        let id; let folder;
+        // let id;
         if (this.isAdmin) {
-          id = this.fsAdmin.project_id;
-          folder = this.fsAdmin.folder;
+          this.id = this.fsAdmin.project_id;
+          this.folder = this.fsAdmin.folder;
         } else {
-          id = this.fsUser.project_id;
-          folder = this.fsUser.folder;
+          this.id = this.fsUser.project_id;
+          this.folder = this.fsUser.folder;
         }
-        this.src = this.path + folder + '/black.jpg';
+        this.src = this.path + this.folder + '/black.jpg';
         // TODO remove after local testing
         // this.src = 'assets/black.jpg';
         console.log('src = ' + this.src);
         // Once we have default project id we can subscribe
         // this.subscribeToRawdataFor(id); Deprecated
         this.debugMsgs += 'src: ' + this.src + ', ';
-        this.subscribeToFsProject(id);
+        this.subscribeToFsProject(this.id);
       }
     });
   }
 
+  openSelectedProject(project: BootParam): void {
+    this.imageLoaded = false;
+    this.bannerWidth = null;
+    this.validated = false;
+    this.src = null;
+    // this.id = project.project_id;
+    // this.folder = project.folder;
+    this.src = this.path + project.folder + '/black.jpg';
+    console.log('src = ' + this.src);
+    // Once we have the project id we can subscribe
+    this.debugMsgs += 'src: ' + this.src + ', ';
+    this.subscribeToFsProject(project.project_id);
+  }
+
   onImageLoad(myImage: HTMLImageElement): void {
+    console.log('ImageLoaded');
     this.debugMsgs += 'onImageLoad START: ';
     // TODO setTimeout used to kick start angular redraw see ngZone
     // setTimeout(() =>  {
@@ -861,6 +886,27 @@ export class PixrComponent implements OnInit, AfterViewInit {
         this.changeImgSize(this.scale);
       }
                    break;
+    }
+  }
+
+  //////////////  April 21 2021 -> ////////////////////
+
+  showPasscode(columnRecDataArray: ColumnRecData[]): void {
+    let str = '';
+    columnRecDataArray.forEach(colRec => {
+      str += colRec.columnChar.final.char !== '' ? colRec.columnChar.final.char : ' ';
+    });
+    prompt('Current Passcode Value', str);
+  }
+
+  selectProject(project: BootParam): void {
+    if (project.folder !== this.folder){
+      if (confirm('The project ' + project.project_id + ' is NOT the current First Saturday project' +
+        ' open this project to research previous portal locations?')) {
+        this.openSelectedProject(project);
+      }
+    } else {
+      this.openSelectedProject(project);
     }
   }
 }
