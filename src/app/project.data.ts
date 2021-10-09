@@ -177,3 +177,20 @@ export interface BootParam {
 export interface ProjectList {
   projects: BootParam[];
 }
+
+///////////////////////////////  Stats April 30 2021  /////////////////////
+
+export interface PlayerStats {
+  playerName: string;
+  portalsDiscovered: number;
+  lettersDetermined: number;
+}
+
+export interface StatsList {
+  code: string;
+  count: number;
+  total: number;
+  prtlcount: number;
+  prtltotal: number;
+  stats: PlayerStats[];
+}

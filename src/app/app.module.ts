@@ -13,6 +13,7 @@ import {MapComponent} from './map/map.component';
 import { SpeedDialComponent } from './components/speed-dial/speed-dial.component';
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { ClipboardComponent } from './dialogs/clipboard/clipboard.component';
+import { StatsComponent } from './dialogs/stats/stats.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { ClipboardComponent } from './dialogs/clipboard/clipboard.component';
     MapComponent,
     SpeedDialComponent,
     CanvasComponent,
-    ClipboardComponent
+    ClipboardComponent,
+    StatsComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +41,8 @@ import { ClipboardComponent } from './dialogs/clipboard/clipboard.component';
   entryComponents: [
     PortalInfoDialogComponent,
     MapDialogComponent,
-    ClipboardComponent],
+    ClipboardComponent,
+    StatsComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -10,9 +10,9 @@ import {
   LatLng,
   Messages,
   MetaData,
-  MsgDat,
+  MsgDat, PlayerStats,
   PortalRec, ProjectList,
-  RawData
+  RawData, StatsList
 } from '../project.data';
 import {AngularFirestoreDocument} from '@angular/fire/firestore';
 import {AuthService} from '../services/auth.service';
@@ -20,8 +20,15 @@ import {UsersService} from '../services/users.service';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MapDialogComponent} from '../dialogs/map/map-dialog.component';
 import {ClipboardComponent} from '../dialogs/clipboard/clipboard.component';
+import {StatsComponent} from '../dialogs/stats/stats.component';
 
 // https://fevgames.net/ifs/ifsathome/2021-03/17631729871888592910113823558419958.jpg
+// https://fevgames.net/ifs/ifsathome/2021-05/1173967923183847241117575464520523.jpg
+// https://fevgames.net/ifs/ifsathome/2021-06/139507609158036861345453685320764.jpg
+// https://fevgames.net/ifs/ifsathome/2021-07/1639139716102680798452289230520979.jpg
+// https://fevgames.net/ifs/ifsathome/2021-09/16607234082109943015158217965621400.jpg
+// https://fevgames.net/ifs/ifsathome/2021-10/532177229195500548340666012721637.jpg
+
 
 @Component({
   selector: 'app-pixr',
@@ -820,6 +827,26 @@ export class PixrComponent implements OnInit, AfterViewInit {
     });
   }
 
+  // TODO various URL configurations
+  /*
+  Desktop
+  Map link:		https://intel.ingress.com/intel?ll=45.418829,-75.694001&z=18&pll=45.418829,-75.694001
+      https://intel.ingress.com/?ll=45.418829,-75.694001&z=18&pll=45.418829,-75.694001
+
+  IITC
+  portal link: 	https://intel.ingress.com/intel?ll=45.418829,-75.694001&z=17&pll=45.418829,-75.694001
+  perma link: 	https://intel.ingress.com/intel?ll=45.418829,-75.694001&z=17
+
+  IITC Mobile
+  permalink:	https://intel.ingress.com/intel?ll=45.418297239908284,-75.69363355636597&z=17
+  share portal:	https://intel.ingress.com/intel?ll=45.418829,-75.694001&z=17&pll=45.418829,-75.694001
+   */
+
+  /**
+   *
+   * @param url
+   * @private
+   */
   private makeLatLng(url: string): LatLng {
     if (url) {
       const arr = url.split('?');
@@ -829,6 +856,12 @@ export class PixrComponent implements OnInit, AfterViewInit {
       if (ll) {
         const arr2 = ll.split(',');
         return {lat: parseFloat(arr2[0]), lng: parseFloat(arr2[1])};
+      } else {
+        const pll = searchParams.get('pll');
+        if (pll) {
+          const arr3 = pll.split(',');
+          return {lat: parseFloat(arr3[0]), lng: parseFloat(arr3[1])};
+        }
       }
     }
     return null;
@@ -909,8 +942,68 @@ export class PixrComponent implements OnInit, AfterViewInit {
       this.openSelectedProject(project);
     }
   }
-}
 
+  openStatsDialog(data: StatsList): void {
+    const dialogRef = this.dialog.open(StatsComponent, {
+      width: '600px', data
+    });
+  }
+
+  showStats(): void {
+    this.openStatsDialog(this.makeStats());
+  }
+
+  makeStats(): StatsList {
+    const statsList: StatsList = {stats: [], code: '', count: 0, total: 0,
+          prtlcount: 0, prtltotal: 0};
+    this.allIngressNames.forEach(value => {
+      const playerStats: PlayerStats = {
+        playerName: value.name,
+        portalsDiscovered: 0,
+        lettersDetermined: 0,
+      };
+      statsList.stats.push(playerStats);
+    });
+
+    let prtltotal = 0;
+    this.rawData.columns.forEach(colmn => {
+      prtltotal += colmn.portals.length;
+    });
+
+    let code = '';
+    let count = 0;
+    let prtlcount = 0;
+    this.columnRecDataArray.forEach(colRec => {
+      if (colRec.columnChar.final.char !== '') { count++; }
+      code += colRec.columnChar.final.char !== '' ? colRec.columnChar.final.char : '_';
+      if (colRec.columnChar.final) {
+        const name = colRec.columnChar.final.ingressName;
+        const stat = statsList.stats.find(s => s.playerName === name);
+        if (stat) {
+          stat.lettersDetermined++;
+        }
+        colRec.portalRecs.forEach(prtlRec => {
+          if (prtlRec.owner) {
+            const stat2 = statsList.stats.find(s => s.playerName === prtlRec.owner);
+            if (stat2) {
+              stat2.portalsDiscovered++;
+              prtlcount++;
+            }
+          }
+        });
+      }
+    });
+    console.log(statsList);
+    const finals: PlayerStats[] = statsList.stats.filter(s => s.portalsDiscovered > 0 || s.lettersDetermined > 0);
+    const finalStats: StatsList = {
+      stats: [], code, count, total: this.rawData.columns.length,
+      prtlcount, prtltotal};
+    finalStats.stats = finals;
+    finalStats.stats.sort((a, b) => b.portalsDiscovered - a.portalsDiscovered);
+    return finalStats;
+  }
+
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // TODO get this out here
@@ -968,8 +1061,9 @@ export class PortalInfoDialogComponent {
     window.open('https://intel.ingress.com/intel', 'intel_map');
   }
 
+  // TODO broadend the search scope of test ( removed intel from ...ingress.com/intel )
   isValidURL(url: string): boolean {
-    return (-1 !== url.indexOf('https://intel.ingress.com/intel?', 0));
+    return (-1 !== url.indexOf('https://intel.ingress.com', 0));
   }
 
   validateUrl(url: string, data: PortalRec): void {

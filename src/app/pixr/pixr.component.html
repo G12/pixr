@@ -4,7 +4,7 @@
         (click)="logout()">
   <mat-icon>logout</mat-icon>
 </button>
-<h1 *ngIf="!bannerWidth">----->  Please Wait Image Loading</h1>
+<h1 *ngIf="!bannerWidth">-----> Image Not Ready - Please Wait</h1>
 <img *ngIf="!bannerWidth" alt="Waiting Waves" [src]="waves">
 <div *ngIf="(bannerWidth)" class="banner_container" [style.left.px]="bannerLeft"
      [style.width.px]="bannerWidth">
@@ -16,26 +16,32 @@
     <div class="message_top" *ngIf="rawData">
       <div *ngIf="isAdmin && !validated" class="button_row">
         <button mat-button [matMenuTriggerFor]="menu">
-          {{rawData.name}} <mat-icon>arrow_drop_down</mat-icon></button>
+          {{rawData.name}}
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
         <mat-menu #menu="matMenu">
           <button mat-menu-item *ngFor="let project of projectList.projects"
-            (click)="selectProject(project)">
+                  (click)="selectProject(project)">
             {{project.folder}}</button>
         </mat-menu>
       </div>
       <div *ngIf="!isAdmin || validated" class="button_row"><h1>{{rawData.name}}</h1></div>
       <div class="button_row"><h1><strong>
         <span class="letter" *ngFor="let colRec of columnRecDataArray"
-        (click)="showPasscode(columnRecDataArray)">
+              (click)="showPasscode(columnRecDataArray)">
           {{colRec.columnChar.final.char !== '' ? colRec.columnChar.final.char : '&nbsp;&nbsp;'}}</span>
       </strong></h1>
       </div>
-      <span *ngIf="!imageLoaded">Image Loading...</span>
-      <span *ngIf="imageLoaded"><strong> beta:002.002</strong></span>
-      <div class="button_row" *ngIf="isAdmin">
+      <span *ngIf="!imageLoaded">Image Not Ready - Please Wait</span>
+      <span *ngIf="imageLoaded"><strong> beta:002.008</strong></span>
+      <div class="button_row">
         <button *ngIf="isAdmin" mat-raised-button color="warn"
                 (click)="clearAllMessages()">
           Clear All!
+        </button>
+        <button *ngIf="validated" mat-raised-button color="accent"
+                (click)="showStats()">
+          STATS
         </button>
       </div>
     </div>
@@ -58,8 +64,8 @@
         <div [id]="colRec.column.name" class="column-32" [style.width.px]="(colRec.column.width * this.scale) - 1.2"
              *ngFor="let colRec of columnRecDataArray" (click)="showColumnInfo(colRec)">
           <div *ngIf="colRec.columnChar.portalsLength !== 0">
-          <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
-          <h2 class="overflow"><strong>&nbsp;{{colRec.columnChar.final.char}}&nbsp;</strong></h2>
+            <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
+            <h2 class="overflow"><strong>&nbsp;{{colRec.columnChar.final.char}}&nbsp;</strong></h2>
           </div>
           <div *ngIf="colRec.columnChar.portalsLength === 0">
             <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
@@ -71,8 +77,8 @@
         <div [id]="colRec.column.name" class="column-50" [style.width.px]="(colRec.column.width * this.scale) - 1.2"
              *ngFor="let colRec of columnRecDataArray" (click)="showColumnInfo(colRec)">
           <div *ngIf="colRec.columnChar.portalsLength !== 0">
-          <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
-          <h1 class="overflow"><strong>&nbsp;{{colRec.columnChar.final.char}}&nbsp;</strong></h1>
+            <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>
+            <h1 class="overflow"><strong>&nbsp;{{colRec.columnChar.final.char}}&nbsp;</strong></h1>
           </div>
           <div *ngIf="colRec.columnChar.portalsLength === 0">
             <h3 class="overflow" [style.color]="grey">Column {{colRec.column.name}}</h3>

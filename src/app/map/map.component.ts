@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Input, ViewChild} from '@angular/core';
-import {ColumnRecData} from '../project.data';
+import {ColumnRecData, PortalRec} from '../project.data';
 import {} from 'googlemaps';
 import LatLng = google.maps.LatLng;
 
@@ -38,15 +38,37 @@ export class MapComponent implements AfterViewInit {
     this.drawMarkers();
   }
 
+  makeInfoMarker(prtl: PortalRec): void {
+    const contentString =
+      '<h1>Portal: ' + prtl.colName + ':' + prtl.index + '</h1>' +
+    '<a href="' + prtl.url + '" target="intel_map"><strong>IntelMap</strong></a>';
+
+    const infowindow = new google.maps.InfoWindow({
+      content: contentString,
+    });
+
+    const marker = new google.maps.Marker({
+      position: prtl.latLng,
+      title: prtl.name,
+      label: prtl.index + '',
+    });
+    marker.setMap(this.map);
+
+    marker.addListener('click', () => {
+      infowindow.open(this.map, marker);
+    });
+  }
+
   drawMarkers(): void {
     this.columnRecData.portalRecs.forEach(prtl => {
       if (prtl.latLng) {
-        const marker = new google.maps.Marker({
-          position: prtl.latLng,
-          title: prtl.name,
-          label: prtl.index + '',
-        });
-        marker.setMap(this.map);
+        this.makeInfoMarker(prtl);
+        // const marker = new google.maps.Marker({
+        //  position: prtl.latLng,
+        //  title: prtl.name,
+        //  label: prtl.index + '',
+        // });
+        // marker.setMap(this.map);
         const diff = this.lastIndex ? prtl.index - this.lastIndex : 0;
         if (diff === 1) {
           // draw a line back to it

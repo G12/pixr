@@ -33,8 +33,13 @@ export class MapDialogComponent {
        if (this.final !== result.columnChar.final.char)
        {
          template.columnChar.final.char = this.final;
-         template.columnChar.final.ingressName = result.ingressName;
-         template.columnChar.final.time = JSON.stringify(new Date());
+         if (this.final !== ''){
+           template.columnChar.final.ingressName = result.ingressName;
+           template.columnChar.final.time = JSON.stringify(new Date());
+         } else {
+           template.columnChar.final.ingressName = '';
+           template.columnChar.final.time = '';
+         }
        }
        if (this.notes !== result.columnChar.notes){
          template.columnChar.notes = this.notes;
