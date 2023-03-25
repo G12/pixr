@@ -1,26 +1,33 @@
 import {AfterViewInit, Component, ElementRef, HostListener, Inject, OnInit, ViewChild} from '@angular/core';
 import {ProjectService} from '../services/project.service';
 import {
+  Admin,
   AdminList,
   BootParam,
-  CharDat, Column,
+  CharDat,
+  Column,
   ColumnChar,
   ColumnRecData,
   IngressNameData,
   LatLng,
   Messages,
   MetaData,
-  MsgDat, PlayerStats,
-  PortalRec, ProjectList,
-  RawData, StatsList
+  MsgDat,
+  PlayerStats,
+  PortalRec,
+  ProjectList,
+  RawData,
+  StatsList
 } from '../project.data';
-import {AngularFirestoreDocument} from '@angular/fire/firestore';
+// import {AngularFirestoreDocument} from '@angular/fire/firestore';
+import {AngularFirestoreDocument} from '@angular/fire/compat/firestore';
 import {AuthService} from '../services/auth.service';
 import {UsersService} from '../services/users.service';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MapDialogComponent} from '../dialogs/map/map-dialog.component';
 import {ClipboardComponent} from '../dialogs/clipboard/clipboard.component';
 import {StatsComponent} from '../dialogs/stats/stats.component';
+import {WarningComponent} from '../dialogs/warning/warning.component';
 
 // https://fevgames.net/ifs/ifsathome/2021-03/17631729871888592910113823558419958.jpg
 // https://fevgames.net/ifs/ifsathome/2021-05/1173967923183847241117575464520523.jpg
@@ -28,7 +35,25 @@ import {StatsComponent} from '../dialogs/stats/stats.component';
 // https://fevgames.net/ifs/ifsathome/2021-07/1639139716102680798452289230520979.jpg
 // https://fevgames.net/ifs/ifsathome/2021-09/16607234082109943015158217965621400.jpg
 // https://fevgames.net/ifs/ifsathome/2021-10/532177229195500548340666012721637.jpg
+// https://fevgames.net/ifs/ifsathome/2021-11/431133399121684360034806937521929.jpg
+// https://fevgames.net/ifs/ifsathome/2021-12/1852696932136631550472357448122084.jpg
+// https://fevgames.net/ifs/ifsathome/2022-02/1633965338100015720168087755322546.jpg
+// https://fevgames.net/ifs/ifsathome/2022-03/156974431251988002029752900622730.jpg
+// https://fevgames.net/ifs/ifsathome/2022-06/1141846103460896867175933259923304.jpg
+// https://fevgames.net/ifs/ifsathome/2022-09/4912206392082515141135149681023827.jpg
+// https://fevgames.net/ifs/ifsathome/2022-10/150687395671621484065049753124000.jpg
+// https://fevgames.net/ifs/ifsathome/2022-11/237931934137780912994223986724172.jpg
+// https://fevgames.net/ifs/ifsathome/2023-01/46012155109606461202836680724599.jpg
+// https://fevgames.net/ifs/ifsathome/2023-02/16659414603368184187485608224617.jpg
 
+// TODO OC Transpo
+// https://api.octranspo1.com/v2.0/GetRouteSummaryForStop?appID=a689165d&apiKey=5889c474f9af925a3b8e7fe2372a35dc&stopNo=7145
+// https://api.octranspo1.com/v2.0/GetNextTripsForStop?appID=a689165d&apiKey=5889c474f9af925a3b8e7fe2372a35dc&stopNo=7145&routeNo=46
+// https://api.octranspo1.com/v2.0/GetNextTripsForStopAllRoutes?appID=a689165d&apiKey=5889c474f9af925a3b8e7fe2372a35dc&stopNo=3034
+
+// TODO Rolf
+// http://haidagwaiimuseum.ca/wp-content/uploads/2022/01/Hlkyakii-Catalogue.pdf
+// lets talk with maria
 
 @Component({
   selector: 'app-pixr',
@@ -321,7 +346,16 @@ export class PixrComponent implements OnInit, AfterViewInit {
           this.fsAdmin = adm.data() as BootParam;
         }
         const test = this.adminList.admins.find(a => a.uid === this.googleUID);
-        this.isAdmin = !!test;
+        let isAdmin = false;
+        let admin: Admin;
+        if (test){
+          isAdmin = true;
+          admin = test as Admin;
+          // Administrators can elect to run as a User
+          isAdmin = admin.isAdmin;
+        }
+        // this.isAdmin = !!test;
+        this.isAdmin = isAdmin;
         // let id;
         if (this.isAdmin) {
           this.id = this.fsAdmin.project_id;
@@ -330,8 +364,9 @@ export class PixrComponent implements OnInit, AfterViewInit {
           this.id = this.fsUser.project_id;
           this.folder = this.fsUser.folder;
         }
-        this.src = this.path + this.folder + '/black.jpg';
-        // TODO remove after local testing
+        // this.src = this.path + this.folder + '/black.jpg';
+        this.src = this.path + this.folder + '.jpg';
+          // TODO remove after local testing
         // this.src = 'assets/black.jpg';
         console.log('src = ' + this.src);
         // Once we have default project id we can subscribe
@@ -349,7 +384,8 @@ export class PixrComponent implements OnInit, AfterViewInit {
     this.src = null;
     // this.id = project.project_id;
     // this.folder = project.folder;
-    this.src = this.path + project.folder + '/black.jpg';
+    // this.src = this.path + project.folder + '/black.jpg';
+    this.src = this.path + this.folder + '.jpg';
     console.log('src = ' + this.src);
     // Once we have the project id we can subscribe
     this.debugMsgs += 'src: ' + this.src + ', ';
@@ -731,6 +767,7 @@ export class PixrComponent implements OnInit, AfterViewInit {
   openPortalDialog(dialogData: PortalRec): void {
     this.portalDialogRef = this.dialog.open(PortalInfoDialogComponent, {
       width: '600px',
+      minHeight: '600px',
       data: dialogData
     });
 
@@ -760,7 +797,12 @@ export class PixrComponent implements OnInit, AfterViewInit {
             status = this.P_NO_URL;
           } else {
             dat.latLng = latLng;
-            status = this.P_FULL; // NOTE LatLng is all you need
+            if (dat.latLng.isValid){
+              status = this.P_FULL; // NOTE LatLng is all you need
+            } else {
+              this.openWarningDialog(dat);
+              return;
+            }
           }
           if (status !== this.P_NO_NAME && status !== this.P_NO_URL) {
             status = this.P_FULL;
@@ -852,15 +894,17 @@ export class PixrComponent implements OnInit, AfterViewInit {
       const arr = url.split('?');
       const paramsString = arr[1];
       const searchParams = new URLSearchParams(paramsString);
-      const ll = searchParams.get('ll');
-      if (ll) {
-        const arr2 = ll.split(',');
-        return {lat: parseFloat(arr2[0]), lng: parseFloat(arr2[1])};
+      const pll = searchParams.get('pll');
+      if (pll) {
+        const arr2 = pll.split(',');
+        return {lat: parseFloat(arr2[0]), lng: parseFloat(arr2[1]), isValid: true};
       } else {
-        const pll = searchParams.get('pll');
-        if (pll) {
-          const arr3 = pll.split(',');
-          return {lat: parseFloat(arr3[0]), lng: parseFloat(arr3[1])};
+        const ll = searchParams.get('ll');
+        if (ll) {
+            const arr3 = ll.split(',');
+            return {lat: parseFloat(arr3[0]), lng: parseFloat(arr3[1]), isValid: false};
+        }else {
+          return {lat: 0, lng: 0, isValid: false};
         }
       }
     }
@@ -1003,10 +1047,47 @@ export class PixrComponent implements OnInit, AfterViewInit {
     return finalStats;
   }
 
+  ///////////////////////  Oct 26 2021 Bad URL handling
+
+  openWarningDialog(portalRec: PortalRec): void {
+    const dialogRef = this.dialog.open(WarningComponent, {
+      width: '600px',
+      maxHeight: '600px',
+      data: portalRec
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log(result);
+        const data = result as PortalRec;
+        if (data.latLng.isValid) {
+          alert('Now Process data.url: ' + data.url);
+        }
+      }
+    });
+  }
+
+
+  showHelp(): void{
+    const dialogData =
+      {
+        index: 0,
+        colName: '',
+        rawDataId: '',
+        user: '',
+        owner: '',
+        l: 0,
+        t: 0,
+        r: 0,
+        b: 0,
+        help: true
+      };
+    this.openPortalDialog(dialogData);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// TODO get this out here
+// TODO get this out of here
 
 @Component({
   selector: 'app-portal-info-dialog',
@@ -1014,6 +1095,7 @@ export class PixrComponent implements OnInit, AfterViewInit {
 })
 export class PortalInfoDialogComponent {
   canvas: any;
+  help = false;
   constructor(public dialogRef: MatDialogRef<PortalInfoDialogComponent>,
               @Inject(MAT_DIALOG_DATA) public data: PortalRec,
               public projectService: ProjectService) {
@@ -1089,6 +1171,10 @@ export class PortalInfoDialogComponent {
   setClipboard(data: PortalRec): void {
     this.projectService.clipboard = data;
     this.dialogRef.close(data);
+  }
+
+  onHelp(): void {
+    this.help = !this.help;
   }
 
 }

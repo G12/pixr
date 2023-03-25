@@ -28,6 +28,11 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Setup steps
 
+### To enable non published environmental variables:
+step 1 commit all changes
+step 2 run: ng g environments
+step 3 gitignore environments folder
+
 ### set up Angular Fire
 
 `ng add @angular/fire`
@@ -71,7 +76,8 @@ to tsconfig.json TODO nead to research the effects of not using Ivy
 Apparently Ivy is new packaging tool to optimize deployement package for size efficiency ...
 
 // to set <base href="pixr"> build as follows
-ng b --prod --base-href pixr
+// NOTE "prod" deprecated ng b --prod --base-href pixr
+ng build --configuration production --base-href pixr
 
 Need to add dialog components to entry components
 entryComponents: [PortalInfoDialogComponent],

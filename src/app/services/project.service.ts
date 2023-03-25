@@ -9,7 +9,8 @@ import {
   MsgDat,
   ColumnChar, ColumnRecData
 } from '../project.data';
-import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument} from '@angular/fire/firestore';
+// import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument} from '@angular/fire/firestore';
+import {AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument} from '@angular/fire/compat/firestore';
 
 @Injectable({
   providedIn: 'root'

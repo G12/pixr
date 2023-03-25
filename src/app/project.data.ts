@@ -40,6 +40,7 @@ export interface ColumnRecData {
 export interface LatLng {
   lat: number;
   lng: number;
+  isValid?: boolean;
 }
 
 /* A firestore Document */
@@ -163,6 +164,7 @@ export interface IngressNameData {
 export interface Admin {
   uid: string;
   name: string;
+  isAdmin?: boolean;
 }
 
 export interface AdminList {

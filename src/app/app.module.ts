@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
-import {AngularFireModule} from '@angular/fire';
+// import {AngularFireModule} from '@angular/fire';
+import { AngularFireModule} from '@angular/fire/compat';
 import {environment} from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MaterialModule} from './modules/material.module';
@@ -14,6 +15,8 @@ import { SpeedDialComponent } from './components/speed-dial/speed-dial.component
 import { CanvasComponent } from './components/canvas/canvas.component';
 import { ClipboardComponent } from './dialogs/clipboard/clipboard.component';
 import { StatsComponent } from './dialogs/stats/stats.component';
+import { WarningComponent } from './dialogs/warning/warning.component';
+import { HelpComponent } from './components/help/help.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +28,9 @@ import { StatsComponent } from './dialogs/stats/stats.component';
     SpeedDialComponent,
     CanvasComponent,
     ClipboardComponent,
-    StatsComponent
+    StatsComponent,
+    WarningComponent,
+    HelpComponent
   ],
   imports: [
     BrowserModule,
@@ -42,7 +47,8 @@ import { StatsComponent } from './dialogs/stats/stats.component';
     PortalInfoDialogComponent,
     MapDialogComponent,
     ClipboardComponent,
-    StatsComponent],
+    StatsComponent,
+    WarningComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

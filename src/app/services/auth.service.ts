@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 
-import {AngularFireAuth} from '@angular/fire/auth';
-import firebase from 'firebase';
+// import {AngularFireAuth} from '@angular/fire/auth';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
+import firebase from 'firebase/compat/app';
 import {Subscription} from 'rxjs';
 import {BootParam} from '../project.data';
 

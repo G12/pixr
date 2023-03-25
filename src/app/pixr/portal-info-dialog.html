@@ -1,3 +1,4 @@
+<div *ngIf="!help; else showHelp">
 <div mat-dialog-actions align="end">
   <button *ngIf="data.latLng" mat-raised-button color="warn"
           (click)="eraseData(data)">DELETE!
@@ -28,6 +29,7 @@
         <button mat-raised-button color="primary" (click)="searchIntelMap()">
           Intel Map.
         </button>
+        &nbsp;&nbsp;&nbsp;&nbsp;<button (click)="onHelp()">Help</button>
       </li>
       <li *ngIf="!data.latLng"><strong>Don't know the location:</strong> use the
         <button mat-button color="primary" (click)="openMissionTool()">
@@ -64,4 +66,13 @@
 <div mat-dialog-actions align="end">
   <button mat-button (click)="onCancelClick(data)">Cancel</button>
 </div>
+</div>
+<ng-template #showHelp>
+  <div mat-dialog-content>
+    <app-help></app-help>
+  </div>
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="onHelp()">OK</button>
+  </div>
+</ng-template>
 
