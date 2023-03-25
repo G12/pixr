@@ -28,7 +28,6 @@ export class MapComponent implements AfterViewInit {
   initMap(): void {
     this.ottawaCenter = new google.maps.LatLng({lat: 45.42, lng: -75.7});
     const mapProperties = {
-      // 45.38237717155323, -75.73928051704821
       center: new google.maps.LatLng(
         {lat: this.ottawaCenter.lat(), lng: this.ottawaCenter.lng()}),
       zoom: 13,
@@ -63,12 +62,6 @@ export class MapComponent implements AfterViewInit {
     this.columnRecData.portalRecs.forEach(prtl => {
       if (prtl.latLng) {
         this.makeInfoMarker(prtl);
-        // const marker = new google.maps.Marker({
-        //  position: prtl.latLng,
-        //  title: prtl.name,
-        //  label: prtl.index + '',
-        // });
-        // marker.setMap(this.map);
         const diff = this.lastIndex ? prtl.index - this.lastIndex : 0;
         if (diff === 1) {
           // draw a line back to it
