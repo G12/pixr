@@ -81,3 +81,7 @@ ng build --configuration production --base-href pixr
 
 Need to add dialog components to entry components
 entryComponents: [PortalInfoDialogComponent],
+
+// NOTE added 
+`streetViewControl: true` to map.components.ts to try and enable strreet view to the map.
+did not work!

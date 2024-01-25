@@ -31,7 +31,8 @@ export class MapComponent implements AfterViewInit {
       center: new google.maps.LatLng(
         {lat: this.ottawaCenter.lat(), lng: this.ottawaCenter.lng()}),
       zoom: 13,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      streetViewControl: true
     };
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapProperties);
     this.drawMarkers();
