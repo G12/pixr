@@ -75,9 +75,8 @@ added:
 to tsconfig.json TODO nead to research the effects of not using Ivy
 Apparently Ivy is new packaging tool to optimize deployement package for size efficiency ...
 
-// to set <base href="pixr"> build as follows
-// NOTE "prod" deprecated ng b --prod --base-href pixr
-ng build --configuration production --base-href pixr
+// to set <base href="pixr2"> build as follows
+ng build --configuration production --base-href pixr2
 
 Need to add dialog components to entry components
 entryComponents: [PortalInfoDialogComponent],

@@ -1,9 +1,17 @@
 <div *ngIf="authService.afAuth.user | async as  user; else showLogin">
   <!-- TODO width hard codec here -->
   <!--<div class="wrapper" [style.width.px]="6611">-->
+
+  <!--
   <div class="wrapper">
     <app-pixr></app-pixr>
   </div>
+  -->
+
+  <div class="wrapper">
+    <app-puzzle></app-puzzle>
+  </div>
+
 </div>
 <ng-template #showLogin>
   <div class="blue_back">

@@ -17,6 +17,7 @@ import { ClipboardComponent } from './dialogs/clipboard/clipboard.component';
 import { StatsComponent } from './dialogs/stats/stats.component';
 import { WarningComponent } from './dialogs/warning/warning.component';
 import { HelpComponent } from './components/help/help.component';
+import { PuzzleComponent } from './components/puzzle/puzzle.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { HelpComponent } from './components/help/help.component';
     ClipboardComponent,
     StatsComponent,
     WarningComponent,
-    HelpComponent
+    HelpComponent,
+    PuzzleComponent
   ],
   imports: [
     BrowserModule,
