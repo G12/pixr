@@ -3,19 +3,26 @@ export interface MarkerData {
   label: string;
 }
 
-export interface PortalData {
+export interface PortalInfo {
+  id: string;
   index: number;
+  published: boolean;
   lat?: number;
   lng?: number;
-  label?: string;
+  label: string;
   comment?: string;
-  height?: number;
 }
 
-export interface LocalStorage {
+export interface PortalFrame {
+  index: number;
+  height?: number; // if variable height else colHeight
+  info: PortalInfo;
+}
+
+export interface LocalMetadata {
   id: string;
   projectName: string;
-  portals: PortalData[];
+  projectID: string;
   rowCount: number;
   colHeight: number;
   imgColWidth: number;

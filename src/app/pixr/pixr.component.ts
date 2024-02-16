@@ -637,6 +637,7 @@ export class PixrComponent implements OnInit, AfterViewInit {
         msg = msg + ' Erased ';
       }
       this.projectService.updatePortalRec(this.rawData.id, path, prtl);
+
     } else {
       msg = msg + ' Discovered ';
       this.projectService.setPortalRec(this.rawData.id, path, prtl);
