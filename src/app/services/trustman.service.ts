@@ -29,8 +29,9 @@ export class TrustmanService {
 
 
   updateMetaData(metadata: LocalMetadata): void{
-    this.firestore.collection(metadata.id).doc('_metadata').update(metadata).then(value => {
-      console.log(value);
+    this.firestore.collection(metadata.projectID).doc('_metadata').update(metadata).then(value => {
+      // console.log(value); // empty!
+      console.log('updated metadata');
     }).catch(reason => {
       console.log(reason);
     });
