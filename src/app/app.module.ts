@@ -8,7 +8,7 @@ import {environment} from '../environments/environment';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MaterialModule} from './modules/material.module';
 import {PixrComponent, PortalInfoDialogComponent} from './pixr/pixr.component';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { MapDialogComponent } from './dialogs/map/map-dialog.component';
 import {MapComponent} from './map/map.component';
 import { SpeedDialComponent } from './components/speed-dial/speed-dial.component';
@@ -18,6 +18,8 @@ import { StatsComponent } from './dialogs/stats/stats.component';
 import { WarningComponent } from './dialogs/warning/warning.component';
 import { HelpComponent } from './components/help/help.component';
 import { PuzzleComponent } from './components/puzzle/puzzle.component';
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -32,19 +34,22 @@ import { PuzzleComponent } from './components/puzzle/puzzle.component';
     StatsComponent,
     WarningComponent,
     HelpComponent,
-    PuzzleComponent
+    PuzzleComponent,
+    FileUploadComponent
   ],
-  imports: [
-    BrowserModule,
-    AngularFireModule.initializeApp(environment.firebaseConfig),
-    BrowserAnimationsModule,
-    MaterialModule,
-    FormsModule,
-    // AgmCoreModule.forRoot({
-    //  apiKey: environment.googleMapsApiKey,
-    //  libraries: ['geometry']
-    // }),
-  ],
+    imports: [
+        BrowserModule,
+        AngularFireModule.initializeApp(environment.firebaseConfig),
+        BrowserAnimationsModule,
+        MaterialModule,
+        FormsModule,
+        ReactiveFormsModule,
+        HttpClientModule
+        // AgmCoreModule.forRoot({
+        //  apiKey: environment.googleMapsApiKey,
+        //  libraries: ['geometry']
+        // }),
+    ],
   entryComponents: [
     PortalInfoDialogComponent,
     MapDialogComponent,

@@ -27,3 +27,11 @@ export interface LocalMetadata {
   colHeight: number;
   imgColWidth: number;
 }
+
+export interface UploadResponse {
+  status: string;
+  error: boolean;
+  message: string;
+  target_file: string;
+  name: string;
+}
