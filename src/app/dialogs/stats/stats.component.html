@@ -1,0 +1,15 @@
+<div mat-dialog-content>
+  <h3>Code letters: <strong>{{data.code}}</strong> ({{data.count}} of {{data.total}} complete).</h3>
+  <h3>Portals {{data.prtlcount}} of {{data.prtltotal}} discovered.</h3>
+  <ul>
+    <li *ngFor="let stat of data.stats">
+      {{stat.playerName}} discovered: {{stat.portalsDiscovered}}
+      portal{{ stat.portalsDiscovered === 1 ? '' : 's' }}
+      , set {{stat.lettersDetermined}}
+      letter{{ stat.lettersDetermined === 1 ? '' : 's' }}
+    </li>
+  </ul>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="onOkClick()">Ok</button>
+</div>

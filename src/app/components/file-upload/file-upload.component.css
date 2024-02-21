@@ -1,0 +1,31 @@
+.subButton{
+  height: 80px;
+  background-color: deeppink;
+  border: black solid 2px;
+}
+
+input[type="file"]
+{
+  font-size:48px;
+}
+
+button[type="submit"]
+{
+  font-size:48px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.newProjButton{
+  font-size:48px;
+  height: 80px;
+  background-color: lawngreen;
+  border: black solid 2px;
+}
+
+.example-card {
+  max-width: 100%;
+  margin: 32px;
+}

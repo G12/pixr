@@ -1,0 +1,80 @@
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.image_wrapper {
+  position: relative;
+  width: 2000px;
+}
+
+img {
+  pointer-events: none;
+}
+
+.overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.row {
+  border-top: deepskyblue solid 1px;
+}
+
+.indexWrapper{
+  cursor:pointer;
+}
+
+.indexNumber{
+  margin-left: 8px;
+  margin-top: 8px;
+  border: black solid 2px;
+  /*background-color: rgba(0,0,0,0.2);*/
+  min-width: 24px;
+  min-height: 24px;
+  width: fit-content;
+  height: fit-content;
+  border-radius: 4px;
+  padding: 12px;
+  display: inline-block;
+  font-size: 36px;
+  text-align: center;
+  color: red;
+  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
+.label{
+  width: fit-content;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.extendedFab{
+  margin: 80px;
+}
+
+.imageWidthClickArea {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.showHideMap{
+  padding: 40px;
+}
+
+input[type="text"]
+{
+  font-size:24px;
+  color: gainsboro;
+  margin-left: 4px;
+}
+
+.tiny {
+  padding-left: 14px;
+  font-size:12px;
+  color: gainsboro;
+}
+
+.inline {
+  vertical-align:middle;
+}

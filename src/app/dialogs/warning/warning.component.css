@@ -1,0 +1,15 @@
+.example-content {
+  margin-top: 10px;
+}
+
+.bold {
+  border-radius: 4px;
+  background: lightblue;
+  padding: 2px;
+  width: 40px;
+  height: 1em;
+}
+
+.sub-wrap {
+  word-wrap: anywhere;
+}

@@ -1,0 +1,79 @@
+<app-file-upload *ngIf="createNewProject"></app-file-upload>
+
+<input type="text" value="{{summary}}"
+        [size]="summary.length !== 0 ? summary.length : 1" readonly>
+<button (click)="copyToClipBoard()" mat-icon-button
+        matTooltip="Copy to Clipboard"  aria-label="Copy to Clipboard">
+  <mat-icon [ngStyle]="{'color':'grey'}">assignment</mat-icon>
+</button>
+<mat-toolbar color="primary">
+  <span>
+      <button *ngIf="authService.afAuth.user"
+              class="btnLogout" [style.left.px]="pageXOffset"
+              mat-mini-fab aria-label="logout"
+              (click)="logout()">
+    <mat-icon>logout</mat-icon>
+  </button>
+  </span>
+  <span *ngIf="ingressName !== ''" class="tiny">{{ ingressName }}</span>
+  <span *ngIf="isAdmin" (click)="showDebugInfo()" class="tiny">?</span>
+  <span class="example-spacer"></span>
+  <span>{{ folder }}</span>
+  <span class="example-spacer"></span>
+  <button *ngIf="isAdmin" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Utility Menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+</mat-toolbar>
+<mat-menu #menu="matMenu">
+
+  <button mat-menu-item [disabled]="!loggedIn"
+          (click)="setPortalCount()">
+    <mat-icon>format_list_numbered</mat-icon>
+    <span>Set Portal Count</span>
+  </button>
+  <button mat-menu-item [disabled]="!loggedIn"
+          (click)="setRowHeight()">
+    <mat-icon>vertical_align_bottom</mat-icon>
+    <span>Set Row Height</span>
+  </button>
+  <button mat-menu-item [disabled]="!loggedIn"
+          (click)="setColumnWidth()">
+    <mat-icon>border_right</mat-icon>
+    <span>Set Column Width</span>
+  </button>
+  <button mat-menu-item [disabled]="!loggedIn"
+          (click)="newFSProject()">
+    <mat-icon>publish</mat-icon>
+    <span>New Project</span>
+  </button>
+  <!-- Login as admin -->
+  <button mat-menu-item (click)="twoFactorAccess()">
+    <mat-icon>vpn_key</mat-icon>
+    <span>Admin</span>
+  </button>
+</mat-menu>
+<div *ngIf="!validated">
+  <button class="extendedFab" mat-fab extended (click)="setIngressName()">
+    <mat-icon>vpn_key</mat-icon>
+    (To contribute:) Set Your Ingress Name
+  </button>
+</div>
+<div *ngIf="validated" class="image_wrapper">
+  <img [src]="src">
+  <div class="overlay">
+    <ng-container>
+      <div *ngFor="let portalFrame of portalFrames" class="row"
+           [ngStyle]="{'height.px': colHeight, 'width.px': imgColWidth}"
+      >
+        <div *ngIf="colHeight" class="imageWidthClickArea"
+             (click)="popUpDialog(portalFrame)"
+             [ngStyle]="{'height.px': colHeight-80, 'width.px': imgColWidth}">
+          <div [ngStyle]="{'height.px': colHeight-80, 'width.px': imgColWidth}"
+               class="indexWrapper">
+            <h1 class="indexNumber">{{ portalFrame.info.label }}</h1>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

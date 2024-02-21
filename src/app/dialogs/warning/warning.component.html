@@ -1,0 +1,29 @@
+<div *ngIf="!help; else showHelp">
+  <div mat-dialog-content>
+    <mat-card class="example-card">
+      <mat-card-title-group>
+        <mat-card-title>Something Went Wrong?</mat-card-title>
+        <mat-card-subtitle class="sub-wrap">Bad URL: {{data.url}}</mat-card-subtitle>
+      </mat-card-title-group>
+      <mat-card-content class="example-content">
+        <p>The URL you pasted does not contain a <span class="bold">&nbsp;&nbsp;pll&nbsp;&nbsp;</span> parameter.</p>
+        <p>To learn how to get the correct URL see the
+          <button mat-raised-button color="primary" (click)="onHelp()">
+            HELP PAGE
+          </button>
+        </p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onCancelClick(data)">Cancel</button>
+  </div>
+</div>
+<ng-template #showHelp>
+  <div mat-dialog-content>
+    <app-help></app-help>
+  </div>
+  <div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelClick(data)">OK</button>
+  </div>
+</ng-template>
