@@ -8,14 +8,10 @@ import {
   Admin,
   AdminList,
   BootParam,
-  ColumnRecData,
   IngressNameData,
   Messages,
-  MetaData,
   MsgDat,
-  PortalRec,
   ProjectList,
-  RawData
 } from '../../project.data';
 import {AngularFirestoreDocument} from '@angular/fire/compat/firestore';
 import {LocalMetadata, PortalFrame, PortalInfo} from '../../data';
@@ -63,12 +59,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   ingressName = '';
   ingressNamesDoc: AngularFirestoreDocument;
   allIngressNames: IngressNameData[];
-  private busy = false;
-  private canDrag = false;
-  private isDraging = false;
-  private lastX: number;
-  private startPageOffset;
-  private startTime: number;
   validated = false; // After user sets ingress name set true and shoe images
 
   //////////////////////////// user info /////////////////////////////
