@@ -7,14 +7,14 @@ import {MatDialog} from '@angular/material/dialog';
 import {
   Admin,
   AdminList,
-  BootParam,
+  // BootParam,
   IngressNameData,
   Messages,
   MsgDat,
-  ProjectList,
+  // ProjectList,
 } from '../../project.data';
 import {AngularFirestoreDocument} from '@angular/fire/compat/firestore';
-import {LocalMetadata, PortalFrame, PortalInfo} from '../../data';
+import {LocalMetadata, PortalFrame, PortalInfo, PzBootParam, PzProjectList} from '../../data';
 import {Clipboard} from '@angular/cdk/clipboard';
 
 
@@ -32,9 +32,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   // mapInfo = 'bigworld';
   loggedIn = false;
 
-  colHeight = 196;
+  colHeight = 299;
   rowCount = 11;
   imgColWidth = 1024;
+  hdrHeight = 144;
 
   portals: PortalInfo[] = [];
   portalFrames: PortalFrame[] = [];
@@ -65,12 +66,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   googleUID: string;
   isAdmin = false;
   adminList: AdminList;
-  fsUser: BootParam;
-  fsAdmin: BootParam;
+  fsUser: PzBootParam;
+  fsAdmin: PzBootParam;
   folder: string; // current first saturday project name
   id: string;
 
-  projectList: ProjectList;
+  projectList: PzProjectList;
 
   debugMsgs = 'START: ';
   // imageLoaded = false;
@@ -102,7 +103,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
 
   // Firestore data
   // rawDataDoc: AngularFirestoreDocument;
-  metaData: LocalMetadata;
+  localMetadata: LocalMetadata;
   logMessages: Messages;
   logMsgArray: MsgDat[] = [];
   // columnRecDataArray: ColumnRecData[]; // gathers all recData objects according to column
@@ -148,9 +149,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     // TODO add UI procedure for assigning admin status this.setAdmin('G12mo', '1KYU0BdE0rXTly5Y5KZslOvxpow2');
     this.projectService.bootParamsCollection.get().subscribe(data => {
       if (!data.empty) {
-        const projLst = data.docs.find(d => d.id === 'project_list');
+        const projLst = data.docs.find(d => d.id === 'pz_project_list');
+        // TODO Project List Not used in puzzle.component
         if (projLst) {
-          this.projectList = projLst.data() as ProjectList;
+          this.projectList = projLst.data() as PzProjectList;
         } else {
           this.projectList = {projects: []};
         }
@@ -158,13 +160,13 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         if (admlst) {
           this.adminList = admlst.data() as AdminList;
         }
-        const usr = data.docs.find(d => d.id === 'fs_user');
+        const usr = data.docs.find(d => d.id === 'pz_user'); // fs_user
         if (usr) {
-          this.fsUser = usr.data() as BootParam;
+          this.fsUser = usr.data() as PzBootParam;
         }
-        const adm = data.docs.find(d => d.id === 'fs_admin');
+        const adm = data.docs.find(d => d.id === 'pz_admin'); // fs_admin
         if (adm) {
-          this.fsAdmin = adm.data() as BootParam;
+          this.fsAdmin = adm.data() as PzBootParam;
         }
         const test = this.adminList.admins.find(a => a.uid === this.googleUID);
         let isAdmin = false;
@@ -218,11 +220,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       const test = this.portals.find(pr => pr.id === '_metadata');
       if (test) {
         const unknown: any = test;
-        this.metaData = unknown as LocalMetadata;
-        this.colHeight = this.metaData.colHeight;
-        this.rowCount = this.metaData.rowCount;
-        console.log('this.metaData.imgColWidth: ' + this.metaData.imgColWidth);
-        this.imgColWidth = this.metaData.imgColWidth;
+        this.localMetadata = unknown as LocalMetadata;
+        this.colHeight = this.localMetadata.colHeight;
+        this.hdrHeight = this.localMetadata.hdrHeight;
+        this.rowCount = this.localMetadata.rowCount;
+        console.log('this.metaData.imgColWidth: ' + this.localMetadata.imgColWidth);
+        this.imgColWidth = this.localMetadata.imgColWidth;
         console.log('this.imgColWidth: ' + this.imgColWidth);
         this.projectService.getMsgLog(id).get().subscribe(doc2 => {
           if (doc2.exists) {
@@ -285,7 +288,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   clearAllMessages(): void {
     if (confirm('CLEAR_ALL_MESSAGES')) {
       // TODO under construction
-      this.projectService.clearLog(this.metaData.id);
+      this.projectService.clearLog(this.localMetadata.id);
     }
   }
 
@@ -305,8 +308,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       this.expandMe = false;
       // this.initCanvas();
       this.bannerInfo = '  @ ' + name + ' started working!' + this.bannerInfo;
-      if (this.metaData) {
-        this.trustmanService.setLogMsg(this.metaData.id,
+      if (this.localMetadata) {
+        this.trustmanService.setLogMsg(this.localMetadata.id,
           this.ingressName + ' Logged In', null);
       }
       this.showDebug = false;
@@ -323,8 +326,20 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       this.rowCount = count;
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.metaData.rowCount = this.rowCount;
-      this.trustmanService.updateMetaData(this.metaData);
+      this.localMetadata.rowCount = this.rowCount;
+      this.trustmanService.updateMetaData(this.localMetadata);
+    }
+  }
+
+  setHdrHeight(): void {
+    const height = prompt('Enter proposed HEADER height',
+      '' + this.hdrHeight);
+    if (height != null) {
+      this.hdrHeight = parseInt(height, 10);
+      // Update metadata
+      // getPortalRecs subscription will thence be called
+      this.localMetadata.hdrHeight = this.hdrHeight;
+      this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
 
@@ -335,8 +350,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       this.colHeight = parseInt(height, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.metaData.colHeight = this.colHeight;
-      this.trustmanService.updateMetaData(this.metaData);
+      this.localMetadata.colHeight = this.colHeight;
+      this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
 
@@ -347,18 +362,22 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       this.imgColWidth = parseInt(width, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.metaData.imgColWidth = this.imgColWidth;
-      this.trustmanService.updateMetaData(this.metaData);
+      this.localMetadata.imgColWidth = this.imgColWidth;
+      this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
 
   popUpDialog(portalFrame: PortalFrame): void {
+    let prefix = 'Enter';
     let defaultLabel = '';
     if (portalFrame.info) {
       defaultLabel = portalFrame.info.label;
+      if (portalFrame.info.label !== ''){
+        prefix = 'Edit';
+      }
     }
     const label = prompt(
-      'Enter character from media item for this portal.', defaultLabel
+      prefix + ' character from media item for portal ' + portalFrame.index, defaultLabel
     );
     if (label != null) {
       if (portalFrame.info.label === '') {
@@ -374,7 +393,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         }
       }
 
-      const projectID = this.metaData.projectID;
+      const projectID = this.localMetadata.projectID;
       const portalInfoID = portalFrame.info.id;
 
       portalFrame.info.published = true; // TODO make a publish log
@@ -417,55 +436,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     }
   }
 
-  newProject(name: string): void {
-    // Create template partially filled
-    const date = new Date().toISOString();
-    const projId = name + ':' + date;
-    const localStorage: LocalMetadata = {
-      id: '_metadata',
-      projectName: name,
-      projectID: projId,
-      rowCount: 11,
-      colHeight: 196,
-      imgColWidth: 1024
-    };
-
-    // create new ColRec collection and set it's _metadata document
-    this.trustmanService.metadataDocRef(projId).set(localStorage).then(val => {
-      // console.log('trustmanService.getMetadataDoc(' + projId + '): ', val);
-      const bootParam: BootParam = {
-        project_id: localStorage.projectID,
-        folder: name
-      };
-      const msgDat: MsgDat = {
-        msg: 'Started Project: ' + name,
-        time: JSON.stringify(new Date())
-      };
-      const messagesDoc = {messages: []};
-      messagesDoc.messages.push(msgDat);
-      this.trustmanService.msgLogDocRef(projId).set(messagesDoc).then(value => {
-        // console.log('set _MsgLog return: ', value);
-      });
-      this.projectList.projects.push(bootParam);
-      // update the project list
-      this.trustmanService.projectListBootDocRef.set(this.projectList).then(doc => {
-        // alert('Project: ' + name + ' published - list updated');
-        this.setUserProject(bootParam);
-      });
-    });
-  }
-
   compareMetadata(): void {
 
-    alert('Local Metadata! ' + JSON.stringify(this.metaData));
+    alert('Local Metadata! ' + JSON.stringify(this.localMetadata));
 
-  }
-
-  setUserProject(bootParams: BootParam): void {
-    if (confirm('Set the fs_user data using: ' + bootParams.folder)) {
-      this.projectService.userBootParamDocRef.set(bootParams);
-      this.projectService.adminBootParamDocRef.set(bootParams);
-    }
   }
 
   twoFactorAccess(): void {
@@ -493,5 +467,4 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       this.clipboard.copy(this.summary);
     }
   }
-
 }

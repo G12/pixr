@@ -9,14 +9,17 @@ import {ProjectService} from './project.service';
 })
 export class TrustmanService {
 
-  userBootParamDocRef: AngularFirestoreDocument;
+  pzAdminBootParamDocRef: AngularFirestoreDocument;
+  pzUserBootParamDocRef: AngularFirestoreDocument;
   projectListBootDocRef: AngularFirestoreDocument;
 
   constructor(private firestore: AngularFirestore,
               private projectService: ProjectService) {
     // get a reference to the AngularFirestoreDocuments
-    this.userBootParamDocRef = this.firestore.collection('fs_boot_params').doc('puzzle_name');
-    this.projectListBootDocRef = this.firestore.collection('fs_boot_params').doc('project_list');
+    this.pzUserBootParamDocRef = this.firestore.collection('fs_boot_params').doc('pz_user');
+    this.pzAdminBootParamDocRef = this.firestore.collection('fs_boot_params').doc('pz_admin');
+
+    this.projectListBootDocRef = this.firestore.collection('fs_boot_params').doc('pz_project_list');
   }
 
   updatePortalInfo(docId: string, portalId: string, portalInfo: PortalInfo): void{
@@ -70,6 +73,4 @@ export class TrustmanService {
       });
     });
   }
-
-
 }

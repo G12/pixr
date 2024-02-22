@@ -1,10 +1,11 @@
 .example-spacer {
-  flex: 1 1 auto;
+  /* flex: 1 1 auto; */
+  width: 48px;
 }
 
 .image_wrapper {
   position: relative;
-  width: 2000px;
+  overflow: clip;
 }
 
 img {
@@ -18,11 +19,20 @@ img {
 }
 
 .row {
-  border-top: deepskyblue solid 1px;
+  border-top: black solid 1px;
+}
+
+.hdr {
+  background-color: lightgray;
 }
 
 .indexWrapper{
   cursor:pointer;
+}
+
+.indexNmbr{
+  margin-left: 24px;
+  color: darkgray;
 }
 
 .indexNumber{

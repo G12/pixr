@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {UploadService} from '../../services/upload.service';
-import {LocalMetadata, UploadResponse} from '../../data';
-import {BootParam, MsgDat, ProjectList} from '../../project.data';
+import {LocalMetadata, PzBootParam, PzProjectList, UploadResponse} from '../../data';
+import {BootParam, MsgDat} from '../../project.data';
 import {TrustmanService} from '../../services/trustman.service';
 import {ProjectService} from '../../services/project.service';
 import {AuthService} from '../../services/auth.service';
@@ -17,9 +17,11 @@ export class FileUploadComponent implements OnInit{
   uploadResponse: UploadResponse;
   showProgress = false;
   uploadComplete = false;
+  newProjectInProgress = false;
   fileChosen = false;
   projectName = '';
-  projectList: ProjectList;
+  // projectList: ProjectList;
+  pzProjectList: PzProjectList;
 
   constructor(private formBuilder: FormBuilder,
               private uploadService: UploadService,
@@ -60,7 +62,6 @@ export class FileUploadComponent implements OnInit{
         this.projectName = this.uploadResponse.name;
         this.showProgress = false;
         this.uploadComplete = true;
-        // console.log(res);
       },
       (err) => {
         console.log(err);
@@ -74,6 +75,7 @@ export class FileUploadComponent implements OnInit{
   ///////////////////////////////////////////////////////////////////////////////
   startNewProject(): void {
     if (confirm('Start a NEW project using Image File: ' + this.projectName)){
+      this.newProjectInProgress = false;
       this.newProject(this.projectName);
     }else{
       this.uploadComplete = false;
@@ -85,24 +87,27 @@ export class FileUploadComponent implements OnInit{
     // Get the current Project List
     this.projectService.bootParamsCollection.get().subscribe(data => {
       if (!data.empty) {
-        const projLst = data.docs.find(d => d.id === 'project_list');
-        if (projLst) {
-          this.projectList = projLst.data() as ProjectList;
+        // const projLst = data.docs.find(d => d.id === 'project_list');
+        // if (projLst) {
+          // this.projectList = projLst.data() as PzProjectList;
+        // } else {
+          // this.projectList = {projects: []};
+        // }
+
+        const pzProjLst = data.docs.find(d => d.id === 'pz_project_list');
+        if (pzProjLst) {
+          this.pzProjectList = pzProjLst.data() as PzProjectList;
         } else {
-          this.projectList = {projects: []};
+          this.pzProjectList = {projects: []};
         }
+
         console.log('Get latest Project List');
-        console.log(this.projectList);
+        console.log(this.pzProjectList);
       }
     });
   }
 
-  setUserProject(bootParams: BootParam): void {
-    if (confirm('Set the fs_user data using: ' + bootParams.folder)) {
-      this.projectService.userBootParamDocRef.set(bootParams);
-      this.projectService.adminBootParamDocRef.set(bootParams);
-      this.logout();
-    }
+  setUserProject(bootParams: PzBootParam): void {
   }
 
   /**
@@ -110,6 +115,7 @@ export class FileUploadComponent implements OnInit{
    * @param name: The name part of the uploaded Ingress image.
    */
   newProject(name: string): void {
+    this.newProjectInProgress = true;
     // Create template partially filled
     const date = new Date().toISOString();
     const projId = name + ':' + date;
@@ -118,14 +124,15 @@ export class FileUploadComponent implements OnInit{
       projectName: name,
       projectID: projId,
       rowCount: 11,
-      colHeight: 196,
-      imgColWidth: 1024
+      colHeight: 299,
+      imgColWidth: 2480,
+      hdrHeight: 144
     };
 
     // create new ColRec collection and set it's _metadata document
     this.trustmanService.metadataDocRef(projId).set(localStorage).then(val => {
       // console.log('trustmanService.getMetadataDoc(' + projId + '): ', val);
-      const bootParam: BootParam = {
+      const bootParam: PzBootParam = {
         project_id: localStorage.projectID,
         folder: name
       };
@@ -138,11 +145,17 @@ export class FileUploadComponent implements OnInit{
       this.trustmanService.msgLogDocRef(projId).set(messagesDoc).then(value => {
         // console.log('set _MsgLog return: ', value);
       });
-      this.projectList.projects.push(bootParam);
+      this.pzProjectList.projects.push(bootParam);
       // update the project list
-      this.trustmanService.projectListBootDocRef.set(this.projectList).then(doc => {
-        // alert('Project: ' + name + ' published - list updated');
-        this.setUserProject(bootParam);
+      this.trustmanService.projectListBootDocRef.set(this.pzProjectList).then(doc => {
+        console.log('project List Updated');
+        console.log(this.pzProjectList.projects);
+      });
+      this.trustmanService.pzUserBootParamDocRef.set(bootParam).then(value2 => {
+        console.log('User Updated');
+      });
+      this.trustmanService.pzAdminBootParamDocRef.set(bootParam).then(value3 => {
+        console.log('Admin Updated');
       });
     });
   }
@@ -155,4 +168,7 @@ export class FileUploadComponent implements OnInit{
 
 
   ////////////////////////////// End of New Project Area
+  logOut(): void {
+    this.authService.logout();
+  }
 }

@@ -1,3 +1,5 @@
+import {BootParam} from './project.data';
+
 export interface MarkerData {
   position: google.maps.LatLngLiteral;
   label: string;
@@ -26,6 +28,7 @@ export interface LocalMetadata {
   rowCount: number;
   colHeight: number;
   imgColWidth: number;
+  hdrHeight: number;
 }
 
 export interface UploadResponse {
@@ -34,4 +37,13 @@ export interface UploadResponse {
   message: string;
   target_file: string;
   name: string;
+}
+
+export interface PzBootParam {
+  project_id?: string;
+  folder?: string;
+}
+
+export interface PzProjectList {
+  projects: PzBootParam[];
 }

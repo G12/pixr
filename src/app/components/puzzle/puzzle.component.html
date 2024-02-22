@@ -1,12 +1,11 @@
 <app-file-upload *ngIf="createNewProject"></app-file-upload>
-
 <input type="text" value="{{summary}}"
         [size]="summary.length !== 0 ? summary.length : 1" readonly>
 <button (click)="copyToClipBoard()" mat-icon-button
         matTooltip="Copy to Clipboard"  aria-label="Copy to Clipboard">
   <mat-icon [ngStyle]="{'color':'grey'}">assignment</mat-icon>
 </button>
-<mat-toolbar color="primary">
+<mat-toolbar color="primary"  [ngStyle]="{'width.px': imgColWidth}">
   <span>
       <button *ngIf="authService.afAuth.user"
               class="btnLogout" [style.left.px]="pageXOffset"
@@ -23,6 +22,9 @@
   <button *ngIf="isAdmin" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Utility Menu">
     <mat-icon>more_vert</mat-icon>
   </button>
+  <mat-basic-chip *ngIf="isAdmin" (click)="newFSProject()"
+                  class="stndrdChip">New Project</mat-basic-chip>
+
 </mat-toolbar>
 <mat-menu #menu="matMenu">
 
@@ -30,6 +32,11 @@
           (click)="setPortalCount()">
     <mat-icon>format_list_numbered</mat-icon>
     <span>Set Portal Count</span>
+  </button>
+  <button mat-menu-item [disabled]="!loggedIn"
+          (click)="setHdrHeight()">
+    <mat-icon>vertical_align_bottom</mat-icon>
+    <span>Set Header Height</span>
   </button>
   <button mat-menu-item [disabled]="!loggedIn"
           (click)="setRowHeight()">
@@ -58,10 +65,12 @@
     (To contribute:) Set Your Ingress Name
   </button>
 </div>
-<div *ngIf="validated" class="image_wrapper">
+<div *ngIf="validated" class="image_wrapper"
+     [ngStyle]="{'width.px': imgColWidth}">
   <img [src]="src" alt="First Saturday Puzzle Image">
   <div class="overlay">
     <ng-container>
+      <div class="hdr" [ngStyle]="{'height.px': hdrHeight, 'width.px': imgColWidth}"></div>
       <div *ngFor="let portalFrame of portalFrames" class="row"
            [ngStyle]="{'height.px': colHeight, 'width.px': imgColWidth}"
       >
@@ -71,6 +80,7 @@
           <div [ngStyle]="{'height.px': colHeight-80, 'width.px': imgColWidth}"
                class="indexWrapper">
             <h1 class="indexNumber">{{ portalFrame.info.label }}</h1>
+            <h1 class="indexNmbr">{{portalFrame.index}}</h1>
           </div>
         </div>
       </div>
