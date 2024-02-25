@@ -84,3 +84,6 @@ entryComponents: [PortalInfoDialogComponent],
 // NOTE added 
 `streetViewControl: true` to map.components.ts to try and enable strreet view to the map.
 did not work!
+
+### set up @angular/google-maps
+`ng add @angular/google-maps`

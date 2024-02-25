@@ -20,6 +20,9 @@ import { HelpComponent } from './components/help/help.component';
 import { PuzzleComponent } from './components/puzzle/puzzle.component';
 import { FileUploadComponent } from './components/file-upload/file-upload.component';
 import {HttpClientModule} from '@angular/common/http';
+import {PuzzleMapDialogComponent} from './dialogs/puzzle-map/puzzle-map-dialog.component';
+// import { GooglMapComponent } from './googl-map/googl-map.component';
+import {GoogleMapsModule} from '@angular/google-maps';
 
 @NgModule({
   declarations: [
@@ -27,6 +30,7 @@ import {HttpClientModule} from '@angular/common/http';
     PixrComponent,
     PortalInfoDialogComponent,
     MapDialogComponent,
+    PuzzleMapDialogComponent,
     MapComponent,
     SpeedDialComponent,
     CanvasComponent,
@@ -35,7 +39,8 @@ import {HttpClientModule} from '@angular/common/http';
     WarningComponent,
     HelpComponent,
     PuzzleComponent,
-    FileUploadComponent
+    FileUploadComponent,
+    // GooglMapComponent
   ],
     imports: [
         BrowserModule,
@@ -44,7 +49,8 @@ import {HttpClientModule} from '@angular/common/http';
         MaterialModule,
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule
+        HttpClientModule,
+        GoogleMapsModule
         // AgmCoreModule.forRoot({
         //  apiKey: environment.googleMapsApiKey,
         //  libraries: ['geometry']
@@ -53,6 +59,7 @@ import {HttpClientModule} from '@angular/common/http';
   entryComponents: [
     PortalInfoDialogComponent,
     MapDialogComponent,
+    PuzzleMapDialogComponent,
     ClipboardComponent,
     StatsComponent,
     WarningComponent],

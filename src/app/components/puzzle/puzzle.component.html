@@ -1,11 +1,12 @@
-<app-file-upload *ngIf="createNewProject"></app-file-upload>
-<input type="text" value="{{summary}}"
-        [size]="summary.length !== 0 ? summary.length : 1" readonly>
-<button (click)="copyToClipBoard()" mat-icon-button
-        matTooltip="Copy to Clipboard"  aria-label="Copy to Clipboard">
-  <mat-icon [ngStyle]="{'color':'grey'}">assignment</mat-icon>
-</button>
-<mat-toolbar color="primary"  [ngStyle]="{'width.px': imgColWidth}">
+<div class="fullWidth">
+  <app-file-upload *ngIf="createNewProject"></app-file-upload>
+  <input type="text" value="{{summary}}"
+         [size]="summary.length !== 0 ? summary.length : 1" readonly>
+  <button (click)="copyToClipBoard()" mat-icon-button
+          matTooltip="Copy to Clipboard" aria-label="Copy to Clipboard">
+    <mat-icon [ngStyle]="{'color':'grey'}">assignment</mat-icon>
+  </button>
+  <mat-toolbar color="primary" [ngStyle]="{'width.px': mapWidth}">
   <span>
       <button *ngIf="authService.afAuth.user"
               class="btnLogout" [style.left.px]="pageXOffset"
@@ -14,63 +15,72 @@
     <mat-icon>logout</mat-icon>
   </button>
   </span>
-  <span *ngIf="ingressName !== ''" class="tiny">{{ ingressName }}</span>
-  <span *ngIf="isAdmin" (click)="showDebugInfo()" class="tiny">?</span>
-  <span class="example-spacer"></span>
-  <span>{{ folder }}</span>
-  <span class="example-spacer"></span>
-  <button *ngIf="isAdmin" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Utility Menu">
-    <mat-icon>more_vert</mat-icon>
-  </button>
-  <mat-basic-chip *ngIf="isAdmin" (click)="newFSProject()"
-                  class="stndrdChip">New Project</mat-basic-chip>
+    <div *ngIf="isAdmin">
+      <button class="projButton" mat-fab extended (click)="newFSProject()">
+        New Proj.
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Utility Menu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <span *ngIf="isAdmin" (click)="prepareMapDialog()" class="tiny">TEST</span>
+    </div>
+    <span *ngIf="ingressName !== '' && !isAdmin"
+          class="tiny">{{ ingressName }}</span>
 
-</mat-toolbar>
-<mat-menu #menu="matMenu">
+    <!--<span *ngIf="isAdmin" (click)="showDebugInfo()" class="tiny">?</span>-->
+    <!--<span *ngIf="isAdmin" (click)="prepareMapDialog()" class="tiny">Map Dialog</span>-->
+    <span class="example-spacer"></span>
+    <span>{{ folder }}</span>
+    <span class="example-spacer"></span>
+  </mat-toolbar>
+  <mat-menu #menu="matMenu">
 
-  <button mat-menu-item [disabled]="!loggedIn"
-          (click)="setPortalCount()">
-    <mat-icon>format_list_numbered</mat-icon>
-    <span>Set Portal Count</span>
-  </button>
-  <button mat-menu-item [disabled]="!loggedIn"
-          (click)="setHdrHeight()">
-    <mat-icon>vertical_align_bottom</mat-icon>
-    <span>Set Header Height</span>
-  </button>
-  <button mat-menu-item [disabled]="!loggedIn"
-          (click)="setRowHeight()">
-    <mat-icon>vertical_align_bottom</mat-icon>
-    <span>Set Row Height</span>
-  </button>
-  <button mat-menu-item [disabled]="!loggedIn"
-          (click)="setColumnWidth()">
-    <mat-icon>border_right</mat-icon>
-    <span>Set Column Width</span>
-  </button>
-  <button mat-menu-item [disabled]="!loggedIn"
-          (click)="newFSProject()">
-    <mat-icon>publish</mat-icon>
-    <span>New Project</span>
-  </button>
-  <!-- Login as admin -->
-  <button mat-menu-item (click)="twoFactorAccess()">
-    <mat-icon>vpn_key</mat-icon>
-    <span>Admin</span>
-  </button>
-</mat-menu>
+    <button mat-menu-item [disabled]="!loggedIn"
+            (click)="setPortalCount()">
+      <mat-icon>format_list_numbered</mat-icon>
+      <span>Set Portal Count</span>
+    </button>
+    <button mat-menu-item [disabled]="!loggedIn"
+            (click)="setHdrHeight()">
+      <mat-icon>vertical_align_bottom</mat-icon>
+      <span>Set Header Height</span>
+    </button>
+    <button mat-menu-item [disabled]="!loggedIn"
+            (click)="setRowHeight()">
+      <mat-icon>vertical_align_bottom</mat-icon>
+      <span>Set Row Height</span>
+    </button>
+    <button mat-menu-item [disabled]="!loggedIn"
+            (click)="setColumnWidth()">
+      <mat-icon>border_right</mat-icon>
+      <span>Set Column Width</span>
+    </button>
+    <button mat-menu-item [disabled]="!loggedIn"
+            (click)="newFSProject()">
+      <mat-icon>publish</mat-icon>
+      <span>New Project</span>
+    </button>
+    <!-- Login as admin -->
+    <button mat-menu-item (click)="twoFactorAccess()">
+      <mat-icon>vpn_key</mat-icon>
+      <span>Admin</span>
+    </button>
+  </mat-menu>
+</div>
 <div *ngIf="!validated">
   <button class="extendedFab" mat-fab extended (click)="setIngressName()">
     <mat-icon>vpn_key</mat-icon>
     (To contribute:) Set Your Ingress Name
   </button>
 </div>
-<div *ngIf="validated" class="image_wrapper"
+<div *ngIf="validated && !isMap" class="image_wrapper"
      [ngStyle]="{'width.px': imgColWidth}">
   <img [src]="src" alt="First Saturday Puzzle Image">
   <div class="overlay">
     <ng-container>
-      <div class="hdr" [ngStyle]="{'height.px': hdrHeight, 'width.px': imgColWidth}"></div>
+      <div class="hdr" [ngStyle]="{'height.px': hdrHeight, 'width.px': imgColWidth}">
+        <button mat-button (click)="toggleMap()">Show Map</button>
+      </div>
       <div *ngFor="let portalFrame of portalFrames" class="row"
            [ngStyle]="{'height.px': colHeight, 'width.px': imgColWidth}"
       >
@@ -80,10 +90,17 @@
           <div [ngStyle]="{'height.px': colHeight-80, 'width.px': imgColWidth}"
                class="indexWrapper">
             <h1 class="indexNumber">{{ portalFrame.info.label }}</h1>
-            <h1 class="indexNmbr">{{portalFrame.index}}</h1>
+            <h1 class="indexNmbr">{{ portalFrame.index }}</h1>
           </div>
         </div>
       </div>
     </ng-container>
+  </div>
+</div>
+<!--<div [ngStyle]="{'width.px': mapWidth, 'height.px': mapHeight}">-->
+<div class="fullWidth" class="fullHeight">
+  <div *ngIf="validated && isMap">
+    <button mat-button (click)="toggleMap()">Show Portal Images</button>
+    <google-map [width]="mapWidth" [height]="mapHeight"></google-map>
   </div>
 </div>

@@ -1,0 +1,25 @@
+<!--<app-puzzle-map *ngIf="portalInfo" [portalInfo]="portalInfo"></app-puzzle-map>-->
+<!--
+<div mat-dialog-content>
+  <div *ngIf="apiLoaded | async">
+  <google-map [height]="600" [width]="600"></google-map>
+  </div>
+</div>-->
+<div mat-dialog-content>
+  <p>This is the dialog for inputing the character: {{portalInfo.label}}
+    for portal number: {{portalInfo.index}}</p>
+  <p>Or pasting the location URL for the portal</p>
+</div>
+<div mat-dialog-actions align="end">
+  <button *ngIf="label !== portalInfo.label||
+          comment !== portalInfo.comment"
+          mat-raised-button color="primary"
+          (click)="onOkClick(portalInfo)">Save</button>
+  <button mat-button (click)="onCancelClick(portalInfo)">
+    <span *ngIf="label !== portalInfo.label ||
+    comment !== portalInfo.comment">Cancel</span>
+    <span *ngIf="label === portalInfo.label &&
+    comment === portalInfo.comment">Ok</span>
+  </button>
+</div>
+

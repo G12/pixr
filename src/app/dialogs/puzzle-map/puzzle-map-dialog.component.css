@@ -1,0 +1,19 @@
+agm-map {
+  height: 360px;
+}
+
+.charInput {
+  text-overflow-ellipsis: true;
+  min-height: 40px;
+  max-width: 20em;
+}
+
+.map-form {
+  min-width: 400px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.small {
+  font-size: smaller;
+}

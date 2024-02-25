@@ -6,16 +6,20 @@ import {TrustmanService} from '../../services/trustman.service';
 import {MatDialog} from '@angular/material/dialog';
 import {
   Admin,
-  AdminList,
+  AdminList, CharDat, Column, ColumnChar, ColumnRecData,
   // BootParam,
   IngressNameData,
   Messages,
-  MsgDat,
+  MsgDat, PortalRec,
   // ProjectList,
 } from '../../project.data';
 import {AngularFirestoreDocument} from '@angular/fire/compat/firestore';
 import {LocalMetadata, PortalFrame, PortalInfo, PzBootParam, PzProjectList} from '../../data';
 import {Clipboard} from '@angular/cdk/clipboard';
+import {PuzzleMapDialogComponent} from '../../dialogs/puzzle-map/puzzle-map-dialog.component';
+import {catchError, map, Observable, of} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../environments/environment';
 
 
 @Component({
@@ -106,11 +110,17 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   localMetadata: LocalMetadata;
   logMessages: Messages;
   logMsgArray: MsgDat[] = [];
-  // columnRecDataArray: ColumnRecData[]; // gathers all recData objects according to column
-  // colRecPrefix = '_ColRec:';
-  // dataReady = false; // After all columnRecData has been initialized
 
-  constructor(public authService: AuthService,
+  //////////////////////////////////////////////////////////////////
+  ///////////////////////// MAP
+  //////////////////////////////////////////////////////////////////
+
+  isMap = false;
+  mapWidth: number;
+  mapHeight: number;
+
+  constructor(httpClient: HttpClient,
+              public authService: AuthService,
               private projectService: ProjectService,
               private usersService: UsersService,
               private trustmanService: TrustmanService,
@@ -123,6 +133,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     } else {
       console.log('NOT a Mobile Device!');
     }
+
+    ////////////////////   MAP
+    this.mapHeight = window.innerHeight - 112 - 33 - 8;
+    this.mapWidth = window.innerWidth;
   }
 
   logout(): void {
@@ -466,5 +480,39 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     if (confirm('Copy to Clipboard')){
       this.clipboard.copy(this.summary);
     }
+  }
+
+  /////////////////////////////////////////////////////////////////////
+  ///////////////////////////// Map Dialog ////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+
+  openMapDialog(portalInfo: PortalInfo): void {
+    const dialogRef = this.dialog.open(PuzzleMapDialogComponent, {
+      width: '600px',
+      data: portalInfo
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+      } else {
+      }
+    });
+  }
+
+  prepareMapDialog(): void {
+    const portalInfo: PortalInfo = {
+        id: 'P1',
+        index: 1,
+        published: true,
+        lat: 45,
+        lng: 76.4,
+        label: 'SHAPERS',
+        comment: 'wasupdoc'
+    };
+    this.openMapDialog(portalInfo);
+  }
+
+  toggleMap(): void {
+    this.isMap = !this.isMap;
   }
 }

@@ -1,6 +1,6 @@
 .example-spacer {
-  /* flex: 1 1 auto; */
-  width: 48px;
+  flex: 1 1 auto;
+  /* width: 48px; */
 }
 
 .image_wrapper {
@@ -59,6 +59,11 @@ img {
   margin-bottom: 8px;
 }
 
+.projButton {
+  margin-left: 32px;
+  margin-right: 24px;
+}
+
 .extendedFab{
   margin: 80px;
 }
@@ -87,4 +92,16 @@ input[type="text"]
 
 .inline {
   vertical-align:middle;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.fullHeight {
+  height: 100%;
+}
+
+body {
+  margin: 0;
 }

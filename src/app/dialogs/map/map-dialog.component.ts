@@ -15,6 +15,7 @@ export class MapDialogComponent {
     public dialogRef: MatDialogRef<MapDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public columnRecData: ColumnRecData,
     public projectService: ProjectService) {
+
       if (columnRecData.columnChar.final) {
         this.final = columnRecData.columnChar.final.char;
       }
