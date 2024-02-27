@@ -22,7 +22,7 @@
       <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Utility Menu">
         <mat-icon>more_vert</mat-icon>
       </button>
-      <span *ngIf="isAdmin" (click)="prepareMapDialog()" class="tiny">TEST</span>
+      <span *ngIf="isAdmin" (click)="toggleTestMode()" class="tiny">TEST</span>
     </div>
     <span *ngIf="ingressName !== '' && !isAdmin"
           class="tiny">{{ ingressName }}</span>

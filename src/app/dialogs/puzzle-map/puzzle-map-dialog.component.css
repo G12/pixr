@@ -17,3 +17,24 @@ agm-map {
 .small {
   font-size: smaller;
 }
+
+.inputWarning {
+  color: tomato;
+}
+
+.lightGrayUrl {
+  max-width: 200px;
+  color: lightgray;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: smaller;
+  font-family: "Calibri Light";
+}
+
+.grayTitle {
+  max-width: 200px;
+  color: darkgray;
+  font-size: medium;
+  font-family: "Calibri Light";
+}

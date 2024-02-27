@@ -118,6 +118,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   isMap = false;
   mapWidth: number;
   mapHeight: number;
+  isTestOn = false;
 
   constructor(httpClient: HttpClient,
               public authService: AuthService,
@@ -381,47 +382,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     }
   }
 
-  popUpDialog(portalFrame: PortalFrame): void {
-    let prefix = 'Enter';
-    let defaultLabel = '';
-    if (portalFrame.info) {
-      defaultLabel = portalFrame.info.label;
-      if (portalFrame.info.label !== ''){
-        prefix = 'Edit';
-      }
-    }
-    const label = prompt(
-      prefix + ' character from media item for portal ' + portalFrame.index, defaultLabel
-    );
-    if (label != null) {
-      if (portalFrame.info.label === '') {
-        // always overwrite ''
-        portalFrame.info.label = label;
-      } else {
-        if (portalFrame.info.label !== label) {
-          if (confirm('Do you want to over write the value: ' + portalFrame.info.label + ' with: ' + label)) {
-            portalFrame.info.label = label;
-          }
-        } else {
-          portalFrame.info.label = label;
-        }
-      }
-
-      const projectID = this.localMetadata.projectID;
-      const portalInfoID = portalFrame.info.id;
-
-      portalFrame.info.published = true; // TODO make a publish log
-      this.trustmanService.setPortalInfo
-      (projectID, portalInfoID, portalFrame.info).then(value => {
-        console.log('setPortalInfo return value: ' + JSON.stringify(value));
-      }).catch(reason => {
-        alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
-        portalFrame.info.published = false;
-      });
-
-    }
-  }
-
   makeSummary(): void {
 
     // TODO Execute a for loop from 1 to 11
@@ -486,7 +446,58 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   ///////////////////////////// Map Dialog ////////////////////////////
   /////////////////////////////////////////////////////////////////////
 
-  openMapDialog(portalInfo: PortalInfo): void {
+  popUpDialog(portalFrame: PortalFrame): void {
+    let prefix = 'Enter';
+    let defaultLabel = '';
+    if (portalFrame.info) {
+      defaultLabel = portalFrame.info.label;
+      if (portalFrame.info.label !== ''){
+        prefix = 'Edit';
+      }
+    }
+    portalFrame.info.projectId = this.localMetadata.projectID;
+    this.openPuzzleMapDialog(portalFrame.info, this.ingressName);
+
+    /*
+    if (this.isTestOn) {
+      portalFrame.info.projectId = this.localMetadata.projectID;
+      this.openPuzzleMapDialog(portalFrame.info, this.ingressName);
+    }else{
+      const label = prompt(
+        prefix + ' character from media item for portal ' + portalFrame.index, defaultLabel
+      );
+      if (label != null) {
+        if (portalFrame.info.label === '') {
+          // always overwrite ''
+          portalFrame.info.label = label;
+        } else {
+          if (portalFrame.info.label !== label) {
+            if (confirm('Do you want to over write the value: ' + portalFrame.info.label + ' with: ' + label)) {
+              portalFrame.info.label = label;
+            }
+          } else {
+            portalFrame.info.label = label;
+          }
+        }
+
+        const projectID = this.localMetadata.projectID;
+        const portalInfoID = portalFrame.info.id;
+
+        portalFrame.info.published = true; // TODO make a publish log
+        this.trustmanService.setPortalInfo
+        (projectID, portalInfoID, portalFrame.info).then(value => {
+          console.log('setPortalInfo return value: ' + JSON.stringify(value));
+        }).catch(reason => {
+          alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
+          portalFrame.info.published = false;
+        });
+      }
+    }*/
+
+
+  }
+
+  openPuzzleMapDialog(portalInfo: PortalInfo, owner: string): void {
     const dialogRef = this.dialog.open(PuzzleMapDialogComponent, {
       width: '600px',
       data: portalInfo
@@ -494,12 +505,19 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log(result);
       } else {
+        console.log('NADA');
       }
     });
   }
 
-  prepareMapDialog(): void {
+  toggleTestMode(): void {
+    this.isTestOn = !this.isTestOn;
+    let str = 'Test is ';
+    str = this.isTestOn ? str + 'ON' : str + 'OFF';
+    alert(str);
+    /*
     const portalInfo: PortalInfo = {
         id: 'P1',
         index: 1,
@@ -510,6 +528,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         comment: 'wasupdoc'
     };
     this.openMapDialog(portalInfo);
+    */
   }
 
   toggleMap(): void {

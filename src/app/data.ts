@@ -5,14 +5,22 @@ export interface MarkerData {
   label: string;
 }
 
+export interface LatLng {
+  lat: number;
+  lng: number;
+  isValid?: boolean;
+}
+
 export interface PortalInfo {
+  projectId?: string; // Used to pass project Id to Dialog
   id: string;
   index: number;
   published: boolean;
-  lat?: number;
-  lng?: number;
+  latLng?: LatLng;
+  url?: string;
   label: string;
   comment?: string;
+  owners?: string;
 }
 
 export interface PortalFrame {

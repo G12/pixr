@@ -1,25 +1,67 @@
-<!--<app-puzzle-map *ngIf="portalInfo" [portalInfo]="portalInfo"></app-puzzle-map>-->
-<!--
+<p mat-dialog-title>
+  <span class="grayTitle">Portal:
+    {{ portalInfo.index }} : {{ portalInfo.label }}</span>
+  <span class="lightGrayUrl" (click)="copyToClipBoard()"
+        matTooltip="Copy to Clipboard" aria-label="Copy to Clipboard">
+      <mat-icon matSuffix>assignment</mat-icon>
+    {{ url }}
+  </span>
+</p>
 <div mat-dialog-content>
-  <div *ngIf="apiLoaded | async">
-  <google-map [height]="600" [width]="600"></google-map>
+  <div *ngIf="!showUrlPage" mat-dialog-actions>
+  <span>{{getUrlPrompt()}}
+    <button mat-button color="primary" (click)="toggleSetUrl()">
+    <mat-icon matSuffix>sentiment_dissatisfied</mat-icon>
+    Click Here</button>
+  </span>
   </div>
-</div>-->
-<div mat-dialog-content>
-  <p>This is the dialog for inputing the character: {{portalInfo.label}}
-    for portal number: {{portalInfo.index}}</p>
-  <p>Or pasting the location URL for the portal</p>
+  <div *ngIf="showUrlPage">
+    <div *ngIf="showUrlPage" mat-dialog-actions align="end">
+      <button *ngIf="this.isValidUrl"
+              mat-raised-button color="primary"
+              (click)="saveUrl(portalInfo)">Save URL
+      </button>
+      <button *ngIf="savedUrl" mat-button color="primary" (click)="editUrl()">
+        <mat-icon matSuffix>sentiment_dissatisfied</mat-icon>
+        EDIT
+      </button>
+      <button mat-button color="primary" (click)="toggleSetUrl()">
+        <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+        Close
+      </button>
+    </div>
+    <p class="inputWarning">{{ msg }}</p>
+    <mat-form-field [style.width.%]="100" appearance="outline">
+      <mat-hint>Please be carefull that the location is correct!</mat-hint>
+      <mat-label>Paste portal url Here</mat-label>
+      <input (ngModelChange)="validateUrl($event, portalInfo)" matInput [(ngModel)]="url"
+             class="charInput" autocomplete="off" [disabled]="savedUrl">
+      <mat-icon *ngIf="!savedUrl" matSuffix>cloud_download</mat-icon>
+      <mat-icon *ngIf="savedUrl" matSuffix
+                (click)="copyToClipBoard()"
+                matTooltip="Copy to Clipboard" aria-label="Copy to Clipboard"
+      >assignment
+      </mat-icon>
+    </mat-form-field>
+
+  </div>
+  <mat-divider></mat-divider>
+  <p><br></p>
+  <mat-form-field [style.width.%]="48" appearance="outline">
+    <mat-label>Set Character or Gliff Name</mat-label>
+    <input (ngModelChange)="validateChar($event, portalInfo)" matInput [(ngModel)]="label"
+           class="charInput" autocomplete="off">
+    <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+  </mat-form-field>
 </div>
 <div mat-dialog-actions align="end">
-  <button *ngIf="label !== portalInfo.label||
-          comment !== portalInfo.comment"
+  <button *ngIf="label !== portalInfo.label"
           mat-raised-button color="primary"
-          (click)="onOkClick(portalInfo)">Save</button>
+          (click)="saveChar(portalInfo)">Save
+  </button>
   <button mat-button (click)="onCancelClick(portalInfo)">
-    <span *ngIf="label !== portalInfo.label ||
-    comment !== portalInfo.comment">Cancel</span>
-    <span *ngIf="label === portalInfo.label &&
-    comment === portalInfo.comment">Ok</span>
+    <span *ngIf="dirty">Cancel</span>
+    <span *ngIf="!dirty">Close</span>
   </button>
 </div>
 
