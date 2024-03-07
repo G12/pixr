@@ -7,6 +7,7 @@ export interface Messages {
 export interface MsgDat {
   msg: string;
   time: string;
+  tStamp?: number;
   prtlId?: string;
 }
 

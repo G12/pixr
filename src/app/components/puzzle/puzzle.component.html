@@ -1,40 +1,38 @@
 <div class="fullWidth">
   <app-file-upload *ngIf="createNewProject"></app-file-upload>
-  <input type="text" value="{{summary}}"
+  <div class="header">
+  <div class="codeBoxContainer">
+      <input (click)="copyToClipBoard()" class="showPointer"
+         matTooltip="Copy to Clipboard" type="text" value="{{summary}}"
          [size]="summary.length !== 0 ? summary.length : 1" readonly>
-  <button (click)="copyToClipBoard()" mat-icon-button
-          matTooltip="Copy to Clipboard" aria-label="Copy to Clipboard">
-    <mat-icon [ngStyle]="{'color':'grey'}">assignment</mat-icon>
-  </button>
+  </div>
   <mat-toolbar color="primary" [ngStyle]="{'width.px': mapWidth}">
-  <span>
+    <span>
       <button *ngIf="authService.afAuth.user"
               class="btnLogout" [style.left.px]="pageXOffset"
               mat-mini-fab aria-label="logout"
               (click)="logout()">
-    <mat-icon>logout</mat-icon>
-  </button>
-  </span>
+        <mat-icon>logout</mat-icon>
+      </button>
+    </span>
     <div *ngIf="isAdmin">
-      <button class="projButton" mat-fab extended (click)="newFSProject()">
+      <button *ngIf="!validated" class="projButton" mat-fab extended (click)="newFSProject()">
         New Proj.
       </button>
       <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Utility Menu">
         <mat-icon>more_vert</mat-icon>
       </button>
-      <span *ngIf="isAdmin" (click)="toggleTestMode()" class="tiny">TEST</span>
+      <span *ngIf="validated" (click)="sendMessage()" class="tiny">Send Message</span>
     </div>
     <span *ngIf="ingressName !== '' && !isAdmin"
           class="tiny">{{ ingressName }}</span>
-
-    <!--<span *ngIf="isAdmin" (click)="showDebugInfo()" class="tiny">?</span>-->
-    <!--<span *ngIf="isAdmin" (click)="prepareMapDialog()" class="tiny">Map Dialog</span>-->
     <span class="example-spacer"></span>
     <span>{{ folder }}</span>
     <span class="example-spacer"></span>
   </mat-toolbar>
+  </div>
+  </div>
   <mat-menu #menu="matMenu">
-
     <button mat-menu-item [disabled]="!loggedIn"
             (click)="setPortalCount()">
       <mat-icon>format_list_numbered</mat-icon>
@@ -42,12 +40,12 @@
     </button>
     <button mat-menu-item [disabled]="!loggedIn"
             (click)="setHdrHeight()">
-      <mat-icon>vertical_align_bottom</mat-icon>
+      <mat-icon>border_top</mat-icon>
       <span>Set Header Height</span>
     </button>
     <button mat-menu-item [disabled]="!loggedIn"
             (click)="setRowHeight()">
-      <mat-icon>vertical_align_bottom</mat-icon>
+      <mat-icon>border_left</mat-icon>
       <span>Set Row Height</span>
     </button>
     <button mat-menu-item [disabled]="!loggedIn"
@@ -56,30 +54,56 @@
       <span>Set Column Width</span>
     </button>
     <button mat-menu-item [disabled]="!loggedIn"
+            (click)="setMaxThumbWidth()">
+      <mat-icon>border_horizontal</mat-icon>
+      <span>Set Thumbnail Width</span>
+    </button>
+    <button mat-menu-item [disabled]="!loggedIn"
+            (click)="setFudgeFactor()">
+      <mat-icon>compare_arrows</mat-icon>
+      <span>Set Fudge Factor</span>
+    </button>
+    <!--
+    <button mat-menu-item [disabled]="!loggedIn"
             (click)="newFSProject()">
       <mat-icon>publish</mat-icon>
       <span>New Project</span>
     </button>
+    -->
     <!-- Login as admin -->
     <button mat-menu-item (click)="twoFactorAccess()">
       <mat-icon>vpn_key</mat-icon>
       <span>Admin</span>
     </button>
   </mat-menu>
-</div>
+
 <div *ngIf="!validated">
   <button class="extendedFab" mat-fab extended (click)="setIngressName()">
     <mat-icon>vpn_key</mat-icon>
-    (To contribute:) Set Your Ingress Name
+    Set Your Ingress Name
   </button>
 </div>
-<div *ngIf="validated && !isMap" class="image_wrapper"
+<div *ngIf="validated && isHome" class="image_wrapper" class="marginTop"
      [ngStyle]="{'width.px': imgColWidth}">
   <img [src]="src" alt="First Saturday Puzzle Image">
   <div class="overlay">
     <ng-container>
-      <div class="hdr" [ngStyle]="{'height.px': hdrHeight, 'width.px': imgColWidth}">
-        <button mat-button (click)="toggleMap()">Show Map</button>
+      <div class="hdr" [ngStyle]="{'height.px': hdrHeight - 16, 'width.px': imgColWidth}">
+        <!--<button mat-button (click)="toggleMap()">Show Map</button>-->
+        <span (click)="openMap()" matTooltip="Open Google Map">
+          <button class="backButton" [style.left.px]="pageXOffset"
+                  mat-icon-button aria-label="Open Google Map">
+            <mat-icon>map</mat-icon>
+          </button>
+          <button class="vert-align" mat-flat-button>Map</button>
+        </span>
+        <span (click)="openLog()" matTooltip="Open Log">
+          <button [style.left.px]="pageXOffset"
+                  mat-icon-button aria-label="Open Log">
+            <mat-icon>list</mat-icon>
+          </button>
+          <button class="vert-align" mat-flat-button>Log</button>
+        </span>
       </div>
       <div *ngFor="let portalFrame of portalFrames" class="row"
            [ngStyle]="{'height.px': colHeight, 'width.px': imgColWidth}"
@@ -90,17 +114,227 @@
           <div [ngStyle]="{'height.px': colHeight-80, 'width.px': imgColWidth}"
                class="indexWrapper">
             <h1 class="indexNumber">{{ portalFrame.info.label }}</h1>
-            <h1 class="indexNmbr">{{ portalFrame.index }}</h1>
+            <h1 class="indexNmbr">{{ portalFrame.index }}
+              {{ hasUrl(portalFrame.info) }}</h1>
           </div>
         </div>
       </div>
     </ng-container>
   </div>
+  <!--</div>
+  </cdk-virtual-scroll-viewport>-->
 </div>
 <!--<div [ngStyle]="{'width.px': mapWidth, 'height.px': mapHeight}">-->
-<div class="fullWidth" class="fullHeight">
+<div class="fullWidth" class="fullHeight" class="marginTop">
   <div *ngIf="validated && isMap">
-    <button mat-button (click)="toggleMap()">Show Portal Images</button>
-    <google-map [width]="mapWidth" [height]="mapHeight"></google-map>
+    <div class="button-bar">
+      <span (click)="closeMap()" matTooltip="Back to Portal List">
+      <button class="backButton" [style.left.px]="pageXOffset"
+              mat-icon-button aria-label="Back to Portals">
+        <mat-icon>arrow_back</mat-icon>
+      </button><button class="vert-align" mat-flat-button>Back</button>
+      </span>
+      <!--<span (click)="getLocation(Const.STATIC_LOCATION)" matTooltip="Recenter to your location">-->
+      <span (click)="fitBounds()" matTooltip="Recenter to Show ALL Portals">
+      <button mat-icon-button aria-label="Example icon button with a menu icon">
+        <mat-icon>adjust</mat-icon>
+      </button><button class="vert-align" mat-flat-button>{{ setLabel() }}</button>
+      </span>
+    </div>
+    <!-- TODO remove for production build -->
+    <!--
+    <span>{{ geoMsg }}</span><br>
+    <span>{{ pegMsg }}</span>
+    -->
+    <div *ngIf="mapIsLoading">
+      <p>Map loading please wait!</p>
+      <mat-progress-bar *ngIf="mapIsLoading" mode="indeterminate"></mat-progress-bar>
+    </div>
+    <!-- [center]="center" -->
+    <google-map #map
+                [center]="center"
+                [width]="mapWidth" [height]="mapHeight"
+                [zoom]="zoom" [options]="mapOptions"
+                (mapInitialized)="mapInitialized()"
+    >
+      <map-marker #pegMarker="mapMarker" [position]="pegPosition"
+                  [options]="markerOptions"
+                  [label]="ingressName"
+                  (mapClick)="openInfoWindow(pegMarker, null)">
+      </map-marker>
+      <map-marker #portalMarker="mapMarker"
+                  *ngFor="let portalFrame of portalFrames"
+                  [position]="portalFrame.info.latLng"
+                  [label]="getLabel(portalFrame.info)"
+                  (mapClick)="openInfoWindow(portalMarker,portalFrame)">
+      </map-marker>
+      <map-info-window (closeclick)="infoClosed($event)">
+        <div *ngIf="currentPortalFrame">
+          <span>Check Location on <a href="{{currentPortalFrame.info.url}}" target="intell">Intel Map</a></span>
+          <br>
+          <div class="thumb" [style.background]="'url(' + src + ')'"
+               [style.background-position]="getYPosition(currentPortalFrame)"
+               [style.width.px]="thumbWidth" [style.height.px]="colHeight / 2 - 8"
+               [style.background-size]="'500%'"
+               [style.background-repeat]="'no-repeat'"
+          >
+          </div>
+          <div>Get Directions to this Portal!</div>
+          <br>
+          <button mat-fab extended align="end"
+                  (click)="openGoogleMaps(currentPortalFrame)">Google Map Directions
+          </button>
+          <div>
+            <br>
+            <div>Set or Edit Chacter or Gliff!</div>
+            <mat-form-field [style.width.%]="48" appearance="outline">
+              <!--<mat-hint class="cautionHint"><strong>@{{ingressName}}</strong></mat-hint>-->
+              <!--<mat-label>Set Character or Gliff Name</mat-label>-->
+              <input (ngModelChange)="validateChar($event, currentPortalFrame.info)" matInput [(ngModel)]="label"
+                     class="charInput" autocomplete="off">
+            </mat-form-field>
+            <button *ngIf="label !== currentPortalFrame.info.label"
+                    mat-raised-button color="primary"
+                    (click)="saveChar(currentPortalFrame.info, label, ingressName)">Save
+            </button>
+              <!--<button mat-button (click)="onCancelClick()">
+                <span *ngIf="dirty">Cancel</span>
+                <span *ngIf="!dirty">Close</span>
+              </button>-->
+          </div>
+
+        </div>
+        <div *ngIf="!currentPortalFrame">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title>Shiba Inu</mat-card-title>
+                <mat-card-subtitle>Large</mat-card-subtitle>
+                <img mat-card-lg-image src="https://material.angular.io/assets/img/examples/shiba2.jpg">
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              Hello {{ ingressName }}; this is where you are!
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div mat-dialog-actions align="end">
+          <button mat-button (click)="closeWindow($event)">
+            Close
+          </button>
+        </div>
+      </map-info-window>
+    </google-map>
+  </div>
+</div>
+<div class="fullWidth" class="fullHeight" class="marginTop">
+  <div *ngIf="validated && isLog">
+    <div class="button-bar">
+      <span (click)="closeLog()" matTooltip="Back to Portal List">
+      <button class="backButton" [style.left.px]="pageXOffset"
+              mat-icon-button aria-label="Back to Portals">
+        <mat-icon>arrow_back</mat-icon>
+      </button><button class="vert-align" mat-flat-button>Home</button>
+      </span>
+      <span (click)="openMap()" matTooltip="Open Google Map">
+          <button class="backButton" [style.left.px]="pageXOffset"
+                  mat-icon-button aria-label="Open Google Map">
+            <mat-icon>map</mat-icon>
+          </button>
+          <button class="vert-align" mat-flat-button>Map</button>
+        </span>
+    </div>
+    <div class="logList">
+
+      <!-- <div *ngFor="let portalFrame of portalFrames" class="row"
+           [ngStyle]="{'height.px': colHeight, 'width.px': imgColWidth}"
+      >-->
+      <div></div>
+      <mat-list>
+        <cdk-virtual-scroll-viewport class="log-viewport"
+          appendOnly itemSize="50" [ngStyle]="{'width.px': logWidth,
+          'height.px': logHeight}">
+        <mat-list-item *ngFor="let msgData of logMessages.messages">
+          <span matListItemIcon>
+            <button mat-icon-button (click)="action(msgData)"
+                    [color]="getAccent(msgData)" aria-label="Example icon button with a heart icon">
+              <mat-icon>play_circle_filled</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>Time {{msgData.time}}
+            <span *ngIf="msgData.portalIndex"> - Portal:{{msgData.portalIndex}}</span>
+          </span>
+          <span matListItemLine class="msgRow">{{msgData.msg}}</span>
+        </mat-list-item>
+        </cdk-virtual-scroll-viewport>
+      </mat-list>
+
+      <!--
+      <mat-list>
+        <mat-list-item>
+          <span matListItemIcon>
+            <button mat-icon-button color="warn" aria-label="Example icon button with a heart icon">
+              <mat-icon>new_releases</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>10:50AM @G12mo</span>
+          <span matListItemLine>color="warn"</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemIcon>
+            <button mat-icon-button color="primary" aria-label="Example icon button with a heart icon">
+              <mat-icon>pause_circle_filled</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>10:40AM @FifthColumnRes</span>
+          <span matListItemLine>color="primary" Extracted from sea water</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemIcon>
+            <button mat-icon-button color="accent" aria-label="Example icon button with a heart icon">
+              <mat-icon>play_circle_filled</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>10:30AM @wrexor</span>
+          <span matListItemLine> color="accent" Produced by dried and ground red peppers</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemIcon>
+            <button mat-icon-button [color]="getAccent()" aria-label="Example icon button with a heart icon">
+              <mat-icon>play_circle_filled</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>10:30AM @wrexor</span>
+          <span matListItemLine>[color]="getAccent()" Produced by dried and ground red peppers</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemIcon>
+            <button mat-icon-button [color]="getPrimary()" aria-label="Example icon button with a heart icon">
+              <mat-icon>new_releases</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>10:50AM @G12mo</span>
+          <span matListItemLine>[color]="getPrimary()" Produced by a plant</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemIcon>
+            <button mat-icon-button [color]="getWarn()" aria-label="Example icon button with a heart icon">
+              <mat-icon>pause_circle_filled</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>10:40AM @FifthColumnRes</span>
+          <span matListItemLine>[color]="getWarn()" Extracted from sea water</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemIcon>
+            <button mat-icon-button aria-label="Example icon button with a heart icon">
+              <mat-icon>pause_circle_filled</mat-icon>
+            </button>
+          </span>
+          <span matListItemTitle>10:40AM @FifthColumnRes</span>
+          <span matListItemLine>NO COLOR Extracted from sea water</span>
+        </mat-list-item>
+      </mat-list>-->
+    </div>
   </div>
 </div>

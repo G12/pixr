@@ -1,10 +1,11 @@
 <p mat-dialog-title>
   <span class="grayTitle">Portal:
     {{ portalInfo.index }} : {{ portalInfo.label }}</span>
-  <span class="lightGrayUrl" (click)="copyToClipBoard()"
+  <span *ngIf="savedUrl" class="lightGrayUrl" [ngStyle]="{'width.px': '250'}"
+        (click)="copyToClipBoard()"
         matTooltip="Copy to Clipboard" aria-label="Copy to Clipboard">
       <mat-icon matSuffix>assignment</mat-icon>
-    {{ url }}
+    {{ clip(url) }}
   </span>
 </p>
 <div mat-dialog-content>
@@ -32,7 +33,7 @@
     </div>
     <p class="inputWarning">{{ msg }}</p>
     <mat-form-field [style.width.%]="100" appearance="outline">
-      <mat-hint>Please be carefull that the location is correct!</mat-hint>
+      <mat-hint *ngIf="!savedUrl" class="cautionHint"><strong>@{{ingressName}}</strong> please be carefull that the location is correct!</mat-hint>
       <mat-label>Paste portal url Here</mat-label>
       <input (ngModelChange)="validateUrl($event, portalInfo)" matInput [(ngModel)]="url"
              class="charInput" autocomplete="off" [disabled]="savedUrl">
@@ -43,19 +44,32 @@
       >assignment
       </mat-icon>
     </mat-form-field>
-
+    <div class="verticalSpace"></div>
   </div>
+  <button *ngIf="savedUrl" mat-fab extended align="end"
+          (click)="openGoogleMaps(portalInfo)">Google Map Directions
+  </button>
   <mat-divider></mat-divider>
   <p><br></p>
+  <div *ngIf="!showUrlPage" mat-dialog-actions>
+  <span *ngIf="portalInfo.published">
+    <span>To VERIFY </span>
+  <span>
+    <button mat-button color="primary" (click)="verifyValue(portalInfo)">
+    <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+    Click Here</button>
+  </span>
+  </span>
+  </div>
   <mat-form-field [style.width.%]="48" appearance="outline">
+    <mat-hint class="cautionHint"><strong>{{hintMsg}}</strong></mat-hint>
     <mat-label>Set Character or Gliff Name</mat-label>
     <input (ngModelChange)="validateChar($event, portalInfo)" matInput [(ngModel)]="label"
            class="charInput" autocomplete="off">
-    <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
   </mat-form-field>
 </div>
 <div mat-dialog-actions align="end">
-  <button *ngIf="label !== portalInfo.label"
+  <button *ngIf="label !== portalInfo.label && isValidChar"
           mat-raised-button color="primary"
           (click)="saveChar(portalInfo)">Save
   </button>

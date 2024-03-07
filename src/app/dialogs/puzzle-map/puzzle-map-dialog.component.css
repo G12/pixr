@@ -23,12 +23,13 @@ agm-map {
 }
 
 .lightGrayUrl {
-  max-width: 200px;
+  width: 150px;
+  /*max-width: 200px;*/
   color: lightgray;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: smaller;
+  font-size: x-small;
   font-family: "Calibri Light";
 }
 
@@ -37,4 +38,12 @@ agm-map {
   color: darkgray;
   font-size: medium;
   font-family: "Calibri Light";
+}
+
+.cautionHint {
+  background-color: orange;
+}
+
+.verticalSpace {
+  height: 1em;
 }

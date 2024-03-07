@@ -1,10 +1,11 @@
 import {Component, Inject, Input, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MapDialogComponent} from '../map/map-dialog.component';
-import {PortalInfo} from '../../data';
+import {DialogPackage, LocalMetadata, PortalInfo, PortalVisiter, PortalVisiters} from '../../data';
 import {TrustmanService} from '../../services/trustman.service';
 import {LatLng, PortalRec} from '../../project.data';
 import {Clipboard} from '@angular/cdk/clipboard';
+import {SnackbarService} from '../../services/snackbar.service';
 
 @Component({
   selector: 'app-puzzle-map-dialog',
@@ -13,6 +14,11 @@ import {Clipboard} from '@angular/cdk/clipboard';
 })
 export class PuzzleMapDialogComponent {
 
+  hintMsg = '';
+  portalInfo: PortalInfo;
+  localMetadata: LocalMetadata;
+  ingressName: string;
+
   label = '';
   comment = '';
   owner = '';
@@ -20,25 +26,32 @@ export class PuzzleMapDialogComponent {
   url = '';
   latLng: LatLng;
   isValidUrl = false;
+  isValidChar = false;
   showUrlPage = false;
   savedUrl = false;
   dirty = false;
+  pegPosition: LatLng;
 
   urlPrompt = 'If you know the Intel url';
 
   constructor(
+    public snackbarService: SnackbarService,
     public dialogRef: MatDialogRef<MapDialogComponent>,
     private clipboard: Clipboard,
-    @Inject(MAT_DIALOG_DATA) public portalInfo: PortalInfo,
+    @Inject(MAT_DIALOG_DATA) public dialogPackage: DialogPackage,
     public trustmanService: TrustmanService) {
-    if (portalInfo.label) {
-      this.label = portalInfo.label;
+    this.ingressName = dialogPackage.ingressName;
+    this.localMetadata = dialogPackage.localMetadata;
+    this.portalInfo = dialogPackage.portalFrame.info;
+    this.pegPosition = dialogPackage.pegPosition;
+    if (this.portalInfo) {
+      this.label = this.portalInfo.label;
     }
-    if (portalInfo.comment) {
-      this.comment = portalInfo.comment;
+    if (this.portalInfo.comment) {
+      this.comment = this.portalInfo.comment;
     }
-    if (portalInfo.latLng){
-      this.url = portalInfo.url;
+    if (this.portalInfo.latLng){
+      this.url = this.portalInfo.url;
       this.savedUrl = true;
     }
   }
@@ -108,6 +121,9 @@ export class PuzzleMapDialogComponent {
     this.trustmanService.setPortalInfo
     (projectID, portalInfoID, portalInfo).then(value => {
       console.log('setPortalInfo return value: ' + JSON.stringify(value));
+      let msg = '@' + this.ingressName;
+      msg = msg + ' SET intel url: ' + portalInfo.url;
+      this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);
     }).catch(reason => {
       alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
       portalInfo.published = false;
@@ -117,18 +133,44 @@ export class PuzzleMapDialogComponent {
   }
 
   saveChar(portalInfo: PortalInfo): void {
+
+    this.trustmanService.saveChar(portalInfo, this.label, this.ingressName);
+
+    /*
     const projectID = portalInfo.projectId;
     const portalInfoID = portalInfo.id;
+    let action = 'EDITED';
+    if (!portalInfo.published){
+      action = 'SET';
+      portalInfo.published = true;
+    }
     portalInfo.label = this.label;
-    portalInfo.published = true; // TODO make a publish log
+    const portalVisiter: PortalVisiter = {
+      ingressName: this.ingressName,
+      action,
+      msg: ''
+    };
+    // TODO push new PortalVisiter into visiters
+    if (!portalInfo.visiters){
+
+    }else{
+
+    }
+    // portalInfo.published = true; // TODO make a publish log
     console.log('Publishing: ' + JSON.stringify(portalInfo));
     this.trustmanService.setPortalInfo
     (projectID, portalInfoID, portalInfo).then(value => {
       console.log('setPortalInfo return value: ' + JSON.stringify(value));
+      let msg = this.ingressName + ' ' + action + ' Portal Character';
+      // this.snackbarService.openSnackBar(msg, 'value: ' + portalInfo.label);
+      // TODO publish message to log append more info to msg
+      msg = msg + ' to ' + portalInfo.label;
+      this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);
     }).catch(reason => {
       alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
       portalInfo.published = false;
     });
+    */
     this.dialogRef.close();
   }
 
@@ -146,6 +188,39 @@ export class PuzzleMapDialogComponent {
   }
 
   validateChar(char: string, portalInfo: PortalInfo): void {
+    const type = portalInfo.type;
+    this.hintMsg = '';
+    this.isValidChar = true;
+    switch (type) {
+      case 'keyword':
+        if (char.length >= 2 || char.toUpperCase() === 'I'){ // smallest Glyph names are 2 characters
+          // Now test for valid glyph name
+          if (this.trustmanService.isGlyphName(char)){
+            this.hintMsg = '';
+          } else {
+            this.hintMsg = 'Not a known Glyph Name!';
+            this.isValidChar = false;
+          }
+        }else{
+          this.hintMsg = 'Not a known Glyph Name!';
+          this.isValidChar = false;
+        }
+        break;
+      case '#':
+          const regX = /^-?\d+$/;
+          if (!regX.test(char)){
+            this.hintMsg = 'Only numbers allowed here!';
+            this.isValidChar = false;
+          }
+          break;
+      case 'x':
+          const regex = /^[a-zA-Z]+$/;
+          if (!regex.test(char)){
+            this.hintMsg = 'Only letters from a-z or A-Z allowed here!';
+            this.isValidChar = false;
+          }
+          break;
+    }
     this.dirty = true;
   }
 
@@ -160,5 +235,42 @@ export class PuzzleMapDialogComponent {
     if (confirm('Copy to Clipboard')){
       this.clipboard.copy(this.url);
     }
+  }
+
+  verifyValue(portalInfo: PortalInfo): void {
+    let isPlural = '';
+    let isOrAre = 'is';
+    if (portalInfo.label.length > 1){
+      isOrAre = ' are';
+      isPlural = 's ';
+    }
+    const msg = 'Message from: @'
+      + this.ingressName +
+      ' at Portal ' + portalInfo.index
+      + ': I verify that I have Hacked the media for' +
+      ' this portal and confirm that the character' + isPlural + ': '
+      + portalInfo.label + isOrAre + ' CORRECT!';
+    if (confirm(msg)){
+      // this.snackbarService.openSnackBarTop
+      //  ('@' + this.ingressName + ' Verified Portal: ' + portalInfo.index,
+      //  'Close', 10000);
+      this.trustmanService.setLogMsg(this.ingressName, portalInfo.projectId, msg, portalInfo);
+    }
+  }
+
+  clip(url: string): string {
+    let str = url.substring(0, 40);
+    str += '...';
+    return str;
+  }
+
+  openGoogleMaps(portalInfo: PortalInfo): void {
+    const dest = portalInfo.latLng;
+    const orig = this.pegPosition;
+    const label = 'Portal number: ' + portalInfo.index;
+    const url = 'https://www.google.com/maps/dir/?api=1&origin='
+      + orig.lat + ',' + orig.lng + '&destination='
+      + dest.lat + ',' + dest.lng + '&travelmode=walking';
+    window.open(url, 'google-maps');
   }
 }

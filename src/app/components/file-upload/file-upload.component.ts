@@ -6,6 +6,7 @@ import {BootParam, MsgDat} from '../../project.data';
 import {TrustmanService} from '../../services/trustman.service';
 import {ProjectService} from '../../services/project.service';
 import {AuthService} from '../../services/auth.service';
+import {Const} from '../../const';
 
 @Component({
   selector: 'app-file-upload',
@@ -19,7 +20,9 @@ export class FileUploadComponent implements OnInit{
   uploadComplete = false;
   newProjectInProgress = false;
   fileChosen = false;
+  templateSet = false;
   projectName = '';
+  localTemplateArray: string[] = [];
   // projectList: ProjectList;
   pzProjectList: PzProjectList;
 
@@ -73,10 +76,16 @@ export class FileUploadComponent implements OnInit{
   ///////////////////////////////////////////////////////////////////////////////
   ///////////////////  Start of New Project Area
   ///////////////////////////////////////////////////////////////////////////////
-  startNewProject(): void {
+  startNewProject(adminOnly: boolean = false): void {
     if (confirm('Start a NEW project using Image File: ' + this.projectName)){
       this.newProjectInProgress = false;
-      this.newProject(this.projectName);
+      if (adminOnly) {
+        if (confirm('Proceed to Admin Only')){
+          this.newProject(this.projectName, adminOnly);
+        }
+      } else {
+        this.newProject(this.projectName, adminOnly);
+      }
     }else{
       this.uploadComplete = false;
       this.fileChosen = false;
@@ -112,9 +121,8 @@ export class FileUploadComponent implements OnInit{
 
   /**
    * Create a new First Saturday Project
-   * @param name: The name part of the uploaded Ingress image.
    */
-  newProject(name: string): void {
+  newProject(name: string, adminOnly: boolean = false): void {
     this.newProjectInProgress = true;
     // Create template partially filled
     const date = new Date().toISOString();
@@ -123,10 +131,13 @@ export class FileUploadComponent implements OnInit{
       id: '_metadata',
       projectName: name,
       projectID: projId,
-      rowCount: 11,
-      colHeight: 299,
-      imgColWidth: 2480,
-      hdrHeight: 144
+      rowCount: Const.DIM_ROW_COUNT,
+      colHeight: Const.DIM_COL_HEIGHT,
+      imgColWidth: Const.DIM_COL_WIDTH,
+      thumbWidth: Const.DIM_THUMB_WIDTH,
+      hdrHeight: Const.DIM_HDR_HEIGHT,
+      fudgeFactor: Const.DIM_FUDGE_FACTOR,
+      localTemplateArray: this.localTemplateArray,
     };
 
     // create new ColRec collection and set it's _metadata document
@@ -151,9 +162,11 @@ export class FileUploadComponent implements OnInit{
         console.log('project List Updated');
         console.log(this.pzProjectList.projects);
       });
-      this.trustmanService.pzUserBootParamDocRef.set(bootParam).then(value2 => {
-        console.log('User Updated');
-      });
+      if (!adminOnly) {
+        this.trustmanService.pzUserBootParamDocRef.set(bootParam).then(value2 => {
+          console.log('User Updated');
+        });
+      }
       this.trustmanService.pzAdminBootParamDocRef.set(bootParam).then(value3 => {
         console.log('Admin Updated');
       });
@@ -166,9 +179,27 @@ export class FileUploadComponent implements OnInit{
     }
   }
 
-
   ////////////////////////////// End of New Project Area
   logOut(): void {
     this.authService.logout();
+  }
+
+  setPasscodeTemplate(): void {
+    const pattern = 'xxx##keyword###xx';
+    const value = prompt(
+      'Please enter Passcode Template', pattern);
+    if (value && value !== '') {
+      for (let i = 0; i < value.length; i++ ){
+        let char = value[i];
+        if (char === 'k'){
+          const len = 'keyword'.length;
+          char = value.substring(i, i + len);
+          i = i + len - 1; // assuming i will be incremented next
+        }
+        this.localTemplateArray.push(char);
+      }
+      this.templateSet = true;
+      alert(JSON.stringify(this.localTemplateArray));
+    }
   }
 }

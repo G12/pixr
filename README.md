@@ -87,3 +87,12 @@ did not work!
 
 ### set up @angular/google-maps
 `ng add @angular/google-maps`
+
+## Geolocation
+To dynamically load google.map TODO test if this helps my loading problem
+If you do not have @ng-web-apis/common:
+
+`npm i @ng-web-apis/common`
+Now install the package:
+
+`npm i @ng-web-apis/geolocation`

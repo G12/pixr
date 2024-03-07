@@ -23,6 +23,8 @@ import {HttpClientModule} from '@angular/common/http';
 import {PuzzleMapDialogComponent} from './dialogs/puzzle-map/puzzle-map-dialog.component';
 // import { GooglMapComponent } from './googl-map/googl-map.component';
 import {GoogleMapsModule} from '@angular/google-maps';
+import {POSITION_OPTIONS} from '@ng-web-apis/geolocation';
+
 
 @NgModule({
   declarations: [
@@ -63,6 +65,12 @@ import {GoogleMapsModule} from '@angular/google-maps';
     ClipboardComponent,
     StatsComponent,
     WarningComponent],
+  providers: [
+    {
+      provide: POSITION_OPTIONS,
+      useValue: {enableHighAccuracy: true, timeout: 3000, maximumAge: 1000},
+    },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
