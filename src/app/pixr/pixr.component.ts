@@ -168,16 +168,15 @@ export class PixrComponent implements OnInit, AfterViewInit {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
       // true for mobile device
       this.isMobile = true;
-      console.log('Mobile Device');
+      // console.log('Mobile Device');
     } else {
-      console.log('NOT a Mobile Device!');
+      // console.log('NOT a Mobile Device!');
     }
   }
 
   @HostListener('window:scroll', ['$event'])
   doSomething(event): void {
     if (event.isTrusted) {
-      // console.log('window:scroll: ' + JSON.stringify(event));
       this.pageXOffset = window.pageXOffset;
       this.pageYOffset = window.pageYOffset;
       this.bannerLeft = window.pageXOffset + this.bannerLeftMargin;
@@ -257,7 +256,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
           portalsLength: column.portals.length,
           notes: '', final, portalCount, percentDone
         };
-        console.log('TESTING TESTING Database Update for Column: ' + column.name);
         // Add an empty ColumnRecData template
         const template = {
           rawDataId: this.rawData.id, columnChar, id: this.colRecPrefix + column.name,
@@ -277,7 +275,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
       this.columnRecDataArray.push(colRecData);
       this.dataReady = true;
     });
-    // console.log('TESTING TESTING DataReady');
     this.dataReady = true;
   }
 
@@ -313,7 +310,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
               ...e.payload.doc.data()
             } as string[];
           });
-          // console.log('TEST drawPortalFrames() and buildColumnRecDataArray()');
           this.debugMsgs += 'ingressNames length: ' + this.allIngressNames.length + ', ';
           this.drawPortalFrames(); // TODO TESTING TESTING
 
@@ -368,7 +364,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
         this.src = this.path + this.folder + '.jpg';
           // TODO remove after local testing
         // this.src = 'assets/black.jpg';
-        console.log('src = ' + this.src);
         // Once we have default project id we can subscribe
         // this.subscribeToRawdataFor(id); Deprecated
         this.debugMsgs += 'src: ' + this.src + ', ';
@@ -386,14 +381,13 @@ export class PixrComponent implements OnInit, AfterViewInit {
     // this.folder = project.folder;
     // this.src = this.path + project.folder + '/black.jpg';
     this.src = this.path + this.folder + '.jpg';
-    console.log('src = ' + this.src);
+    // console.log('src = ' + this.src);
     // Once we have the project id we can subscribe
     this.debugMsgs += 'src: ' + this.src + ', ';
     this.subscribeToFsProject(project.project_id);
   }
 
   onImageLoad(myImage: HTMLImageElement): void {
-    console.log('ImageLoaded');
     this.debugMsgs += 'onImageLoad START: ';
     // TODO setTimeout used to kick start angular redraw see ngZone
     // setTimeout(() =>  {
@@ -619,7 +613,7 @@ export class PixrComponent implements OnInit, AfterViewInit {
         canDrag = true;
       });
       if (canDrag) {
-        // console.log('CAN DRAG');
+        // CAN DRAG
       }
     }
     this.busy = false;
@@ -758,7 +752,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
 
     clipboardDialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('updatePortalRecs: ', result);
         this.updatePortalRecs(result);
       } else {
       }
@@ -773,7 +766,7 @@ export class PixrComponent implements OnInit, AfterViewInit {
     });
 
     this.portalDialogRef.afterOpened().subscribe(() => {
-      // console.log('portalDialogRef.afterOpened');
+      // TODO anything usefull
     });
 
     this.portalDialogRef.afterClosed().subscribe(result => {
@@ -843,7 +836,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
 
   scrollIntoView(prtl: PortalRec): void {
     if (this.isMobile) {
-      console.log('Scroll into view');
       const target = document.getElementById(prtl.colName);
       target.scrollIntoView();
       // Try to scroll into view vertically
@@ -852,7 +844,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
         top: prtl.t
       });
     } else {
-      console.log('No Scroll');
     }
   }
 
@@ -1038,7 +1029,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
         });
       }
     });
-    console.log(statsList);
     const finals: PlayerStats[] = statsList.stats.filter(s => s.portalsDiscovered > 0 || s.lettersDetermined > 0);
     const finalStats: StatsList = {
       stats: [], code, count, total: this.rawData.columns.length,
@@ -1059,7 +1049,6 @@ export class PixrComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log(result);
         const data = result as PortalRec;
         if (data.latLng.isValid) {
           alert('Now Process data.url: ' + data.url);
@@ -1104,7 +1093,6 @@ export class PortalInfoDialogComponent {
 
   scrollIntoView(prtl: PortalRec): void {
     if (prtl.isMobile) {
-      // console.log('Scroll into view');
       const target = document.getElementById(prtl.colName);
       target.scrollIntoView();
       // Try to scroll into view vertically
@@ -1113,7 +1101,7 @@ export class PortalInfoDialogComponent {
         top: prtl.t
       });
     } else {
-      // console.log('NO Scroll');
+      // NO Scroll
     }
   }
 

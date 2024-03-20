@@ -1,6 +1,8 @@
 <p mat-dialog-title>
   <span class="grayTitle">Portal:
-    {{ portalInfo.index }} : {{ portalInfo.label }}</span>
+    {{ portalInfo.index }}</span>
+  <span> {{ portalInfo.label }}</span>
+  <span class="grayTitle" *ngIf="portalInfo.AKA"> {{portalInfo.AKA}}</span>
   <span *ngIf="savedUrl" class="lightGrayUrl" [ngStyle]="{'width.px': '250'}"
         (click)="copyToClipBoard()"
         matTooltip="Copy to Clipboard" aria-label="Copy to Clipboard">
@@ -21,6 +23,10 @@
       <button *ngIf="this.isValidUrl"
               mat-raised-button color="primary"
               (click)="saveUrl(portalInfo)">Save URL
+      </button>
+      <button *ngIf="savedUrl" mat-button color="warn" (click)="deleteUrl(portalInfo)">
+        <mat-icon matSuffix>delete_forever</mat-icon>
+        REMOVE
       </button>
       <button *ngIf="savedUrl" mat-button color="primary" (click)="editUrl()">
         <mat-icon matSuffix>sentiment_dissatisfied</mat-icon>
@@ -46,11 +52,19 @@
     </mat-form-field>
     <div class="verticalSpace"></div>
   </div>
-  <button *ngIf="savedUrl" mat-fab extended align="end"
-          (click)="openGoogleMaps(portalInfo)">Google Map Directions
-  </button>
+  <span *ngIf="savedUrl">
+    <button mat-button color="primary" (click)="openGoogleMaps(portalInfo)">
+      <mat-icon matSuffix>directions_walk</mat-icon>
+      Directions
+    </button>
+    <button *ngIf="savedUrl" mat-button color="primary" (click)="openMap(portalInfo)">
+        <mat-icon matSuffix>map</mat-icon>
+      MAP
+    </button>
+  </span>
   <mat-divider></mat-divider>
   <p><br></p>
+  <!--
   <div *ngIf="!showUrlPage" mat-dialog-actions>
   <span *ngIf="portalInfo.published">
     <span>To VERIFY </span>
@@ -61,17 +75,27 @@
   </span>
   </span>
   </div>
+  -->
+  <div *ngIf="hintMsg.length !== 0">
+    <mat-hint class="cautionHint"><strong>{{hintMsg}}
+    </strong></mat-hint>
+  </div>
   <mat-form-field [style.width.%]="48" appearance="outline">
-    <mat-hint class="cautionHint"><strong>{{hintMsg}}</strong></mat-hint>
-    <mat-label>Set Character or Gliff Name</mat-label>
-    <input (ngModelChange)="validateChar($event, portalInfo)" matInput [(ngModel)]="label"
+    <!--<mat-hint class="cautionHint"><strong>{{hintMsg}}</strong></mat-hint>-->
+    <mat-label>{{getHint(portalInfo.type)}}</mat-label>
+    <input (ngModelChange)="validate($event, portalInfo)" matInput [(ngModel)]="label"
            class="charInput" autocomplete="off">
   </mat-form-field>
+  <button *ngIf="testDeleteConditions(label, portalInfo)"
+          (click)="delete(portalInfo, label, ingressName)"
+          mat-icon-button color="warn" aria-label="Delete Forever">
+    <mat-icon>delete_forever</mat-icon>
+  </button>
 </div>
 <div mat-dialog-actions align="end">
-  <button *ngIf="label !== portalInfo.label && isValidChar"
+  <button *ngIf="label !== portalInfo.label && isValidChar && label.length !== 0"
           mat-raised-button color="primary"
-          (click)="saveChar(portalInfo)">Save
+          (click)="saveChar(portalInfo, label)">Save
   </button>
   <button mat-button (click)="onCancelClick(portalInfo)">
     <span *ngIf="dirty">Cancel</span>

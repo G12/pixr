@@ -1,6 +1,7 @@
 
 ////////////////////////////////  MAP  /////////////////////////////////////
 import {MsgDat} from './project.data';
+import {MapCircle, MapMarker} from '@angular/google-maps';
 
 export interface MarkerData {
   position: google.maps.LatLngLiteral;
@@ -31,15 +32,25 @@ export interface PortalInfo {
   latLng?: LatLng;
   url?: string;
   label: string;
+  AKA?: string;
   visiters?: PortalVisiters;
   comment?: string;
   type: string;
+  isActive?: boolean;
+}
+
+export interface RetVal {
+  hintMsg: string;
+  isValidChar: boolean;
+  dirty: boolean;
 }
 
 export interface PortalFrame {
   index: number;
   height?: number; // if variable height else colHeight
   info: PortalInfo;
+  marker?: MapMarker;
+  circle?: MapCircle;
 }
 
 export interface LocalMetadata {
@@ -107,23 +118,14 @@ export interface OneItemArray{
 }
 
 ///////////////////////// GLYPHS
-export interface Glyphs {
+export interface GlyphData {
   names: string[];
+  name: string;
+  isGlyph: boolean;
+  AKA: string;
 }
-/*
-const data: string[] = [
-  [
-"Abandon"]
-"Adapt"]
-"Advance"]
-"After"]
-"Again"]
-All"]
-Answer"]
-Attack", "War"]" +
-"Avoid"] //"Struggle"
-Barrier", "Obstacle"]
-  ];
 
-]
-*/
+export interface MarkerOptions {
+  icon: string;
+  title: string;
+}

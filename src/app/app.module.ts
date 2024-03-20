@@ -24,6 +24,8 @@ import {PuzzleMapDialogComponent} from './dialogs/puzzle-map/puzzle-map-dialog.c
 // import { GooglMapComponent } from './googl-map/googl-map.component';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {POSITION_OPTIONS} from '@ng-web-apis/geolocation';
+import { PortalInfoComponent } from './components/portal-info/portal-info.component';
+import { ThumbnailComponent } from './components/thumbnail/thumbnail.component';
 
 
 @NgModule({
@@ -42,6 +44,8 @@ import {POSITION_OPTIONS} from '@ng-web-apis/geolocation';
     HelpComponent,
     PuzzleComponent,
     FileUploadComponent,
+    PortalInfoComponent,
+    ThumbnailComponent,
     // GooglMapComponent
   ],
     imports: [

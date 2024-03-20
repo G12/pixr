@@ -44,7 +44,6 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     } catch (error) {
       this.debugMsg = 'NO Image? Some Browsers cause this error - working on a fix: ' +
           JSON.stringify(error);
-      // console.log(this.debugMsg);
       this.canvas.style.display = 'none';
       return;
     }
@@ -53,7 +52,6 @@ export class CanvasComponent implements OnInit, AfterViewInit {
     // console.log(this.debugMsg);
     setTimeout(() =>  {
       this.ctx.putImageData(this.imgData, 0, 0);
-      console.log('Image Done: ');
       this.ImageDone.emit(true);
     }, 1000);
   }

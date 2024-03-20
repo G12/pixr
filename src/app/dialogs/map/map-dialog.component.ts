@@ -49,7 +49,6 @@ export class MapDialogComponent {
        this.projectService.setColumnRecData(template);
        if (result.isMobile)
        {
-         // console.log('Scroll into view');
          // Scroll into view
          const target = document.getElementById(result.column.name);
          target.scrollIntoView();
@@ -58,11 +57,9 @@ export class MapDialogComponent {
            top: 0
          });
        } else {
-         // console.log('NO Scroll');
        }
      } else {
        // Should never Get here
-       console.log('mapDialogComponent onOkClick NO result');
        this.dialogRef.close();
      }
    }
@@ -75,15 +72,12 @@ export class MapDialogComponent {
     this.dialogRef.close();
     if (data.isMobile) {
       // Scroll into view
-      // console.log('Scroll into view');
       const target = document.getElementById(data.column.name);
       target.scrollIntoView();
       // Try to scroll into view vertically
       window.scrollTo({
         top: 0
       });
-    } else {
-      // console.log('NO Scroll');
     }
   }
 }

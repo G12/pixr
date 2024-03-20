@@ -1,11 +1,12 @@
 import {Component, Inject, Input, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {DialogPosition, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MapDialogComponent} from '../map/map-dialog.component';
-import {DialogPackage, LocalMetadata, PortalInfo, PortalVisiter, PortalVisiters} from '../../data';
+import {DialogPackage, GlyphData, LocalMetadata, PortalInfo, PortalVisiter, PortalVisiters} from '../../data';
 import {TrustmanService} from '../../services/trustman.service';
 import {LatLng, PortalRec} from '../../project.data';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {SnackbarService} from '../../services/snackbar.service';
+import {Const} from '../../const';
 
 @Component({
   selector: 'app-puzzle-map-dialog',
@@ -32,6 +33,8 @@ export class PuzzleMapDialogComponent {
   dirty = false;
   pegPosition: LatLng;
 
+  dialogPosition: DialogPosition;
+
   urlPrompt = 'If you know the Intel url';
 
   constructor(
@@ -39,7 +42,7 @@ export class PuzzleMapDialogComponent {
     public dialogRef: MatDialogRef<MapDialogComponent>,
     private clipboard: Clipboard,
     @Inject(MAT_DIALOG_DATA) public dialogPackage: DialogPackage,
-    public trustmanService: TrustmanService) {
+    private trustmanService: TrustmanService) {
     this.ingressName = dialogPackage.ingressName;
     this.localMetadata = dialogPackage.localMetadata;
     this.portalInfo = dialogPackage.portalFrame.info;
@@ -62,7 +65,7 @@ export class PuzzleMapDialogComponent {
 
   validateUrl(url: string, portalInfo: PortalInfo): void {
     this.isValidUrl = false;
-    console.log(url);
+    // console.log(url);
     this.msg = 'Not a Valid Intel URL';
     if (this.testForValidURL(url)){
       this.msg = 'Missing URL location parameters ie: ?pll=45.5,-75.6';
@@ -117,11 +120,11 @@ export class PuzzleMapDialogComponent {
       portalInfo.url = this.url;
       portalInfo.latLng = this.latLng;
     }
-    console.log('Publishing: ' + JSON.stringify(portalInfo));
+    // console.log('Publishing: ' + JSON.stringify(portalInfo));
     this.trustmanService.setPortalInfo
     (projectID, portalInfoID, portalInfo).then(value => {
-      console.log('setPortalInfo return value: ' + JSON.stringify(value));
-      let msg = '@' + this.ingressName;
+      // console.log('setPortalInfo return value: ' + JSON.stringify(value));
+      let msg = this.ingressName;
       msg = msg + ' SET intel url: ' + portalInfo.url;
       this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);
     }).catch(reason => {
@@ -132,46 +135,21 @@ export class PuzzleMapDialogComponent {
     this.savedUrl = true;
   }
 
-  saveChar(portalInfo: PortalInfo): void {
-
-    this.trustmanService.saveChar(portalInfo, this.label, this.ingressName);
-
-    /*
-    const projectID = portalInfo.projectId;
-    const portalInfoID = portalInfo.id;
-    let action = 'EDITED';
-    if (!portalInfo.published){
-      action = 'SET';
-      portalInfo.published = true;
-    }
-    portalInfo.label = this.label;
-    const portalVisiter: PortalVisiter = {
-      ingressName: this.ingressName,
-      action,
-      msg: ''
-    };
-    // TODO push new PortalVisiter into visiters
-    if (!portalInfo.visiters){
-
-    }else{
+  saveChar(portalInfo: PortalInfo, label: string): void {
+    if (this.trustmanService.confirmLabel(portalInfo, label)){
+      this.trustmanService.saveChar(portalInfo, label, this.ingressName);
+      /* Difficult problem controlling dialog
+      position over multiple device types. */
+      /*
+      const top = this.portalInfo.index * 300 + 146;
+      this.dialogRef.updatePosition({
+        top: top + 'px',
+        left: '150px'
+      });
+      */
+      this.dialogRef.close();
 
     }
-    // portalInfo.published = true; // TODO make a publish log
-    console.log('Publishing: ' + JSON.stringify(portalInfo));
-    this.trustmanService.setPortalInfo
-    (projectID, portalInfoID, portalInfo).then(value => {
-      console.log('setPortalInfo return value: ' + JSON.stringify(value));
-      let msg = this.ingressName + ' ' + action + ' Portal Character';
-      // this.snackbarService.openSnackBar(msg, 'value: ' + portalInfo.label);
-      // TODO publish message to log append more info to msg
-      msg = msg + ' to ' + portalInfo.label;
-      this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);
-    }).catch(reason => {
-      alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
-      portalInfo.published = false;
-    });
-    */
-    this.dialogRef.close();
   }
 
   onCancelClick(portalInfo: PortalInfo): void {
@@ -187,16 +165,27 @@ export class PuzzleMapDialogComponent {
     this.showUrlPage = !this.showUrlPage;
   }
 
+  validate(char: string, portalInfo: PortalInfo): void {
+    const retVal = this.trustmanService.validateChar(char, portalInfo);
+    this.hintMsg = retVal.hintMsg;
+    this.dirty = retVal.dirty;
+    this.isValidChar = retVal.isValidChar;
+  }
   validateChar(char: string, portalInfo: PortalInfo): void {
     const type = portalInfo.type;
     this.hintMsg = '';
     this.isValidChar = true;
     switch (type) {
-      case 'keyword':
+      case Const.GLYPH_CODE:
         if (char.length >= 2 || char.toUpperCase() === 'I'){ // smallest Glyph names are 2 characters
           // Now test for valid glyph name
-          if (this.trustmanService.isGlyphName(char)){
+          const glyphData: GlyphData = this.trustmanService.isGlyphName(char);
+          if (glyphData.isGlyph){
             this.hintMsg = '';
+            if (glyphData.names.length > 1){
+              this.hintMsg = glyphData.AKA;
+              portalInfo.AKA = glyphData.AKA;
+            }
           } else {
             this.hintMsg = 'Not a known Glyph Name!';
             this.isValidChar = false;
@@ -206,14 +195,14 @@ export class PuzzleMapDialogComponent {
           this.isValidChar = false;
         }
         break;
-      case '#':
+      case Const.NUMBER_CODE:
           const regX = /^-?\d+$/;
           if (!regX.test(char)){
             this.hintMsg = 'Only numbers allowed here!';
             this.isValidChar = false;
           }
           break;
-      case 'x':
+      case Const.LETTER_CODE:
           const regex = /^[a-zA-Z]+$/;
           if (!regex.test(char)){
             this.hintMsg = 'Only letters from a-z or A-Z allowed here!';
@@ -265,12 +254,62 @@ export class PuzzleMapDialogComponent {
   }
 
   openGoogleMaps(portalInfo: PortalInfo): void {
-    const dest = portalInfo.latLng;
-    const orig = this.pegPosition;
-    const label = 'Portal number: ' + portalInfo.index;
-    const url = 'https://www.google.com/maps/dir/?api=1&origin='
-      + orig.lat + ',' + orig.lng + '&destination='
-      + dest.lat + ',' + dest.lng + '&travelmode=walking';
-    window.open(url, 'google-maps');
+    if (confirm('The Google Maps App will open with walking' +
+      ' directions for you to the portal. Shall we Proceed?')) {
+      const dest = portalInfo.latLng;
+      const orig = this.pegPosition;
+      const label = 'Portal number: ' + portalInfo.index;
+      const url = 'https://www.google.com/maps/dir/?api=1&origin='
+        + orig.lat + ',' + orig.lng + '&destination='
+        + dest.lat + ',' + dest.lng + '&travelmode=walking';
+      window.open(url, 'google-maps');
+    }
+  }
+
+  delete(portalInfo: PortalInfo, label: string, ingressName: string): void {
+    if (confirm('Remove the Value: ' + label )){
+      this.label = '';
+      // Wait a bit so snack bar will appear; probably not neccessary on user screen
+      setTimeout(() => {
+        this.trustmanService.saveChar(portalInfo, '', ingressName);
+      }, Const.SNACK_WAIT_VERY_SHORT);
+    }
+  }
+
+  getHint(type: string): string {
+    return this.trustmanService.getHint(type);
+  }
+
+  testDeleteConditions(label: string, portalInfo: PortalInfo): boolean {
+    return this.trustmanService.testDeleteConditions(label, portalInfo);
+  }
+
+  deleteUrl(portalInfo: PortalInfo): void {
+    if (confirm('Remove the url?')){
+      const projectID = portalInfo.projectId;
+      const portalInfoID = portalInfo.id;
+      // if (this.isValidUrl) {
+      portalInfo.url = '';
+      portalInfo.latLng = null;
+      this.url = '';
+      // }
+      // console.log('Publishing: ' + JSON.stringify(portalInfo));
+      this.trustmanService.setPortalInfo
+      (projectID, portalInfoID, portalInfo).then(value => {
+        // console.log('setPortalInfo return value: ' + JSON.stringify(value));
+        let msg = this.ingressName;
+        msg = msg + ' REMOVED intel url: ' + portalInfo.url;
+        this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);
+      }).catch(reason => {
+        alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
+        portalInfo.published = false;
+      });
+      this.showUrlPage = false;
+      this.savedUrl = false;
+    }
+  }
+
+  openMap(portalInfo): void {
+    this.dialogRef.close(portalInfo);
   }
 }

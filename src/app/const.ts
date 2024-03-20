@@ -5,6 +5,7 @@ export class Const {
   public static IMAGE_FOLDER = 'https://geopad.ca/pixr2/assets/puzzle_images/';
   public static ZOOM_POSTAGE_STAMP = 22;
   public static ZOOM_BACKYARD = 20;
+  public static ZOOM_TO_PORTAL = 18;
   public static ZOOM_NEIGHBORHOOD = 15;
   public static ZOOM_VILLAGE = 14;
   public static ZOOM_CITY = 13;
@@ -22,11 +23,52 @@ export class Const {
   public static DIM_COL_WIDTH = 2480;
   public static DIM_THUMB_WIDTH = 250;
   public static DIM_HDR_HEIGHT = 146;
+  public static DIM_LEFT_MARGIN = 50;
   public static DIM_FUDGE_FACTOR = 14;
 
   public static SNACK_WAIT_VERY_LONG = 50000;
   public static SNACK_WAIT_LONG = 10000;
   public static SNACK_WAIT_SHORT = 5000;
-  public static SNACK_WAIT_VERY_SHORT = 2000;
+  public static SNACK_WAIT_VERY_SHORT = 1000;
+  public static WAIT_300 = 300;
 
+  public static NUMBER_CODE = '#';
+  public static LETTER_CODE = '*';
+  public static GLYPH_CODE = 'keyword';
+
+  public static LABEL_X = 14;
+  public static LABEL_Y = 9;
+  public static SCALE_W = 37.5;
+  public static SCALE_H = 60;
+  public static DISPLAY_THRESHOLD = 17;
+
+  public static URL_RED_PIN = 'https://geopad.ca/pixr2/assets/smurf.gif';
+  public static URL_GREY_PIN = 'https://geopad.ca/pixr2/assets/WhitePin.png';
+  public static URL_GREEN_PIN = 'https://geopad.ca/pixr2/assets/GreenPin.png';
+
+  public static CIRCLE_FILL_1 = '#ff9c00';
+  public static CIRCLE_STROKE_1 = '#704500';
+  public static CIRCLE_FILL_2 = '#5889ee';
+  public static CIRCLE_STROKE_2 = '#2d4472';
+
+  public static Z_INDEX_100 = 100;
+  public static Z_INDEX_200 = 200;
+
+  public static CIRCLE_OPTIONS = {
+    strokeColor: Const.CIRCLE_STROKE_1,
+    strokeOpacity: 1,
+    strokeWeight: 1,
+    fillColor: Const.CIRCLE_FILL_1,
+    fillOpacity: 0.20,
+    zIndex: Const.Z_INDEX_100,
+  };
+
+  public static PEG_CIRCLE_OPTIONS = {
+    strokeColor: Const.CIRCLE_STROKE_2,
+    strokeOpacity: 1,
+    strokeWeight: 1,
+    fillColor: Const.CIRCLE_FILL_2,
+    fillOpacity: 0.20,
+    zIndex: Const.Z_INDEX_200,
+  };
 }

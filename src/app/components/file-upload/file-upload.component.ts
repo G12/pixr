@@ -42,9 +42,7 @@ export class FileUploadComponent implements OnInit{
   onFileSelect(event): void {
     this.uploadComplete = false;
     this.fileChosen = true;
-    // console.log(event);
     if (event.target.files.length > 0) {
-      // console.log('DEBUG1');
       const file = event.target.files[0];
       // this.file = event.target.files[0];
       this.form.get('puzzle_img').setValue(file);
@@ -58,7 +56,6 @@ export class FileUploadComponent implements OnInit{
     this.uploadComplete = false;
     const formData = new FormData();
     formData.append('puzzle_img', this.form.get('puzzle_img').value);
-    // console.log('formData');
     this.uploadService.uploadFile(formData).subscribe(
       (res) => {
         this.uploadResponse = res;
@@ -110,8 +107,8 @@ export class FileUploadComponent implements OnInit{
           this.pzProjectList = {projects: []};
         }
 
-        console.log('Get latest Project List');
-        console.log(this.pzProjectList);
+        // console.log('Get latest Project List');
+        // console.log(this.pzProjectList);
       }
     });
   }
@@ -142,7 +139,6 @@ export class FileUploadComponent implements OnInit{
 
     // create new ColRec collection and set it's _metadata document
     this.trustmanService.metadataDocRef(projId).set(localStorage).then(val => {
-      // console.log('trustmanService.getMetadataDoc(' + projId + '): ', val);
       const bootParam: PzBootParam = {
         project_id: localStorage.projectID,
         folder: name
@@ -154,21 +150,20 @@ export class FileUploadComponent implements OnInit{
       const messagesDoc = {messages: []};
       messagesDoc.messages.push(msgDat);
       this.trustmanService.msgLogDocRef(projId).set(messagesDoc).then(value => {
-        // console.log('set _MsgLog return: ', value);
       });
       this.pzProjectList.projects.push(bootParam);
       // update the project list
       this.trustmanService.projectListBootDocRef.set(this.pzProjectList).then(doc => {
-        console.log('project List Updated');
-        console.log(this.pzProjectList.projects);
+        // console.log('project List Updated');
+        // console.log(this.pzProjectList.projects);
       });
       if (!adminOnly) {
         this.trustmanService.pzUserBootParamDocRef.set(bootParam).then(value2 => {
-          console.log('User Updated');
+          // console.log('User Updated');
         });
       }
       this.trustmanService.pzAdminBootParamDocRef.set(bootParam).then(value3 => {
-        console.log('Admin Updated');
+        // console.log('Admin Updated');
       });
     });
   }
@@ -185,9 +180,9 @@ export class FileUploadComponent implements OnInit{
   }
 
   setPasscodeTemplate(): void {
-    const pattern = 'xxx##keyword###xx';
+    const pattern = '***##keyword###**';
     const value = prompt(
-      'Please enter Passcode Template', pattern);
+      'Passcode Template where * = letters and # = numbers', pattern);
     if (value && value !== '') {
       for (let i = 0; i < value.length; i++ ){
         let char = value[i];

@@ -13,7 +13,7 @@ export class WarningComponent implements OnInit {
 
   constructor(public dialogRef: MatDialogRef<WarningComponent>,
               @Inject(MAT_DIALOG_DATA) public data: PortalRec) {
-    console.log(data);
+    // console.log(data);
   }
 
   ngOnInit(): void {

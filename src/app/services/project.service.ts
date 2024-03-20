@@ -70,9 +70,7 @@ export class ProjectService {
 
   ////////////////// disparate PortalRecCollection objects //////////////
   setColumnRecData(columnRecData: ColumnRecData): void{
-    // console.log('columnRecData: ' + JSON.stringify(columnRecData));
     this.firestore.collection(columnRecData.rawDataId).doc(columnRecData.id).set(columnRecData).then(value => {
-      // console.log('setportal return value: ' + JSON.stringify(value));
     }).catch(reason => {
       console.log('setColumnRecData ERROR reason: ' + JSON.stringify(reason));
     });
@@ -80,10 +78,8 @@ export class ProjectService {
 
   ////////////////////////////////////////////  Not used
   setCodeChar(columnChar: ColumnChar): void{
-    // console.log('setCodeChar ColumnChar: ' + JSON.stringify(columnChar));
     // if (true) {return; }
     this.firestore.collection(columnChar.rawDataId).doc(columnChar.id).set(columnChar).then(value => {
-      // console.log('setportal return value: ' + JSON.stringify(value));
     }).catch(reason => {
       console.log('setCodeChar ERROR reason: ' + JSON.stringify(reason));
     });
@@ -112,7 +108,6 @@ export class ProjectService {
       }
       messagesDoc.messages.unshift(msgDat);
       this.firestore.collection(rawDatId).doc('_MsgLog').set(messagesDoc).then(doc => {
-        // console.log('setLogMsg return value: ' + JSON.stringify(doc));
       }).catch(reason => {
         console.log('setLogMsg ERROR reason: ' + JSON.stringify(reason));
       });
@@ -130,7 +125,6 @@ export class ProjectService {
 
   setPortalRec(rawDatId: string, path: string, portalRec: PortalRec): void{
     this.firestore.collection(rawDatId).doc(path).set(portalRec).then(value => {
-      // console.log('setportal return value: ' + JSON.stringify(value));
     }).catch(reason => {
       console.log('setPortal ERROR reason: ' + JSON.stringify(reason));
     });

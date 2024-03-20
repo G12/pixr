@@ -130,7 +130,6 @@
 .wrapper {
   overflow: hidden;
 }
-
 /* Dialog Box  */
 .anchor{
   cursor: pointer;
@@ -140,11 +139,9 @@
   text-overflow: ellipsis;
   width: 100%;
 }
-
 .logBuffer {
   border: black;
 }
-
 .small {
   color: lightgray;
 }
