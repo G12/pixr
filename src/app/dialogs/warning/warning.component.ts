@@ -20,6 +20,7 @@ export class WarningComponent implements OnInit {
   }
 
   onCancelClick(data: PortalRec): void {
+    // TODO determine how to use data
     this.dialogRef.close();
   }
 

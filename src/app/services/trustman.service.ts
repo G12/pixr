@@ -1,60 +1,48 @@
 import { Injectable } from '@angular/core';
 import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/compat/firestore';
-import {GlyphData, LocalMetadata, LogMessages, MarkerOptions, MsgData, PortalInfo, PortalVisiter, RetVal} from '../data';
+import {GlyphData, LocalMetadata, LogMessages, MsgData, PortalInfo, PortalVisiter, RetVal} from '../data';
 import {SnackbarService} from './snackbar.service';
 import {Const} from '../const';
-// import {ProjectService} from './project.service';
-
 @Injectable({
   providedIn: 'root'
 })
 export class TrustmanService {
-
   pzAdminBootParamDocRef: AngularFirestoreDocument;
   pzUserBootParamDocRef: AngularFirestoreDocument;
   projectListBootDocRef: AngularFirestoreDocument;
-
   iconBase = 'https://geopad.ca/pixr2/assets/';
-
   constructor(private firestore: AngularFirestore,
               private snackbarService: SnackbarService) {
     // get a reference to the AngularFirestoreDocuments
     this.pzUserBootParamDocRef = this.firestore.collection('fs_boot_params').doc('pz_user');
     this.pzAdminBootParamDocRef = this.firestore.collection('fs_boot_params').doc('pz_admin');
-
     this.projectListBootDocRef = this.firestore.collection('fs_boot_params').doc('pz_project_list');
   }
-
   updatePortalInfo(docId: string, portalId: string, portalInfo: PortalInfo): void{
     this.firestore.collection(docId).doc(portalId).update(portalInfo);
   }
-
   setPortalInfo(docId: string, portalId: string, portalInfo: PortalInfo): Promise<void>{
     return this.firestore.collection(docId).doc(portalId).set(portalInfo);
   }
-
-
   updateMetaData(metadata: LocalMetadata): void{
-    this.firestore.collection(metadata.projectID).doc('_metadata').update(metadata).then(value => {
+    this.firestore.collection(metadata.projectID).doc
+      ('_metadata').update(metadata).then(value => {
+        if (Const.DEBUG_TRUSTMAN){
+          console.log(value);
+        }
     }).catch(reason => {
       console.log(reason);
     });
   }
-
   metadataDocRef(id: string): AngularFirestoreDocument {
     return this.firestore.collection(id).doc('_metadata');
   }
-
   msgLogDocRef(id: string): AngularFirestoreDocument {
     return this.firestore.collection(id).doc('_MsgLog');
   }
-
   getMsgLog(rawDatId: string): AngularFirestoreDocument{
     return this.firestore.collection(rawDatId).doc('_MsgLog');
-    // this.rawDataDocRef = this.firestore.collection(rawDatId).doc('_MsgLog');
-    // return this.rawDataDocRef;
   }
-
   setLogMsg(ingressName: string, projId: string, msg: string, portalData: PortalInfo): void{
     this.firestore.collection(projId).doc('_MsgLog').get().subscribe(document => {
       const date = new Date();
@@ -84,7 +72,7 @@ export class TrustmanService {
       let messagesDoc: LogMessages;
       if (msg === 'CLEAR_ALL_MESSAGES') {
         messagesDoc = {messages: []};
-        // Send a user friendly message
+        // TODO Send a user friendly message
         // const usrName = portalData ? portalData.user : '';
         // msgDat.msg = usrName + ' Cleared the Log!';
       } else if (document.exists){
@@ -93,13 +81,16 @@ export class TrustmanService {
         messagesDoc = {messages: []};
       }
       messagesDoc.messages.unshift(msgDat);
-      this.firestore.collection(projId).doc('_MsgLog').set(messagesDoc).then(doc => {
+      this.firestore.collection(projId).doc('_MsgLog').set
+          (messagesDoc).then(doc => {
+            if (Const.DEBUG_TRUSTMAN){
+              console.log(doc);
+            }
       }).catch(reason => {
         console.log('setLogMsg ERROR reason: ' + JSON.stringify(reason));
       });
     });
   }
-
   saveChar(portalInfo: PortalInfo, label: string, ingressName: string): void {
     const projectID = portalInfo.projectId;
     const portalInfoID = portalInfo.id;
@@ -114,6 +105,7 @@ export class TrustmanService {
       }
     }
     portalInfo.label = label;
+    // TODO store info on player visits to portal
     const portalVisiter: PortalVisiter = {
       ingressName,
       action,
@@ -128,6 +120,9 @@ export class TrustmanService {
     // portalInfo.published = true; // TODO make a publish log
     this.setPortalInfo
     (projectID, portalInfoID, portalInfo).then(value => {
+      if (Const.DEBUG_TRUSTMAN){
+        console.log(value);
+      }
       let msg = 'At Portal:' + portalInfo.index + ' ' + ingressName + ' ' + action + ' value';
       if (action === 'EDITED'){
         msg = msg + ' from "' + startValue + '" to "' + portalInfo.label + '"';
@@ -143,7 +138,6 @@ export class TrustmanService {
       portalInfo.published = false;
     });
   }
-
   isGlyphName(glyphName: string): GlyphData {
     const glyphs = [
       ['Abandon'],
@@ -289,13 +283,13 @@ export class TrustmanService {
       ['You', 'Other'],
     ];
     const names: string[] = [];
-    const name = '';
     const glyphData: GlyphData = {
         names,
         name: glyphName,
         isGlyph: false,
         AKA: '',
     };
+    // TODO test AKA return funtionality
     const test = glyphs.find(arr => {
       arr.find(str => {
         const t = glyphName.toUpperCase() === str.toUpperCase();
@@ -311,7 +305,6 @@ export class TrustmanService {
     });
     return glyphData;
   }
-
   validateChar(char: string, portalInfo: PortalInfo): RetVal {
     const type = portalInfo.type;
     let hintMsg = '';
@@ -320,7 +313,6 @@ export class TrustmanService {
     const retVal: RetVal = {
       hintMsg, isValidChar, dirty
     };
-
     switch (type) {
       case Const.GLYPH_CODE:
         if (char.length >= 2 || char.toUpperCase() === 'I'){ // smallest Glyph names are 2 characters
@@ -362,7 +354,6 @@ export class TrustmanService {
     retVal.hintMsg = hintMsg;
     return retVal;
   }
-
   getHint(type: string): string {
     let str = 'Glyph Name';
     if (type === Const.LETTER_CODE){
@@ -372,13 +363,12 @@ export class TrustmanService {
     }
     return str;
   }
-
   getIconUrl(info: PortalInfo): string {
     let done = false;
     if (info.label && info.label.length > 0){
       done = true;
     }
-    let filename = '';
+    let filename;
     if (info.type === Const.LETTER_CODE){
       filename = done ? 'letterDone.png' : 'letter.png';
     }else if (info.type === Const.NUMBER_CODE){
@@ -388,9 +378,9 @@ export class TrustmanService {
     }
     return this.iconBase + filename; // this.iconBase + 'gliph.png';
   }
-
   getOptons(info: PortalInfo): google.maps.MarkerOptions {
     const url = this.getIconUrl(info);
+    // TODO test if title is set elswhere
     let title = 'Portal:' + info.index + ' value = ';
     if (!info.label || info.label === ''){
       title += 'UKNOWN?';
@@ -417,12 +407,7 @@ export class TrustmanService {
     console.log('OK now?');
     return true;
   }
-
-
-
-
   testDeleteConditions(label: string, portalInfo: PortalInfo): boolean {
     return label.length !== 0 && portalInfo.label && label === portalInfo.label;
   }
-
 }

@@ -70,7 +70,9 @@ export class ProjectService {
 
   ////////////////// disparate PortalRecCollection objects //////////////
   setColumnRecData(columnRecData: ColumnRecData): void{
-    this.firestore.collection(columnRecData.rawDataId).doc(columnRecData.id).set(columnRecData).then(value => {
+    this.firestore.collection(columnRecData.rawDataId).doc(columnRecData.id).set
+        (columnRecData).then(value => {
+          const v = value; // TODO FIX warnings later
     }).catch(reason => {
       console.log('setColumnRecData ERROR reason: ' + JSON.stringify(reason));
     });

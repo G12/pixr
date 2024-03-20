@@ -30,14 +30,14 @@ agm-map {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: x-small;
-  font-family: "Calibri Light";
+  font-family: "Calibri Light", serif;
 }
 
 .grayTitle {
   max-width: 200px;
   color: gray;
   font-size: medium;
-  font-family: "Calibri Light";
+  font-family: "Calibri Light", serif;
 }
 
 .cautionHint {

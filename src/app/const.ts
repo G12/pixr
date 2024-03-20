@@ -1,4 +1,9 @@
 export class Const {
+  public static DEBUG_PUZZLE = false;
+  public static DEBUG_FILE_UPLOAD = false;
+  public static DEBUG_PORTAL_INFO = false;
+  public static DEBUG_TRUSTMAN = false;
+  public static DEBUG_PUZZLE_MAP_DIALOG = false;
   public static LAT_LNG_OTTAWA = { lat: 45.423502, lng: -75.691320};
   public static STATIC_LOCATION = 1;
   public static DYNAMIC_LOCATION = 2;

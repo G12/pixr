@@ -65,6 +65,7 @@ export class MapDialogComponent {
    }
 
   validateChar(columnRecData: ColumnRecData): void {
+    // TODO Why no validation
     const test = columnRecData;
   }
 

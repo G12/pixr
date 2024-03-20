@@ -208,7 +208,9 @@ export class PuzzleMapDialogComponent {
       // console.log('Publishing: ' + JSON.stringify(portalInfo));
       this.trustmanService.setPortalInfo
       (projectID, portalInfoID, portalInfo).then(value => {
-        // console.log('setPortalInfo return value: ' + JSON.stringify(value));
+        if (Const.DEBUG_PUZZLE_MAP_DIALOG){
+          console.log('setPortalInfo return value: ' + JSON.stringify(value));
+        }
         let msg = this.ingressName;
         msg = msg + ' REMOVED intel url: ' + portalInfo.url;
         this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);

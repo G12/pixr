@@ -2,12 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {UploadService} from '../../services/upload.service';
 import {LocalMetadata, PzBootParam, PzProjectList, UploadResponse} from '../../data';
-import {BootParam, MsgDat} from '../../project.data';
+import {MsgDat} from '../../project.data';
 import {TrustmanService} from '../../services/trustman.service';
 import {ProjectService} from '../../services/project.service';
 import {AuthService} from '../../services/auth.service';
 import {Const} from '../../const';
-
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
@@ -25,20 +24,17 @@ export class FileUploadComponent implements OnInit{
   localTemplateArray: string[] = [];
   // projectList: ProjectList;
   pzProjectList: PzProjectList;
-
   constructor(private formBuilder: FormBuilder,
               private uploadService: UploadService,
               private trustmanService: TrustmanService,
               private projectService: ProjectService,
               private authService: AuthService) { }
-
   ngOnInit(): void {
     this.form = this.formBuilder.group({
       puzzle_img: ['']
     });
     this.getProjectList();
   }
-
   onFileSelect(event): void {
     this.uploadComplete = false;
     this.fileChosen = true;
@@ -50,7 +46,6 @@ export class FileUploadComponent implements OnInit{
       console.log('File Selection FAILED!');
     }
   }
-
   onSubmit(): void {
     this.showProgress = true;
     this.uploadComplete = false;
@@ -69,7 +64,6 @@ export class FileUploadComponent implements OnInit{
       }
     );
   }
-
   ///////////////////////////////////////////////////////////////////////////////
   ///////////////////  Start of New Project Area
   ///////////////////////////////////////////////////////////////////////////////
@@ -88,7 +82,6 @@ export class FileUploadComponent implements OnInit{
       this.fileChosen = false;
     }
   }
-
   getProjectList(): void {
     // Get the current Project List
     this.projectService.bootParamsCollection.get().subscribe(data => {
@@ -99,23 +92,17 @@ export class FileUploadComponent implements OnInit{
         // } else {
           // this.projectList = {projects: []};
         // }
-
         const pzProjLst = data.docs.find(d => d.id === 'pz_project_list');
         if (pzProjLst) {
           this.pzProjectList = pzProjLst.data() as PzProjectList;
         } else {
           this.pzProjectList = {projects: []};
         }
-
         // console.log('Get latest Project List');
         // console.log(this.pzProjectList);
       }
     });
   }
-
-  setUserProject(bootParams: PzBootParam): void {
-  }
-
   /**
    * Create a new First Saturday Project
    */
@@ -136,9 +123,11 @@ export class FileUploadComponent implements OnInit{
       fudgeFactor: Const.DIM_FUDGE_FACTOR,
       localTemplateArray: this.localTemplateArray,
     };
-
     // create new ColRec collection and set it's _metadata document
     this.trustmanService.metadataDocRef(projId).set(localStorage).then(val => {
+      if (Const.DEBUG_FILE_UPLOAD){
+        console.log(val);
+      }
       const bootParam: PzBootParam = {
         project_id: localStorage.projectID,
         folder: name
@@ -150,35 +139,43 @@ export class FileUploadComponent implements OnInit{
       const messagesDoc = {messages: []};
       messagesDoc.messages.push(msgDat);
       this.trustmanService.msgLogDocRef(projId).set(messagesDoc).then(value => {
+        if (Const.DEBUG_FILE_UPLOAD){
+          console.log(value);
+        }
       });
       this.pzProjectList.projects.push(bootParam);
       // update the project list
       this.trustmanService.projectListBootDocRef.set(this.pzProjectList).then(doc => {
-        // console.log('project List Updated');
-        // console.log(this.pzProjectList.projects);
+        if (Const.DEBUG_FILE_UPLOAD){
+          console.log('project List Updated');
+          console.log(this.pzProjectList.projects);
+        }
       });
       if (!adminOnly) {
         this.trustmanService.pzUserBootParamDocRef.set(bootParam).then(value2 => {
-          // console.log('User Updated');
+          if (Const.DEBUG_FILE_UPLOAD){
+            console.log('User Updated');
+            console.log(value2);
+          }
         });
       }
       this.trustmanService.pzAdminBootParamDocRef.set(bootParam).then(value3 => {
-        // console.log('Admin Updated');
+        if (Const.DEBUG_FILE_UPLOAD){
+          console.log('Admin Updated');
+          console.log(value3);
+        }
       });
     });
   }
-
   logout(): void {
     if (confirm('Log Out?')) {
       this.authService.logout();
     }
   }
-
   ////////////////////////////// End of New Project Area
   logOut(): void {
     this.authService.logout();
   }
-
   setPasscodeTemplate(): void {
     const pattern = '***##keyword###**';
     const value = prompt(

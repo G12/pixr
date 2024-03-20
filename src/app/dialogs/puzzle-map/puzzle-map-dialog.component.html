@@ -41,7 +41,7 @@
     <mat-form-field [style.width.%]="100" appearance="outline">
       <mat-hint *ngIf="!savedUrl" class="cautionHint"><strong>@{{ingressName}}</strong> please be carefull that the location is correct!</mat-hint>
       <mat-label>Paste portal url Here</mat-label>
-      <input (ngModelChange)="validateUrl($event, portalInfo)" matInput [(ngModel)]="url"
+      <input (ngModelChange)="validateUrl($event)" matInput [(ngModel)]="url"
              class="charInput" autocomplete="off" [disabled]="savedUrl">
       <mat-icon *ngIf="!savedUrl" matSuffix>cloud_download</mat-icon>
       <mat-icon *ngIf="savedUrl" matSuffix

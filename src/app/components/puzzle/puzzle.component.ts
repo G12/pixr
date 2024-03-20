@@ -22,7 +22,7 @@ import {PuzzleMapDialogComponent} from '../../dialogs/puzzle-map/puzzle-map-dial
 import {HttpClient} from '@angular/common/http';
 import {GEOLOCATION_SUPPORT, GeolocationService} from '@ng-web-apis/geolocation';
 import {take} from 'rxjs';
-import {GoogleMap, MapCircle, MapInfoWindow, MapMarker} from '@angular/google-maps';
+import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {Const} from '../../const';
 import {SnackbarService} from '../../services/snackbar.service';
 import {ThemePalette} from '@angular/material/core';
@@ -555,10 +555,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       (str, 'Close', 5000);
   }
   hasUrl(info: PortalInfo): boolean {
-    if (info.url && info.url.length > 0) {
-      return true;
-    }
-    return false;
+    return info.url && info.url.length > 0;
   }
   ///////////////////////// Google Map ///////////////////////////////
   ////////////////////////////////////////////////////////////////////
@@ -615,10 +612,14 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.infoWindow?.open(marker);
   }
   infoClosed($event: void): void {
-    // console.log($event);
+    if (Const.DEBUG_PUZZLE){
+      console.log($event);
+    }
   }
   closeWindow($event: MouseEvent): void {
-    // console.log($event);
+    if (Const.DEBUG_PUZZLE){
+      console.log($event);
+    }
     this.infoWindow.close();
   }
   getLabel(portalInfo: PortalInfo): string {
@@ -627,7 +628,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   openGoogleMaps(currentPortalFrame: PortalFrame): void {
     const dest = currentPortalFrame.info.latLng;
     const orig = this.center;
-    const label = 'Portal number: ' + currentPortalFrame.index;
     const url = 'https://www.google.com/maps/dir/?api=1&origin='
     + orig.lat + ',' + orig.lng + '&destination='
     + dest.lat + ',' + dest.lng + '&travelmode=walking';
@@ -713,7 +713,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     if (msgData.latLng){
       const dest = msgData.latLng;
       const orig = this.pegPosition;
-      const label = 'Portal Id: ' + msgData.prtlId;
       const url = 'https://www.google.com/maps/dir/?api=1&origin='
         + orig.lat + ',' + orig.lng + '&destination='
         + dest.lat + ',' + dest.lng + '&travelmode=walking';
@@ -768,11 +767,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     let pitch = 0;
     // TODO see if we can store heading and pitch values
     if (info) {
-      const listener = streetView.addListener('closeclick', ($e) => {
+      streetView.addListener('closeclick', ($e) => {
         console.log('Street View Closed');
         console.log($e);
         console.log('heading: ' + heading + ' pitch: ' + pitch);
-
       });
       streetView.addListener('pov_changed', () => {
           heading = streetView.getPov().heading;
@@ -832,7 +830,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     return this.ingressName.substring(0, 5);
   }
   getChar(portalInfo: PortalInfo): string{
-    let char = '';
+    let char;
     if (portalInfo.label !== '') {
       char = portalInfo.label; // as string;
     }else{
