@@ -1,0 +1,9 @@
+.portalFrame {
+  border: black 2px solid;
+  border-radius: 4px;
+}
+.cautionHint {
+  background-color: orange;
+  width: 90%;
+}
+

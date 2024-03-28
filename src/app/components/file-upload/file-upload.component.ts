@@ -116,11 +116,13 @@ export class FileUploadComponent implements OnInit{
       projectName: name,
       projectID: projId,
       rowCount: Const.DIM_ROW_COUNT,
-      colHeight: Const.DIM_COL_HEIGHT,
-      imgColWidth: Const.DIM_COL_WIDTH,
-      thumbWidth: Const.DIM_THUMB_WIDTH,
-      hdrHeight: Const.DIM_HDR_HEIGHT,
-      fudgeFactor: Const.DIM_FUDGE_FACTOR,
+      rowHeight: Const.DIM_ROW_HEIGHT,
+      hdrHeight: Const.HDR_HEIGHT,
+      lefMargin: Const.LEFT_MARGIN,
+      thumbWidth: Const.THUMB_WIDTH,
+      thumbHeight: Const.THUMB_HEIGHT,
+      thumbSize: Const.THUMB_SIZE,
+      fudgeFactor: Const.FUDGE_FACTOR,
       localTemplateArray: this.localTemplateArray,
     };
     // create new ColRec collection and set it's _metadata document

@@ -1,4 +1,19 @@
 export class Const {
+  public static SIDE_BAR_RIGHT_PADDING = 28;
+  public static BUTTON_WIDTH = 56;
+
+  // thumbnail defaults
+  public static THUMB_WIDTH = 500;
+  public static THUMB_HEIGHT = 299;
+  public static THUMB_SIZE = 500;
+  public static FUDGE_FACTOR = 3.5;
+
+  // FS Image Defaults
+  public static DIM_ROW_COUNT = 11;
+  public static DIM_ROW_HEIGHT = 299;
+  public static HDR_HEIGHT = 144;
+  public static LEFT_MARGIN = 120;
+
   public static DEBUG_PUZZLE = false;
   public static DEBUG_FILE_UPLOAD = false;
   public static DEBUG_PORTAL_INFO = false;
@@ -22,14 +37,6 @@ export class Const {
   public static ZOOM_CONTINENT = 4;
   public static ZOOM_HEMISPHERE = 3;
   public static ZOOM_WORLD = 2;
-
-  public static DIM_ROW_COUNT = 11;
-  public static DIM_COL_HEIGHT = 299;
-  public static DIM_COL_WIDTH = 2480;
-  public static DIM_THUMB_WIDTH = 250;
-  public static DIM_HDR_HEIGHT = 146;
-  public static DIM_LEFT_MARGIN = 50;
-  public static DIM_FUDGE_FACTOR = 14;
 
   public static SNACK_WAIT_VERY_LONG = 50000;
   public static SNACK_WAIT_LONG = 10000;
@@ -58,6 +65,9 @@ export class Const {
 
   public static Z_INDEX_100 = 100;
   public static Z_INDEX_200 = 200;
+  public static CONFIDENCE_GREEN = 40;
+  public static CONFIDENCE_YELLOW = 200;
+  public static CONFIDENCE_RED = 1000;
 
   public static CIRCLE_OPTIONS = {
     strokeColor: Const.CIRCLE_STROKE_1,
@@ -76,4 +86,9 @@ export class Const {
     fillOpacity: 0.20,
     zIndex: Const.Z_INDEX_200,
   };
+  public static RENDER_OPTIONS =
+    { markerOptions: { visible: false },
+      polylineOptions: { strokeColor: '#5889ee',
+        strokeWeight: 6}
+    };
 }

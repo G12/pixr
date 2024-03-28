@@ -53,29 +53,20 @@
     <div class="verticalSpace"></div>
   </div>
   <span *ngIf="savedUrl">
-    <button mat-button color="primary" (click)="openGoogleMaps(portalInfo)">
+    <!-- TODO archive Google Maps code for future use
+    <button mat-button color="primary" (click)="openGoogleMaps(portalInfo)"
+            matTooltip="Open Google Maps for directions to this portal">
       <mat-icon matSuffix>directions_walk</mat-icon>
       Directions
-    </button>
-    <button *ngIf="savedUrl" mat-button color="primary" (click)="openMap(portalInfo)">
-        <mat-icon matSuffix>map</mat-icon>
+    </button>-->
+    <!--<button *ngIf="savedUrl" mat-button color="primary" (click)="openMap(portalInfo)"
+          matTooltip="Close Side Bar and Zoom into this portal">
+        <mat-icon matSuffix>arrow_left</mat-icon>
       MAP
-    </button>
+    </button>-->
   </span>
   <mat-divider></mat-divider>
   <p><br></p>
-  <!--
-  <div *ngIf="!showUrlPage" mat-dialog-actions>
-  <span *ngIf="portalInfo.published">
-    <span>To VERIFY </span>
-  <span>
-    <button mat-button color="primary" (click)="verifyValue(portalInfo)">
-    <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-    Click Here</button>
-  </span>
-  </span>
-  </div>
-  -->
   <div *ngIf="hintMsg.length !== 0">
     <mat-hint class="cautionHint"><strong>{{hintMsg}}
     </strong></mat-hint>
@@ -97,6 +88,12 @@
           mat-raised-button color="primary"
           (click)="saveChar(portalInfo, label)">Save
   </button>
+  <!--
+  <button *ngIf="savedUrl" mat-button color="primary" (click)="openMap(portalInfo)"
+          matTooltip="Close Side Bar and Zoom into this portal">
+    <mat-icon matSuffix>arrow_right</mat-icon>
+    Go to MAP
+  </button>-->
   <button mat-button (click)="onCancelClick(portalInfo)">
     <span *ngIf="dirty">Cancel</span>
     <span *ngIf="!dirty">Close</span>

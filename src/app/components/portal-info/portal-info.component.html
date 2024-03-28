@@ -1,0 +1,46 @@
+
+<div *ngIf="portalFrame">
+  <h4>Portal:{{portalFrame.info.index}} value: {{portalFrame.info.label}}</h4>
+  <!-- TODO does not work well
+  <span>Check Location on <a href="{{portalFrame.info.url}}" target="intell">Intel Map</a></span>
+  -->
+  <div class="portalFrame">
+  <app-thumbnail
+    [src]="src" [index]="portalFrame.index" [thumbWidth]="localMetadata.thumbWidth/2"
+    [thumbHeight]="localMetadata.thumbHeight/2" [hdrHeight]="localMetadata.hdrHeight/2"
+    [thumbSize]="localMetadata.thumbSize" [leftMargin]="localMetadata.lefMargin/2"
+    [fudgeFactor]="localMetadata.fudgeFactor/2">
+  </app-thumbnail>
+  </div>
+  <div>
+    <br>
+    <div *ngIf="hintMsg.length !== 0">
+    <mat-hint class="cautionHint"><strong>{{hintMsg}}
+      </strong></mat-hint>
+    </div>
+    <mat-form-field [style.width.%]="64" appearance="outline">
+      <mat-label>{{getHint(portalFrame.info.type)}}</mat-label>
+      <input (ngModelChange)="validate($event, portalFrame.info)"
+             matInput [(ngModel)]="label"
+             class="charInput" autocomplete="off">
+    </mat-form-field>
+    <button *ngIf="testDeleteConditions(label, portalFrame.info)"
+            (click)="delete(portalFrame.info, label, ingressName)"
+      mat-icon-button color="warn" aria-label="Delete Forever">
+      <mat-icon>delete_forever</mat-icon>
+    </button>
+    <!--
+    <button (click)="openStreetView(portalFrame.info)"
+            mat-icon-button aria-label="Open Street View">
+      <mat-icon>streetview</mat-icon>
+    </button>
+    -->
+    <div>
+      <button *ngIf="isValidChar"
+              mat-raised-button color="primary"
+              (click)="saveChar(portalFrame.info, label, ingressName)">Save
+      </button>
+    </div>
+  </div>
+</div>
+

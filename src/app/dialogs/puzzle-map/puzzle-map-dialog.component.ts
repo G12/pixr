@@ -123,16 +123,10 @@ export class PuzzleMapDialogComponent {
   }
   saveChar(portalInfo: PortalInfo, label: string): void {
     if (this.trustmanService.confirmLabel(portalInfo, label)){
+      const d = this.trustmanService.distanceBetween(
+                        this.pegPosition, portalInfo.latLng);
+
       this.trustmanService.saveChar(portalInfo, label, this.ingressName);
-      /* Difficult problem controlling dialog
-      position over multiple device types. */
-      /*
-      const top = this.portalInfo.index * 300 + 146;
-      this.dialogRef.updatePosition({
-        top: top + 'px',
-        left: '150px'
-      });
-      */
       this.dialogRef.close();
     }
   }

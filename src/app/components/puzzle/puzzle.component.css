@@ -10,14 +10,20 @@ img {
 .row {
   border-top: black solid 1px;
 }
-.iconBar {
+.btnBar {
+  position: absolute;
+  top: 80%;
+  left: 0px;
+}
+.btnSpacing {
   margin-left: 18px;
-  background-color: black;
+}
+.icon-display {
+  transform: scale(2);
+}
+.iconGreen {
   color: lawngreen;
-  height: fit-content;
-  width: fit-content;
-  padding: 4px;
-  text-align: center;
+  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
 }
 .indexWrapper{
   position: absolute;
@@ -143,6 +149,31 @@ input[type="text"]
   width: 100%;
   border-right: black solid 1px;
 }
+.zoom-button-for-map {
+  padding: 6px;
+  position: absolute;
+  left: 60%;
+  top: 100px;
+  border: black solid 1px;
+  font-size:18px;
+  background-color:  rgba(255,255,255,0.64);
+  cursor: pointer;
+}
+.side-bar-button-for-map {
+  padding: 6px;
+  position: absolute;
+  left: 8px;
+  top: 152px;
+  border: black solid 1px;
+  font-size:18px;
+  background-color:  rgba(255,255,255,0.64);
+  cursor: pointer;
+}
+.side-bar-button {
+  position: absolute;
+  /*left: 60%;*/
+  top: 152px;
+}
 .mapFrame {
   margin-top: 96px;
 }
@@ -156,8 +187,8 @@ input[type="text"]
   margin-top: 96px;
 }
 .imagePage {
+  position: relative;
   margin-top: 96px;
-  /*width: 100%;*/
   width: fit-content;
   /*height: 3508px;*/
   height: fit-content;
@@ -165,7 +196,7 @@ input[type="text"]
   color: lawngreen;
 }
 .homeFrame{
-  width: 100%;
+  /*width: 100%;*/
 }
 .pushDownBelowToolBar {
   margin-top: 98px;
@@ -187,3 +218,11 @@ input[type="text"]
      'GRAD' -25,
      'opsz' 48
  }
+.blink {
+  animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}

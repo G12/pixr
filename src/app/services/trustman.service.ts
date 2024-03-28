@@ -3,6 +3,8 @@ import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/compat/f
 import {GlyphData, LocalMetadata, LogMessages, MsgData, PortalInfo, PortalVisiter, RetVal} from '../data';
 import {SnackbarService} from './snackbar.service';
 import {Const} from '../const';
+import {MapDirectionsResponse, MapDirectionsService} from '@angular/google-maps';
+import {Observable} from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -11,12 +13,24 @@ export class TrustmanService {
   pzUserBootParamDocRef: AngularFirestoreDocument;
   projectListBootDocRef: AngularFirestoreDocument;
   iconBase = 'https://geopad.ca/pixr2/assets/';
+  googleMapsDirectionResult: google.maps.DirectionsResult;
+
   constructor(private firestore: AngularFirestore,
-              private snackbarService: SnackbarService) {
+              private snackbarService: SnackbarService,
+              private mapDirectionsService: MapDirectionsService) {
     // get a reference to the AngularFirestoreDocuments
     this.pzUserBootParamDocRef = this.firestore.collection('fs_boot_params').doc('pz_user');
     this.pzAdminBootParamDocRef = this.firestore.collection('fs_boot_params').doc('pz_admin');
     this.projectListBootDocRef = this.firestore.collection('fs_boot_params').doc('pz_project_list');
+  }
+
+  getDirections(origin: google.maps.LatLngLiteral,
+                destination: google.maps.LatLngLiteral,
+                travelMode: google.maps.TravelMode): Observable<MapDirectionsResponse>
+  {
+    const request: google.maps.DirectionsRequest = {
+      destination, origin, travelMode };
+    return this.mapDirectionsService.route(request);
   }
   updatePortalInfo(docId: string, portalId: string, portalInfo: PortalInfo): void{
     this.firestore.collection(docId).doc(portalId).update(portalInfo);
@@ -404,10 +418,13 @@ export class TrustmanService {
         return false;
       }
     }
-    console.log('OK now?');
     return true;
   }
   testDeleteConditions(label: string, portalInfo: PortalInfo): boolean {
     return label.length !== 0 && portalInfo.label && label === portalInfo.label;
+  }
+  distanceBetween(origin: google.maps.LatLngLiteral, dest: google.maps.LatLngLiteral): number{
+    return google.maps.geometry.spherical.computeDistanceBetween(
+      origin, dest);
   }
 }
