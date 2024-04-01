@@ -116,6 +116,7 @@ export class TrustmanService {
     }else{
       if (label === ''){
         action = 'REMOVED';
+        console.log('DEBUG delete 2');
       }
     }
     portalInfo.label = label;

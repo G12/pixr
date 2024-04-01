@@ -12,23 +12,34 @@ img {
 }
 .btnBar {
   position: absolute;
-  top: 80%;
-  left: 0px;
+  top: 75%;
+  left: 60%;
 }
 .btnSpacing {
-  margin-left: 18px;
+  margin-left: 24px;
+}
+.btnSpacingLeft {
+  margin-left: 0px;
 }
 .icon-display {
   transform: scale(2);
 }
 .iconGreen {
+  border: black solid 4px;
+  background-color: rgba(158,165,169,0.5);
+  min-width: 24px;
+  min-height: 24px;
+  width: fit-content;
+  height: fit-content;
+  border-radius: 4px;
+  padding: 12px;
   color: lawngreen;
   text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
 }
 .indexWrapper{
   position: absolute;
-  top: 18px;
-  left: 18px;
+  top: 8px;
+  left: 8px;
   height: fit-content;
   /*background-color: gainsboro;*/
 }
@@ -37,8 +48,8 @@ img {
   color: darkgray;
 }
 .indexNumber{
-  margin-left: 8px;
-  margin-top: 8px;
+  margin-left: 4px;
+  margin-top: 4px;
   border: black solid 4px;
   background-color: rgba(158,165,169,0.5);
   min-width: 24px;
@@ -53,13 +64,20 @@ img {
   color: lawngreen;
   text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
 }
+.infoFrame {
+  width: fit-content;
+  padding: 4px;
+}
 .portalFrame {
-  cursor:pointer;
   position: relative;
   border: lawngreen 4px solid;
   border-radius: 9px;
-  margin: 18px;
-  padding: 8px;
+  border: black solid 2px;
+  margin-top: 2px;
+  margin-left: 0px;
+  margin-right: 2px;
+  /*margin-top: 8px;*/
+  padding: 0px;
   width: fit-content;
   background-color: white;
 }

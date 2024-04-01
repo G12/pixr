@@ -1,9 +1,24 @@
-.portalFrame {
+.thumbFrame {
+  width: fit-content;
   border: black 2px solid;
   border-radius: 4px;
+  margin: 8px;
 }
 .cautionHint {
   background-color: orange;
   width: 90%;
 }
+.inTheGreen {
+  border: black solid 4px;
+  background-color: lightgray;
+  min-width: 24px;
+  min-height: 24px;
+  width: fit-content;
+  height: fit-content;
+  border-radius: 4px;
+  padding: 12px;
+  color: lawngreen;
+  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
 

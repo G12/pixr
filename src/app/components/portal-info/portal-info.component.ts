@@ -1,8 +1,8 @@
-import {AfterViewInit, Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, Output} from '@angular/core';
 import {TrustmanService} from '../../services/trustman.service';
-import {LatLng, LocalMetadata, PortalFrame, PortalInfo} from '../../data';
+import {LocalMetadata, PortalFrame, PortalInfo} from '../../data';
 import {Const} from '../../const';
-import {GoogleMap, MapInfoWindow} from '@angular/google-maps';
+import {GoogleMap} from '@angular/google-maps';
 
 @Component({
   selector: 'app-portal-info',
@@ -16,6 +16,8 @@ export class PortalInfoComponent implements AfterViewInit{
   @Input() ingressName: string;
   @Input() pegPosition: google.maps.LatLngLiteral;
   @Input() map: GoogleMap;
+  @Input() imgWidth: number;
+  @Input() infoScale: number;
   @Output('parentFun') parentFun: EventEmitter<any> = new EventEmitter();
   // colHeight = Const.DIM_COL_HEIGHT;
   // fudgeFactor = Const.DIM_FUDGE_FACTOR;
@@ -23,6 +25,7 @@ export class PortalInfoComponent implements AfterViewInit{
   hintMsg = '';
   dirty = false;
   isValidChar = false;
+  protected readonly Const = Const;
   constructor(private trustmanService: TrustmanService) {
 
   }
@@ -32,10 +35,12 @@ export class PortalInfoComponent implements AfterViewInit{
       // called only once when map initializes
     }
   }
-  saveChar(info: PortalInfo, label: string, ingressName: string): void {
-    if (this.trustmanService.confirmLabel(info, label)){
-      this.trustmanService.saveChar(info, label, ingressName);
-      this.parentFun.emit(info);
+
+  saveChar(frame: PortalFrame, label: string, ingressName: string): void {
+    frame.canEdit = false;
+    if (this.trustmanService.confirmLabel(frame.info, label)){
+      this.trustmanService.saveChar(frame.info, label, ingressName);
+      this.parentFun.emit(frame.info);
     }
   }
   validate(char: string, portalInfo: PortalInfo): void {
@@ -49,7 +54,7 @@ export class PortalInfoComponent implements AfterViewInit{
       ' directions for you to the portal. Shall we Proceed?')){
       const dest = currentPortalFrame.info.latLng;
       const orig = this.pegPosition;
-      const label = 'Portal number: ' + currentPortalFrame.index;
+      // const label = 'Portal number: ' + currentPortalFrame.index;
       const url = 'https://www.google.com/maps/dir/?api=1&origin='
         + orig.lat + ',' + orig.lng + '&destination='
         + dest.lat + ',' + dest.lng + '&travelmode=walking';
@@ -69,9 +74,11 @@ export class PortalInfoComponent implements AfterViewInit{
   delete(info: PortalInfo, label: string, ingressName: string): void {
     if (confirm('Remove the Value: ' + label )){
       // Wait a bit so snack bar will appear; probably not neccessary on user screen
-      setTimeout(() => {
+      // setTimeout(() => {
+        console.log('DEBUG delete 1');
         this.trustmanService.saveChar(info, '', ingressName);
-      }, Const.SNACK_WAIT_VERY_SHORT);
+        this.parentFun.emit(info);
+      // }, Const.SNACK_WAIT_VERY_SHORT);
     }
   }
   getHint(type: string): string {
@@ -103,5 +110,14 @@ export class PortalInfoComponent implements AfterViewInit{
     streetView.setVisible(true);
   }
 
-  protected readonly Const = Const;
+  toggleEdit(portalFrame: PortalFrame): void {
+    if (!portalFrame.canEdit){
+      if (confirm('The "Distance to Portal": ' + Math.round(portalFrame.d) +
+        ' meters is TOO far to Hack\nDo you STILL want to edit?')){
+        portalFrame.canEdit = !portalFrame.canEdit;
+      }
+    }else{
+      portalFrame.canEdit = !portalFrame.canEdit;
+    }
+  }
 }

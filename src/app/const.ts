@@ -1,12 +1,17 @@
 export class Const {
-  public static SIDE_BAR_RIGHT_PADDING = 28;
+  public static SIDE_BAR_RIGHT_PADDING = 56;
   public static BUTTON_WIDTH = 56;
+
+  public static CONFIDENCE_GREEN = 40;
+
 
   // thumbnail defaults
   public static THUMB_WIDTH = 500;
   public static THUMB_HEIGHT = 299;
   public static THUMB_SIZE = 500;
-  public static FUDGE_FACTOR = 3.5;
+  public static FUDGE_FACTOR = 1;
+  public static IMG_SCALE = 1.25;
+  public static INFO_SCALE = 2.5;
 
   // FS Image Defaults
   public static DIM_ROW_COUNT = 11;
@@ -54,7 +59,7 @@ export class Const {
   public static SCALE_H = 60;
   public static DISPLAY_THRESHOLD = 17;
 
-  public static URL_RED_PIN = 'https://geopad.ca/pixr2/assets/smurf.gif';
+  public static URL_SMURF_GIF = 'https://geopad.ca/pixr2/assets/smurf.gif';
   public static URL_GREY_PIN = 'https://geopad.ca/pixr2/assets/WhitePin.png';
   public static URL_GREEN_PIN = 'https://geopad.ca/pixr2/assets/GreenPin.png';
 
@@ -65,9 +70,6 @@ export class Const {
 
   public static Z_INDEX_100 = 100;
   public static Z_INDEX_200 = 200;
-  public static CONFIDENCE_GREEN = 40;
-  public static CONFIDENCE_YELLOW = 200;
-  public static CONFIDENCE_RED = 1000;
 
   public static CIRCLE_OPTIONS = {
     strokeColor: Const.CIRCLE_STROKE_1,

@@ -123,8 +123,8 @@ export class PuzzleMapDialogComponent {
   }
   saveChar(portalInfo: PortalInfo, label: string): void {
     if (this.trustmanService.confirmLabel(portalInfo, label)){
-      const d = this.trustmanService.distanceBetween(
-                        this.pegPosition, portalInfo.latLng);
+      // const d = this.trustmanService.distanceBetween(
+      //                  this.pegPosition, portalInfo.latLng);
 
       this.trustmanService.saveChar(portalInfo, label, this.ingressName);
       this.dialogRef.close();

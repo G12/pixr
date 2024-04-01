@@ -1,18 +1,21 @@
 
 <div *ngIf="portalFrame">
   <h4>Portal:{{portalFrame.info.index}} value: {{portalFrame.info.label}}</h4>
-  <!-- TODO does not work well
-  <span>Check Location on <a href="{{portalFrame.info.url}}" target="intell">Intel Map</a></span>
-  -->
-  <div class="portalFrame">
+  <div class="thumbFrame">
   <app-thumbnail
-    [src]="src" [index]="portalFrame.index" [thumbWidth]="localMetadata.thumbWidth/2"
-    [thumbHeight]="localMetadata.thumbHeight/2" [hdrHeight]="localMetadata.hdrHeight/2"
-    [thumbSize]="localMetadata.thumbSize" [leftMargin]="localMetadata.lefMargin/2"
-    [fudgeFactor]="localMetadata.fudgeFactor/2">
+    [src]="src" [index]="portalFrame.index"
+    [thumbWidth]="localMetadata.thumbWidth/infoScale"
+    [thumbHeight]="localMetadata.thumbHeight/infoScale"
+    [hdrHeight]="localMetadata.hdrHeight/infoScale"
+    [imgWidth]="imgWidth/infoScale"
+    [leftMargin]="localMetadata.lefMargin/infoScale"
+    [fudgeFactor]="localMetadata.fudgeFactor/infoScale">
   </app-thumbnail>
   </div>
   <div>
+    <span *ngIf="portalFrame.d <= Const.CONFIDENCE_GREEN" class="inTheGreen">
+      Your in the Green; good to HACK Now!
+    </span>
     <br>
     <div *ngIf="hintMsg.length !== 0">
     <mat-hint class="cautionHint"><strong>{{hintMsg}}
@@ -21,7 +24,7 @@
     <mat-form-field [style.width.%]="64" appearance="outline">
       <mat-label>{{getHint(portalFrame.info.type)}}</mat-label>
       <input (ngModelChange)="validate($event, portalFrame.info)"
-             matInput [(ngModel)]="label"
+             matInput [(ngModel)]="label" [disabled]="!portalFrame.canEdit"
              class="charInput" autocomplete="off">
     </mat-form-field>
     <button *ngIf="testDeleteConditions(label, portalFrame.info)"
@@ -29,16 +32,23 @@
       mat-icon-button color="warn" aria-label="Delete Forever">
       <mat-icon>delete_forever</mat-icon>
     </button>
+    <button *ngIf="portalFrame.d > Const.CONFIDENCE_GREEN" (click)="toggleEdit(portalFrame)"
+      mat-icon-button class="btnSpacingLeft">
+      <span class="iconGreen">
+        <mat-icon class="icon-display">edit</mat-icon>
+      </span>
+    </button>
+
     <!--
     <button (click)="openStreetView(portalFrame.info)"
             mat-icon-button aria-label="Open Street View">
       <mat-icon>streetview</mat-icon>
     </button>
     -->
-    <div>
+    <div mat-dialog-actions align="end">
       <button *ngIf="isValidChar"
               mat-raised-button color="primary"
-              (click)="saveChar(portalFrame.info, label, ingressName)">Save
+              (click)="saveChar(portalFrame, label, ingressName)">Save
       </button>
     </div>
   </div>

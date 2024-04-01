@@ -1,5 +1,5 @@
 ////////////////////////////////  MAP  /////////////////////////////////////
-import {MapCircle, MapMarker} from '@angular/google-maps';
+import {MapMarker} from '@angular/google-maps';
 export interface MarkerData {
   position: google.maps.LatLngLiteral;
   label: string;
@@ -37,11 +37,21 @@ export interface RetVal {
   isValidChar: boolean;
   dirty: boolean;
 }
+export interface Size {
+  width: number;
+  height: number;
+  dlt: number;
+}
 export interface PortalFrame {
   index: number;
   height?: number; // if variable height else colHeight
   info: PortalInfo;
   marker?: MapMarker;
+  canEdit: boolean;
+  isTarget: boolean;
+  d: number;
+  opts?: google.maps.MarkerOptions;
+  iconLabel?: string;
 }
 export interface LocalMetadata {
   id: string;

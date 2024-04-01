@@ -39,11 +39,12 @@
         <mat-icon>border_horizontal</mat-icon>
         <span>Set Thumb Width</span>
       </button>
+      <!--
       <button mat-menu-item [disabled]="!loggedIn"
               (click)="setThumbSize()">
         <mat-icon>border_right</mat-icon>
         <span>Set Thumb Size (%)</span>
-      </button>
+      </button>-->
       <button mat-menu-item [disabled]="!loggedIn"
               (click)="setFudgeFactor()">
         <mat-icon>compare_arrows</mat-icon>
@@ -64,7 +65,7 @@
         <mat-icon>logout</mat-icon>
       </button>
     </span>
-      <!--<span>H: {{heading}}</span>-->
+      <span>W:{{imagePageWidth}} w: {{w}}</span>
     <div *ngIf="isAdmin">
       <button *ngIf="!validated" class="projButton" mat-fab extended (click)="newFSProject()">
         New Proj.
@@ -103,7 +104,7 @@
   <!-- //////////////////////// SIDE BAR /////////////////////////////////-->
   <mat-drawer #drawer (closed)="drawerClosed()"
              (opened)="drawerOpened()" class="example-sidenav" mode="side">
-      <div class="imagePage">
+      <div #imagePage class="imagePage">
         <!--<h1>{{ folder }}</h1>-->
         <div class="portalFrame" *ngFor="let portalFrame of portalFrames">
           <div class="indexWrapper">
@@ -111,7 +112,8 @@
                 class="indexNumber">{{ portalFrame.info.label }}</h1>
           </div>
           <div class="btnBar">
-            <button (click)="popUpDialog(portalFrame)" mat-icon-button class="btnSpacing">
+            <button (click)="popUpDialog(portalFrame)"
+                    mat-icon-button class="btnSpacingLeft">
               <span class="iconGreen">
                 <mat-icon class="icon-display">edit</mat-icon>
               </span>
@@ -125,14 +127,18 @@
             </button>
           </div>
           <app-thumbnail
-          [src]="src" [index]="portalFrame.index" [thumbWidth]="thumbWidth"
-              [thumbHeight]="thumbHeight" [hdrHeight]="hdrHeight" [thumbSize]="thumbSize"
-              [leftMargin]="lefMargin" [fudgeFactor]="fudgeFactor">
+            [src]="src" [index]="portalFrame.index"
+            [thumbWidth]="thumbWidth/imgScale"
+            [thumbHeight]="thumbHeight/imgScale"
+            [hdrHeight]="hdrHeight/imgScale"
+            [imgWidth]="width/imgScale"
+            [leftMargin]="lefMargin/imgScale"
+            [fudgeFactor]="fudgeFactor/imgScale">
           </app-thumbnail>
         </div>
       </div>
-    <div class="side-bar-button" matTooltip="Close Side Bar"
-         [style.left.px]="getLeftSideBarPosition()"> <!-- 472-->
+    <div *ngIf="imagePageWidth" class="side-bar-button" matTooltip="Close Side Bar"
+         [style.left.px]="buttonOffset"> <!-- 472-->
       <button (click)="drawer.toggle()"
         mat-fab color="primary" aria-label="close sidebar">
         <mat-icon>arrow_left</mat-icon>
@@ -146,7 +152,7 @@
     <mat-progress-bar *ngIf="mapIsLoading" mode="indeterminate"></mat-progress-bar>
   </div>
   <google-map #map
-              [center]="center" (boundsChanged)="getZoom()"
+              [center]="center"
               (centerChanged)="getCenter()"
               [width]="mapWidth" [height]="mapHeight"
               [zoom]="zoom" [options]="mapOptions"
@@ -160,68 +166,82 @@
     <!--</map-directions-renderer>-->
     <map-marker #pegMarker="mapMarker" [position]="pegPosition"
                 [options]="getPegMarkerOptions(pegMarker)"
-                (mapClick)="openInfoWindow(pegMarker, null)">
+                (mapClick)="reCenterRoute(directions, destination)">
     </map-marker>
     <map-circle
       [center]="pegMarker.getPosition()"
       [radius]="40" [options]="Const.PEG_CIRCLE_OPTIONS">
     </map-circle>
+
+    <!--[options]="getAndProccessOptons(portalFrame, portalMarker)"-->
+    <!--[label]="portalFrame.info.index.toString()"-->
     <map-marker #portalMarker="mapMarker"
                 *ngFor="let portalFrame of portalFrames"
-                [label]="getLabel(portalFrame.info)"
-                [options]="geAndProccessOptons(portalFrame, portalMarker)"
+                [label]="portalFrame.iconLabel"
+                [options]="portalFrame.opts"
                 [position]="portalFrame.info.latLng"
                 (mapClick)="openInfoWindow (portalMarker,portalFrame)">
     </map-marker>
-    <!--[options]="getAndProcessCircleOps(portalFrame, portalCircle)">-->
     <map-circle #portalCircle="mapCircle"
         *ngFor="let portalFrame of portalFrames"
         [center]="portalFrame.info.latLng"
         [radius]="40" [options]="Const.CIRCLE_OPTIONS">
     </map-circle>
-    <map-info-window (closeclick)="infoClosed($event)"
+    <map-info-window (closeclick)="infoClosed()"
             (domready)="setInfo(currentPortalFrame)">
-      <div *ngIf="currentPortalFrame">
-        <app-portal-info [portalFrame]="currentPortalFrame"
+      <div class="infoFrame">
+        <div *ngIf="currentPortalFrame">
+          <app-portal-info [portalFrame]="currentPortalFrame"
             [src]="src" [localMetadata]="localMetadata"
+            [imgWidth]="width" [infoScale]="infoScale"
             [ingressName]="ingressName" [pegPosition]="pegPosition"
             [map]="map"  (parentFun)="closeInfoWindow($event)">
-        </app-portal-info>
-        <!-- TODO solve info window jiggle problem before using this
-        <button mat-button
-                (click)="showStreetview
-                (currentPortalFrame.info.latLng, currentPortalFrame.info)">
-          Street View
-        </button>
-        -->
-        <!-- TODO iframe embed of streetview 360 image
-        <div>
-          <iframe src="https://www.google.com/maps/embed?pb=!4v1710693246144!6m8!1m7!1sCAoSLEFGMVFpcE5zQ1haR0o5bTJxMmotWEpObFJNdnVYWkVoZ085azFvZXFMZFQw!2m2!1d45.4560438!2d-75.681788!3f297.6851778027556!4f-0.4107078254452716!5f0.7820865974627469" width="500" height="375" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </app-portal-info>
+          <!-- TODO solve info window jiggle problem before using this
+          <button mat-button
+                  (click)="showStreetview
+                  (currentPortalFrame.info.latLng, currentPortalFrame.info)">
+            Street View
+          </button>
+          -->
+          <!-- TODO iframe embed of streetview 360 image
+          <div>
+            <iframe src="https://www.google.com/maps/embed?pb=!4v1710693246144!6m8!1m7!1sCAoSLEFGMVFpcE5zQ1haR0o5bTJxMmotWEpObFJNdnVYWkVoZ085azFvZXFMZFQw!2m2!1d45.4560438!2d-75.681788!3f297.6851778027556!4f-0.4107078254452716!5f0.7820865974627469" width="500" height="375" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+          -->
         </div>
-        -->
-      </div>
-      <div *ngIf="!currentPortalFrame">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title-group>
-              <mat-card-title>{{folder}}</mat-card-title>
-              <img mat-card-sm-image-image [src]="Const.URL_RED_PIN" alt="Red Pin" >
-            </mat-card-title-group>
-          </mat-card-header>
-          <mat-card-content>
-            Hello {{ ingressName }}; this is where you are!
-          </mat-card-content>
-        </mat-card>
-        <!-- TODO test if this causes the jiggles! -->
-        <button mat-button
-                (click)="showStreetview(pegPosition,null, heading)">
-          Street View
-        </button>
-      </div>
-      <div mat-dialog-actions align="end">
-        <button mat-button (click)="closeWindow($event)">
-          Close
-        </button>
+        <div *ngIf="!currentPortalFrame">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title-group>
+                <mat-card-title>{{folder}}</mat-card-title>
+                <img mat-card-sm-image-image [src]="Const.URL_SMURF_GIF" alt="Red Pin" >
+              </mat-card-title-group>
+            </mat-card-header>
+            <mat-card-content>
+              Hello {{ ingressName }}; this is where you are!
+            </mat-card-content>
+          </mat-card>
+          <!-- TODO test if this causes the jiggles! YES it does -->
+          <!--<button mat-button
+                  (click)="showStreetview(pegPosition,null, heading)">
+            Street View
+          </button>-->
+        </div>
+        <div mat-dialog-actions align="start">
+          <button *ngIf="currentPortalFrame && !currentPortalFrame.isTarget"
+                  (click)="drawDirectionsTo(currentPortalFrame)"
+                  mat-icon-button>
+              <span class="iconGreen">
+                <mat-icon  class="icon-display">directions_run</mat-icon>
+              </span>
+          </button>
+        </div>
+        <div mat-dialog-actions align="end">
+          <button mat-button (click)="closeWindow()">
+            Close
+          </button>
+        </div>
       </div>
     </map-info-window>
   </google-map>

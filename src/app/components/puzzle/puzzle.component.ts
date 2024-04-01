@@ -6,14 +6,25 @@ import {TrustmanService} from '../../services/trustman.service';
 import {MatDialog} from '@angular/material/dialog';
 import {Admin, AdminList, IngressNameData} from '../../project.data';
 import {AngularFirestoreDocument} from '@angular/fire/compat/firestore';
-import {DialogPackage, LatLng, LocalMetadata, LogMessages, MsgData, PortalFrame, PortalInfo, PzBootParam, PzProjectList} from '../../data';
+import {
+  DialogPackage,
+  LatLng,
+  LocalMetadata,
+  LogMessages,
+  MsgData,
+  PortalFrame,
+  PortalInfo,
+  PzBootParam,
+  PzProjectList,
+  Size
+} from '../../data';
 import {Clipboard} from '@angular/cdk/clipboard';
 import {PuzzleMapDialogComponent} from '../../dialogs/puzzle-map/puzzle-map-dialog.component';
 import {HttpClient} from '@angular/common/http';
 import {GEOLOCATION_SUPPORT, GeolocationService} from '@ng-web-apis/geolocation';
 import {async, take} from 'rxjs';
 import {
-  GoogleMap,
+  GoogleMap, MapCircle,
   MapDirectionsRenderer,
   MapDirectionsService,
   MapInfoWindow,
@@ -41,7 +52,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   lefMargin = Const.LEFT_MARGIN;
   thumbWidth = Const.THUMB_WIDTH;
   thumbHeight = Const.THUMB_HEIGHT;
-  thumbSize = Const.THUMB_SIZE;
+  imgWidth = Const.THUMB_SIZE;
   fudgeFactor = Const.FUDGE_FACTOR;
   portals: PortalInfo[] = [];
   portalFrames: PortalFrame[] = [];
@@ -78,6 +89,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   @ViewChild('canvasEl') canvasEl: ElementRef;
   @ViewChild('myImage') myImage: ElementRef;
   @ViewChild(PortalInfoComponent) PortalInfoComponent;
+  @ViewChild('imagePage') imagePage: ElementRef;
   src: string; // path plus image name
   // path = 'https://geopad.ca/pixr2/assets/puzzle_images/';
   path = Const.IMAGE_FOLDER;
@@ -97,6 +109,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   lookOutOn = true;
   @ViewChild(GoogleMap) map: GoogleMap | undefined;
   @ViewChild(MapInfoWindow) infoWindow: MapInfoWindow | undefined;
+  // @ViewChild(MapCircle) portalCircle: MapCircle | undefined;
   @ViewChild(MatDrawer) drawer;
   protected readonly Const = Const;
   center: google.maps.LatLngLiteral = Const.LAT_LNG_OTTAWA;
@@ -159,6 +172,16 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   directionsRenderer: MapDirectionsRenderer;
   renderOps: google.maps.DirectionsRendererOptions;
 
+  ////////////////////// Image Scale ////////////////////
+  imagePageWidth: number;
+  buttonOffset: number;
+  imgScale = Const.IMG_SCALE;
+  infoScale = Const.INFO_SCALE;
+  protected w: number;
+
+  ///////////////////////// edit privelages /////////////////
+  private canEdit: boolean;
+
   // TODO WHAT'S this!
   protected readonly Math = Math; // mistake by Webstorm!
 
@@ -178,9 +201,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       // true for mobile device
       this.isMobile = true;
-      // console.log('Mobile Device');
     } else {
-      // console.log('NOT a Mobile Device!');
     }
     ////////////////////   MAP
     this.mapHeight = (window.innerHeight - 96) + 'px';
@@ -189,39 +210,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.logWidth = window.innerWidth - 6;
     this.homeHeight = window.innerHeight - 48 - 48 - 64 - 57 - 4;
     this.homeWidth = window.innerWidth - 4;
-  }
-  getDirectionsFor(dstntn: LatLng): void {
-    const origin = {lat: this.pegPosition.lat,
-        lng: this.pegPosition.lng};
-    const destination = {lat: dstntn.lat,
-        lng: dstntn.lng};
-    const travelMode = google.maps.TravelMode.WALKING;
-    // this.getDirections(origin, destination, travelMode);
-    this.trustmanService.getDirections
-    (origin, destination, travelMode).subscribe
-    (value => {
-      this.googleMapsDirectionResult = value.result;
-      if (this.directions.length > 0){
-        this.directions.pop();
-      }
-      this.directions.push(value.result);
-      // console.log(this.googleMapsDirectionResult);
-
-      const renderer = new google.maps.DirectionsRenderer();
-      // ops: google.maps.DirectionsRendererOptions =
-      // renderer.setOptions(ops);
-    });
-  }
-  getDirections(origin: google.maps.LatLngLiteral,
-                destination: google.maps.LatLngLiteral,
-                travelMode: google.maps.TravelMode): void{
-
-    this.trustmanService.getDirections
-      (origin, destination, travelMode).subscribe
-      (value => {
-        this.googleMapsDirectionResult = value.result;
-        console.log(this.googleMapsDirectionResult);
-    });
   }
   logout(): void {
     if (confirm('Log Out?')) {
@@ -317,7 +305,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       if (test) {
         const unknown: any = test;
         this.localMetadata = unknown as LocalMetadata;
-        console.log(this.localMetadata);
         this.localTemplateArray = this.localMetadata.localTemplateArray;
         this.rowHeight = this.localMetadata.rowHeight;
         this.hdrHeight = this.localMetadata.hdrHeight;
@@ -325,7 +312,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         this.lefMargin = this.localMetadata.lefMargin;
         this.thumbWidth = this.localMetadata.thumbWidth;
         this.thumbHeight = this.localMetadata.thumbHeight;
-        this.thumbSize = this.localMetadata.thumbSize;
+        this.imgWidth = this.localMetadata.thumbSize;
         this.fudgeFactor = this.localMetadata.fudgeFactor;
 
         this.trustmanService.getMsgLog(id).get().subscribe(doc2 => {
@@ -344,15 +331,11 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
             if (delta < 120000){ // No snack bars older than 2 minutes
               // TODO test this interval
               if (this.lastLogTime === time){ // been here before
-                // do nothing
-                // console.log('Duplicate Message IGNORED!'); // FIX duplication BUG
               }else{
-                // console.log('MESSAGE to Snackbar: ' + logMsg);
                 this.snackbarService.openSnackBarBottom(logMsg, 'Close', 12000);
                 this.lastLogTime = time;
               }
             } else {
-              // console.log('Message older than ' + delta + ' milliseconds IGNORED');
             }
           }
         });
@@ -370,6 +353,10 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     });
   }
   updatePortalFrames(isNew: boolean, count: number): void {
+    let zoom = 15;
+    if (this.getZoom()){
+      zoom = this.getZoom();
+    }
     if (isNew) {
       this.rowCount = count;
       this.portalFrames = [];
@@ -378,6 +365,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         const portalFrame: PortalFrame = {
           // colHeight is optional - will be neccessary if colHeights are not uniform
           index: i, height: this.rowHeight,
+          canEdit: false, isTarget: false, d: 0,
           info: {
             index: i,
             id: 'P:' + i,
@@ -385,9 +373,13 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
             label: '',
             type,
             // isActive: false,
-          }
+          },
+          opts: {}
         };
-        // console.log('Index: ' + portalFrame.info.index + ' isActive: ' + portalFrame.info.isActive);
+        // some default values for size and color of pin
+        // portalFrame.opts = this.setPinOptionsForFrame(portalFrame.info, zoom);
+        // TODO TEST TEST
+        portalFrame.iconLabel = this.setPinLabelForFrame(portalFrame.info, zoom);
         this.portalFrames.push(portalFrame);
       }
     }
@@ -397,6 +389,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       const test = this.portals.find(portl => portl.index === portlFrame.index);
       if (test) {
         portlFrame.info = test;
+        if (test.latLng){
+          portlFrame.opts = this.setPinOptionsForFrame(test, zoom);
+        }
       }
     });
     // TODO test if this is safe
@@ -492,12 +487,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   }
   setThumbSize(): void {
     const width = prompt('Enter Thumbnail Size (%)',
-      '' + this.thumbSize);
+      '' + this.imgWidth);
     if (width != null){
-      this.thumbSize = parseInt(width, 10);
+      this.imgWidth = parseInt(width, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.thumbSize = this.thumbSize;
+      this.localMetadata.thumbSize = this.imgWidth;
       this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
@@ -581,25 +576,25 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.openPuzzleMapDialog(dialogPackage, this.ingressName);
   }
   // Determie the position of Side Bar Button
-  getLeftSideBarPosition(): number {
-    let n = Const.THUMB_WIDTH - Const.SIDE_BAR_RIGHT_PADDING;
-    if (this.homeWidth < Const.THUMB_WIDTH){
-      n = this.homeWidth - Const.BUTTON_WIDTH - Const.SIDE_BAR_RIGHT_PADDING;
-    }
-    return n;
-  }
+  // getLeftSideBarPosition(): number {
+    // let n = Const.THUMB_WIDTH - Const.SIDE_BAR_RIGHT_PADDING;
+    // if (this.homeWidth < Const.THUMB_WIDTH){
+    //  n = this.homeWidth - Const.BUTTON_WIDTH - Const.SIDE_BAR_RIGHT_PADDING;
+    // }
+    // return n;
+  // }
   drawerOpened(): void {
     this.isMap = false; // Display map related tools
-    console.log('drawerOpened');
+    if (this.imagePage.nativeElement){
+      this.imagePageWidth = this.imagePage.nativeElement.clientWidth;
+      this.buttonOffset = this.imagePageWidth - Const.BUTTON_WIDTH;
+    }
   }
   drawerClosed(): void {
-    console.log('drawerClosed this.openedFromPortal = ' + this.openedFromPortal);
     this.isMap = true; // Hide map related tools
     if (this.openedFromPortal){
       this.openedFromPortal = false;
     }
-    console.log('drawerClosed zoom: ' + this.zoom);
-    console.log('this.map.getZoom(): ' + this.map.getZoom());
   }
   openPuzzleMapDialog(dialogPackage: DialogPackage, owner: string): void {
     const dialogRef = this.dialog.open(PuzzleMapDialogComponent, {
@@ -659,7 +654,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     } else {
       this.geoMsg = 'Geolocation NOT supported';
       this.zoom = Const.ZOOM_NEIGHBORHOOD;
-      console.log('getLocation zoom: ' + this.zoom);
     }
   }
   staticGeolocation(): void {
@@ -714,7 +708,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       this.pegPosition = {lat: position.coords.latitude,  lng: position.coords.longitude};
       this.heading = Math.round(position.coords.heading);
       this.speed = position.coords.speed; // meters per second
-      // console.log('speed coming in: ' + this.speed);
       // TODO why is device orientation unpredictable?
       this.setPegOrientation(null, this.heading);
     });
@@ -724,7 +717,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       window.addEventListener(
         'deviceorientation',
         (event) => {
-          console.log('alpha coming in: ' + event.alpha);
           if (event.absolute){ // Device is using earth based framework
             const alpha = event.alpha; // alpha: rotation around z-axis
             const gama = event.gamma; // gamma: left to right
@@ -739,58 +731,63 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     }*/
   }
   openInfoWindow(marker: MapMarker, portalFrame: PortalFrame): void {
-    let canEdit = false;
+    // let canEdit = false;
+    let isTarget = false;
     if (portalFrame){
-      // Always draw directions
-      const d = this.trustmanService.distanceBetween(this.pegPosition, portalFrame.info.latLng);
-      if (d >= Const.CONFIDENCE_YELLOW){ // Give directions
-        this.destination = portalFrame.info.latLng;
-        this.getDirectionsFor(portalFrame.info.latLng);
-        return;
-      }else if (d < Const.CONFIDENCE_YELLOW && d >= Const.CONFIDENCE_GREEN){
-        if (confirm('You are not close enough to hack!\n' +
-          'To open the Edit Dialog anyways click Ok\n'))
-        {
-          canEdit = true; // Open the dialog
+      if (this.destination && this.directions.length === 1) {
+        const latD = this.destination.lat;
+        const lngD = this.destination.lng;
+        const latO = portalFrame.info.latLng.lat;
+        const lngO = portalFrame.info.latLng.lng;
+        if (latD === latO && lngD === lngO) {
+          isTarget = true;
         }
+      }
+      const d = this.trustmanService.distanceBetween(this.pegPosition, portalFrame.info.latLng);
+      if (d <= Const.CONFIDENCE_GREEN){
+        portalFrame.canEdit = true;
       }else{
-        canEdit = true;
+        portalFrame.canEdit = false;
       }
-      if (canEdit) {
-        this.currentPortalFrame = portalFrame;
-        this.label = portalFrame.info.label;
-        this.dirty = false;
-        // this.setActiveCircle(portalFrame.info);
-        setTimeout(() => {
-          // populate the PortalInfoComponent ngModel values
-          this.PortalInfoComponent.setInfo(portalFrame.info.label);
-          if (Const.DEBUG_PUZZLE) {
-            console.log('Setting PortalInfoComponent label: '
-              + portalFrame.info.label);
-          }
-        }, this.Const.WAIT_300);
-        this.infoWindow?.open(marker);
-      }
+      portalFrame.isTarget = isTarget;
+      portalFrame.d = d;
+      this.currentPortalFrame = portalFrame;
+      this.label = portalFrame.info.label;
+      this.dirty = false;
+      // this.setActiveCircle(portalFrame.info);
+      setTimeout(() => {
+        // populate the PortalInfoComponent ngModel values
+        this.PortalInfoComponent.setInfo(portalFrame.info.label);
+        if (Const.DEBUG_PUZZLE) {
+          console.log('Setting PortalInfoComponent label: '
+            + portalFrame.info.label);
+        }
+      }, this.Const.WAIT_300);
+      this.infoWindow?.open(marker);
     }else{
       // This is the pegMarker
-      this.currentPortalFrame = null;
-      this.infoWindow?.open(marker);
+      // this.currentPortalFrame = null;
+      // this.infoWindow?.open(marker);
     }
   }
-  infoClosed($event: void): void {
-    if (Const.DEBUG_PUZZLE){
-      console.log($event);
-    }
+  // called by map-info-window (closeclick)
+  infoClosed(): void {
+    console.log('infoClosed() called by map-info-window (closeclick)');
   }
-  closeWindow($event: MouseEvent): void {
-    if (Const.DEBUG_PUZZLE){
-      console.log($event);
-    }
+  closeWindow(): void {
+    this.currentPortalFrame.canEdit = false;
+    console.log('closeWindow() portal: ' + this.currentPortalFrame.index);
     this.infoWindow.close();
   }
-  getLabel(portalInfo: PortalInfo): string {
-    return  portalInfo.index + ':' + portalInfo.label;
+  // event call from app-portal-info
+  closeInfoWindow($event: any): void {
+    console.log('closeInfoWindow($event: any) from app-portal-info');
+    this.closeWindow();
   }
+
+  // getLabel(portalInfo: PortalInfo): string {
+  //  return  portalInfo.index + ':' + portalInfo.label;
+  // }
   // TODO usefull for opening a route on google maps
   openGoogleMaps(currentPortalFrame: PortalFrame): void {
     const dest = currentPortalFrame.info.latLng;
@@ -818,7 +815,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   }
   fitBounds(): void {
     this.boundsInitialized = true;
-    // console.log('CALLED fitBounds this.portals.length: ' + this.portals.length);
     if (this.portals.length === 0){ return; }
     let count = 0;
     let singlton;
@@ -826,12 +822,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     bounds.extend({lat: this.pegPosition.lat, lng: this.pegPosition.lng});
     this.portals.forEach(prtl => {
       if (prtl.index) {
-        // console.log('PORTAL: ' + prtl.index);
       }
       if (prtl.latLng) {
         if (count === 0) {
           singlton = prtl.latLng;
         }
+        this.setPinOptionsForFrame(prtl, this.getZoom());
         count++;
         bounds.extend({lat: prtl.latLng.lat, lng: prtl.latLng.lng});
       }
@@ -872,20 +868,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       window.open(url, 'google-maps');
     }
   }
-  saveChar(info: PortalInfo, label: string, ingressName: string): void {
-    this.trustmanService.saveChar(info, label, ingressName);
-    this.infoWindow.close();
-  }
-  onCancelClick(): void {
-    this.infoWindow.close();
-  }
   mapInitialized(): void { // NOTE only called once when page opens
-    console.log('mapInitialized');
     this.mapIsLoading = true;
     // TODO unreachable code see NOTE above
     setTimeout(() => {
        if (this.openedFromPortal){
-          console.log('Do we ever get here?');
+          // Do we ever get here?
        }else{
         if (this.openedFromLogIn){
           this.fitBounds();
@@ -894,14 +882,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
        }
        this.mapIsLoading = false;
     }, this.Const.SNACK_WAIT_VERY_SHORT);
-  }
-  closeInfoWindow($event: PortalInfo): void {
-    if ($event) {
-      if (Const.DEBUG_PUZZLE){
-        console.log($event);
-      }
-    }
-    this.infoWindow.close();
   }
   setInfo(currentPortalFrame: PortalFrame = null): void {
     if (currentPortalFrame) {
@@ -915,8 +895,14 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.debugMsgs += 'onImageLoad START: ';
     this.width = myImage.naturalWidth; // myImage.width;
     this.height = myImage.naturalHeight; // myImage.height;
-    if (Const.DEBUG_PUZZLE){
+
+    const ratio = window.devicePixelRatio || 1;
+    this.w = screen.width * ratio;
+    const h = screen.height * ratio;
+    if (Const.DEBUG_PUZZLE) {
       console.log('this.width: ' + this.width + ' this.height: ' + this.height);
+      console.log('screen.width: ' + screen.width + ' ratio:' + ratio
+      + ' screen.width * ratio: ' + this.w);
     }
   }
 
@@ -926,9 +912,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     // TODO see if we can store heading and pitch values
     if (info) {
       streetView.addListener('closeclick', ($e) => {
-        console.log('Street View Closed');
-        console.log($e);
-        console.log('heading: ' + heading + ' pitch: ' + pitch);
       });
       streetView.addListener('pov_changed', () => {
           heading = streetView.getPov().heading;
@@ -949,39 +932,80 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     // @ts-ignore
     streetView.setVisible(true);
   }
-  getSize(zoom: number): { width: number; height: number } {
+  getSize(zoom: number): Size {
     if (zoom === 0){
       zoom = 1;
     }
     let width = 0;
     let height = 0;
-    if (zoom > 12) {
+    if (zoom > 14) {
       const scale = zoom / (21 * (21 / zoom)); // (21 * (21 / zoom));
       width = Const.SCALE_W * scale;
       height = Const.SCALE_H * scale;
     }
-    return {width, height};
+    let dlt = 0;
+    if (zoom > 14) {
+      switch (zoom) {
+        case 22: dlt = 4;
+                 break;
+        case 21: dlt = 3;
+                 break;
+        case 20: dlt = 2;
+                 break;
+        case 19: dlt = 2;
+                 break;
+        case 18: dlt = 1;
+                 break;
+        case 17: dlt = 0;
+                 break;
+        case 16: dlt = -6;
+                 break;
+        case 15: dlt = -10;
+                 break;
+        default: dlt = 0;
+                 break;
+      }
+    }
+    return {width, height, dlt};
   }
   resizePins(portalFrames: PortalFrame[]): void {
     if (!this.map){return; }
     const zoom = this.map.getZoom();
     if (zoom === this.lastZoomLevel) {return; } // TODO why is resize being called so often
     this.lastZoomLevel = zoom;
-    const size = this.getSize(zoom);
     portalFrames.forEach(frame => {
-      const url = this.getUrlForInfo(frame.info);
-      const portalIcon = {url,
-        scaledSize: new google.maps.Size( size.width, size.height),
-        labelOrigin: new google.maps.Point(Const.LABEL_X, Const.LABEL_Y + zoom / 2 - 1) };
-      if (frame.marker){
-        frame.marker.icon = portalIcon;
-        if (zoom < 17) {
-          frame.marker.label = '';
-        } else {
-          frame.marker.label =  this.getChar(frame.info); // this.getLabel(frame.info); //  frame.info.index.toString();
-        }
-      }
+      frame.opts = this.setPinOptionsForFrame(frame.info, zoom);
+      frame.iconLabel = this.setPinLabelForFrame(frame.info, zoom);
     });
+  }
+  setPinLabelForFrame(info: PortalInfo, zoom: number): string{
+    let z = this.zoom;
+    let label = '';
+    if (zoom) {
+      z = zoom;
+    }
+    if (z > 14){
+      if (info){
+        label = info.index.toString();
+      }
+    }
+    return label;
+  }
+  setPinOptionsForFrame(info: PortalInfo, zoom: number): google.maps.MarkerOptions {
+    let z = this.zoom;
+    if (zoom) {
+      z = zoom;
+    }
+    const size = this.getSize(z);
+    const url = this.getUrlForInfo(info);
+    return {
+      icon: {
+        url,
+        scaledSize: new google.maps.Size(size.width, size.height),
+        labelOrigin: new google.maps.Point(Const.LABEL_X + size.dlt,
+          Const.LABEL_Y + this.zoom / 2 - 1)
+      }
+    };
   }
   getShortName(): string {
     return this.ingressName.substring(0, 5);
@@ -1002,32 +1026,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     }
     return url;
   }
-  geAndProccessOptons(portalFrame: PortalFrame, portalMarker: MapMarker): google.maps.MarkerOptions {
-    const url = this.getUrlForInfo(portalFrame.info);
-    let opts = {icon: {url,
-        scaledSize: new google.maps.Size(Const.SCALE_W, Const.SCALE_H),
-        labelOrigin: new google.maps.Point(Const.LABEL_X, Const.LABEL_Y) }};
-    if (this.map) {
-      portalFrame.marker = portalMarker;
-      const zoom = this.map.getZoom();
-      const size = this.getSize(zoom);
-      if (zoom < 17) {
-        portalMarker.label = '';
-      } else {
-        portalMarker.label = portalFrame.index.toString(); // portalFrame.index.toString();
-      }
-      opts = {
-        icon: {
-          url,
-          scaledSize: new google.maps.Size(size.width, size.height),
-          labelOrigin: new google.maps.Point(Const.LABEL_X, Const.LABEL_Y)
-        }
-      };
-    }
-    return opts;
-  }
   getPegMarkerOptions(marker: MapMarker): google.maps.MarkerOptions {
-    const url = Const.URL_RED_PIN;
+    const url = Const.URL_SMURF_GIF;
     let opts = {icon: {
       url,
       scaledSize: new google.maps.Size(Const.SCALE_W, Const.SCALE_H),
@@ -1035,7 +1035,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     }};
     if (this.map) {
       this.pegMarker = marker;
-      const size = this.getSize(21);
+      // const size = this.getSize(21);
       // this.pegMarker.label = this.getShortName();
       this.pegImage.rotation = this.heading;
       // @ts-ignore
@@ -1043,18 +1043,52 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     }
     return opts;
   }
-  getZoom(): void {
+  getZoom(): number {
     // TODO
+    if (this.map){
+      return this.map.getZoom();
+    }
+    return null;
   }
   getCenter(): void {
     // TODO
   }
+  //////////////////////////// Directions ////////////////////////////////
   closeSideBarAndZoomToPortal(info: PortalInfo): void {
     this.isLog = false;
     this.portalCenter = info.latLng;
     this.openedFromPortal = true;
     this.drawer.toggle();
+    this.destination = info.latLng;
     this.getDirectionsFor(info.latLng);
+  }
+  getDirectionsFor(dstntn: LatLng): void {
+    const origin = {lat: this.pegPosition.lat,
+      lng: this.pegPosition.lng};
+    // const destination = {lat: dstntn.lat,
+    //  lng: dstntn.lng};
+    const travelMode = google.maps.TravelMode.WALKING;
+    // this.getDirections(origin, destination, travelMode);
+    this.trustmanService.getDirections
+    (origin, dstntn, travelMode).subscribe
+    (value => {
+      this.googleMapsDirectionResult = value.result;
+      if (this.directions.length > 0){
+        this.directions.pop();
+      }
+      this.directions.push(value.result);
+    });
+  }
+  reCenterRoute(directions: google.maps.DirectionsResult[], destination: LatLng): void {
+    if (directions.length === 1){ // NOTE should be 0 or 1 exclusively
+      this.getDirectionsFor(destination);
+    }
+  }
+  drawDirectionsTo(currentPortalFrame: PortalFrame): void {
+    this.closeWindow();
+    console.log('closeWindow() from drawDirectionsTo');
+    this.destination = currentPortalFrame.info.latLng;
+    this.getDirectionsFor(currentPortalFrame.info.latLng);
   }
 }
 ///////////////////// THE END ! ///////////////////////
