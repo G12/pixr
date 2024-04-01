@@ -393,17 +393,6 @@ export class TrustmanService {
     }
     return this.iconBase + filename; // this.iconBase + 'gliph.png';
   }
-  getOptons(info: PortalInfo): google.maps.MarkerOptions {
-    const url = this.getIconUrl(info);
-    // TODO test if title is set elswhere
-    let title = 'Portal:' + info.index + ' value = ';
-    if (!info.label || info.label === ''){
-      title += 'UKNOWN?';
-    }else{
-      title += info.label;
-    }
-    return {icon: {url, labelOrigin: new google.maps.Point(20, -8) }};
-  }
   confirmLabel(portalInfo: PortalInfo, label: string): boolean {
     // Check letters and numbers in case multiple chars are being used
     if (portalInfo.type !== Const.GLYPH_CODE && label.length > 1){

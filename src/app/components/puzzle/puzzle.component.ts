@@ -24,7 +24,7 @@ import {HttpClient} from '@angular/common/http';
 import {GEOLOCATION_SUPPORT, GeolocationService} from '@ng-web-apis/geolocation';
 import {async, take} from 'rxjs';
 import {
-  GoogleMap, MapCircle,
+  GoogleMap,
   MapDirectionsRenderer,
   MapDirectionsService,
   MapInfoWindow,
@@ -180,7 +180,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   protected w: number;
 
   ///////////////////////// edit privelages /////////////////
-  private canEdit: boolean;
 
   // TODO WHAT'S this!
   protected readonly Math = Math; // mistake by Webstorm!
@@ -744,11 +743,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         }
       }
       const d = this.trustmanService.distanceBetween(this.pegPosition, portalFrame.info.latLng);
-      if (d <= Const.CONFIDENCE_GREEN){
-        portalFrame.canEdit = true;
-      }else{
-        portalFrame.canEdit = false;
-      }
+      portalFrame.canEdit = d <= Const.CONFIDENCE_GREEN;
       portalFrame.isTarget = isTarget;
       portalFrame.d = d;
       this.currentPortalFrame = portalFrame;
@@ -898,7 +893,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
 
     const ratio = window.devicePixelRatio || 1;
     this.w = screen.width * ratio;
-    const h = screen.height * ratio;
     if (Const.DEBUG_PUZZLE) {
       console.log('this.width: ' + this.width + ' this.height: ' + this.height);
       console.log('screen.width: ' + screen.width + ' ratio:' + ratio

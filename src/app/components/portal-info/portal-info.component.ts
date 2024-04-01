@@ -87,6 +87,7 @@ export class PortalInfoComponent implements AfterViewInit{
   testDeleteConditions(label: string, info: PortalInfo): boolean {
     return this.trustmanService.testDeleteConditions(label, info);
   }
+  // TODO for future use
   openStreetView(portalInfo: PortalInfo): void {
     const streetView = this.map?.googleMap?.getStreetView();
     // @ts-ignore

@@ -19,7 +19,7 @@ img {
   margin-left: 24px;
 }
 .btnSpacingLeft {
-  margin-left: 0px;
+  margin-left: 0;
 }
 .icon-display {
   transform: scale(2);
@@ -70,14 +70,13 @@ img {
 }
 .portalFrame {
   position: relative;
-  border: lawngreen 4px solid;
   border-radius: 9px;
   border: black solid 2px;
   margin-top: 2px;
-  margin-left: 0px;
+  margin-left: 0;
   margin-right: 2px;
   /*margin-top: 8px;*/
-  padding: 0px;
+  padding: 0;
   width: fit-content;
   background-color: white;
 }

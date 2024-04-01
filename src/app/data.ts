@@ -121,6 +121,7 @@ export interface MarkerOptions {
   icon: string;
   title: string;
 }
+// TODO for information only; should not be used.
 interface DirectionsRendererOptions {
   /**
    * The directions to display on the map and/or in a <code>&lt;div&gt;</code>
