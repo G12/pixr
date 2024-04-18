@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/compat/firestore';
-import {GlyphData, LocalMetadata, LogMessages, MsgData, PortalInfo, PortalVisiter, RetVal} from '../data';
+import {GlyphData, LatLng, LocalMetadata, LogMessages, MsgData, PortalFrame, PortalInfo, PortalVisiter, RetVal} from '../data';
 import {SnackbarService} from './snackbar.service';
 import {Const} from '../const';
 import {MapDirectionsResponse, MapDirectionsService} from '@angular/google-maps';
 import {Observable} from 'rxjs';
+import {GeolocationService} from '@ng-web-apis/geolocation';
 @Injectable({
   providedIn: 'root'
 })
 export class TrustmanService {
+  public isAdmin;
   pzAdminBootParamDocRef: AngularFirestoreDocument;
   pzUserBootParamDocRef: AngularFirestoreDocument;
   projectListBootDocRef: AngularFirestoreDocument;
   iconBase = 'https://geopad.ca/pixr2/assets/';
-  googleMapsDirectionResult: google.maps.DirectionsResult;
-
   constructor(private firestore: AngularFirestore,
               private snackbarService: SnackbarService,
               private mapDirectionsService: MapDirectionsService) {
@@ -23,7 +23,6 @@ export class TrustmanService {
     this.pzAdminBootParamDocRef = this.firestore.collection('fs_boot_params').doc('pz_admin');
     this.projectListBootDocRef = this.firestore.collection('fs_boot_params').doc('pz_project_list');
   }
-
   getDirections(origin: google.maps.LatLngLiteral,
                 destination: google.maps.LatLngLiteral,
                 travelMode: google.maps.TravelMode): Observable<MapDirectionsResponse>
@@ -57,7 +56,8 @@ export class TrustmanService {
   getMsgLog(rawDatId: string): AngularFirestoreDocument{
     return this.firestore.collection(rawDatId).doc('_MsgLog');
   }
-  setLogMsg(ingressName: string, projId: string, msg: string, portalData: PortalInfo): void{
+
+  setLogMsg(ingressName: string, projId: string, msg: string, portalFrame: PortalFrame): void{
     this.firestore.collection(projId).doc('_MsgLog').get().subscribe(document => {
       const date = new Date();
       const hours = date.getHours();
@@ -69,20 +69,34 @@ export class TrustmanService {
       let latLng = null;
       let portalIndex = null;
       let portalLabel = '';
-      if (portalData) {
-          portalLabel = portalData.label;
-          prtlId = 'P:' + portalData.index;
-          if (portalData.url && portalData.url.length > 0){
-            url = portalData.url;
+      let pegLatLng  = null;
+      let distance = Const.CONFIDENCE_RED;
+      if (portalFrame.pegLatLng){
+        pegLatLng = portalFrame.pegLatLng;
+      }
+      if (portalFrame) {
+          if (portalFrame.info.label){
+            portalLabel = portalFrame.info.label;
           }
-          if (portalData.latLng){
-            latLng = portalData.latLng;
+          if (portalFrame.index){
+            prtlId = 'P:' + portalFrame.index;
           }
-          if (portalData.index) {
-            portalIndex = portalData.index;
+          if (portalFrame.info.url && portalFrame.info.url.length > 0){
+            url = portalFrame.info.url;
+          }
+          if (portalFrame.info.latLng){
+            latLng = portalFrame.info.latLng;
+          }
+          if (portalFrame.index) {
+            portalIndex = portalFrame.index;
+          }
+          if (portalFrame.info.distance){
+            distance = portalFrame.info.distance;
           }
       }
-      const msgDat: MsgData = { ingressName, portalIndex, portalLabel, msg, time, tStamp, prtlId, url, latLng };
+      const msgDat: MsgData = { ingressName, portalIndex, portalLabel,
+            distance, msg, time, tStamp, prtlId, url, latLng,
+            pegLatLng };
       let messagesDoc: LogMessages;
       if (msg === 'CLEAR_ALL_MESSAGES') {
         messagesDoc = {messages: []};
@@ -105,21 +119,22 @@ export class TrustmanService {
       });
     });
   }
-  saveChar(portalInfo: PortalInfo, label: string, ingressName: string): void {
-    const projectID = portalInfo.projectId;
-    const portalInfoID = portalInfo.id;
-    const startValue = portalInfo.label;
+
+  saveChar(portalFrame: PortalFrame, label: string, ingressName: string): void {
+    const projectID = portalFrame.info.projectId;
+    const portalInfoID = portalFrame.info.id;
+    const startValue = portalFrame.info.label;
     let action = 'EDITED';
-    if (!portalInfo.published){
+    if (!portalFrame.info.published){
       action = 'SET';
-      portalInfo.published = true;
+      portalFrame.info.published = true;
     }else{
       if (label === ''){
         action = 'REMOVED';
         console.log('DEBUG delete 2');
       }
     }
-    portalInfo.label = label;
+    portalFrame.info.label = label;
     // TODO store info on player visits to portal
     const portalVisiter: PortalVisiter = {
       ingressName,
@@ -127,30 +142,30 @@ export class TrustmanService {
       msg: ''
     };
     // TODO push new PortalVisiter into visiters
-    if (!portalInfo.visiters){
+    if (!portalFrame.info.visiters){
 
     }else{
 
     }
     // portalInfo.published = true; // TODO make a publish log
     this.setPortalInfo
-    (projectID, portalInfoID, portalInfo).then(value => {
+    (projectID, portalInfoID, portalFrame.info).then(value => {
       if (Const.DEBUG_TRUSTMAN){
         console.log(value);
       }
-      let msg = 'At Portal:' + portalInfo.index + ' ' + ingressName + ' ' + action + ' value';
+      let msg = ingressName + ' ' + action + ' value';
       if (action === 'EDITED'){
-        msg = msg + ' from "' + startValue + '" to "' + portalInfo.label + '"';
+        msg = msg + ' from "' + startValue + '" to "' + portalFrame.info.label + '"';
       }else if (action === 'REMOVED'){
         msg = msg + ': "' + startValue + '"';
       }else{
-        msg = msg + ' to "' + portalInfo.label + '"';
+        msg = msg + ' to "' + portalFrame.info.label + '"';
       }
-      this.setLogMsg(ingressName, projectID, msg, portalInfo);
+      this.setLogMsg(ingressName, projectID, msg, portalFrame);
     }).catch(reason => {
       const str = 'Could not set the value; ERROR reason: ' + JSON.stringify(reason);
       this.snackbarService.openSnackBarTop(str, 'Close', Const.SNACK_WAIT_LONG);
-      portalInfo.published = false;
+      portalFrame.info.published = false;
     });
   }
   isGlyphName(glyphName: string): GlyphData {

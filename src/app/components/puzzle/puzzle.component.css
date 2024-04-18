@@ -24,6 +24,9 @@ img {
 .icon-display {
   transform: scale(2);
 }
+.runner-button {
+  margin-top: 18px;
+}
 .iconGreen {
   border: black solid 4px;
   background-color: rgba(158,165,169,0.5);

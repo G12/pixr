@@ -1,44 +1,41 @@
-
 <div *ngIf="portalFrame">
-  <h4>Portal:{{portalFrame.info.index}} value: {{portalFrame.info.label}}</h4>
+  <h4>Portal:{{ portalFrame.info.index }} value: {{ portalFrame.info.label }}</h4>
   <div class="thumbFrame">
-  <app-thumbnail
-    [src]="src" [index]="portalFrame.index"
-    [thumbWidth]="localMetadata.thumbWidth/infoScale"
-    [thumbHeight]="localMetadata.thumbHeight/infoScale"
-    [hdrHeight]="localMetadata.hdrHeight/infoScale"
-    [imgWidth]="imgWidth/infoScale"
-    [leftMargin]="localMetadata.lefMargin/infoScale"
-    [fudgeFactor]="localMetadata.fudgeFactor/infoScale">
-  </app-thumbnail>
+    <app-thumbnail
+      [src]="src" [index]="portalFrame.index"
+      [thumbWidth]="localMetadata.thumbWidth/infoScale"
+      [thumbHeight]="localMetadata.thumbHeight/infoScale"
+      [hdrHeight]="localMetadata.hdrHeight/infoScale"
+      [imgWidth]="imgWidth/infoScale"
+      [leftMargin]="localMetadata.lefMargin/infoScale"
+      [fudgeFactor]="localMetadata.fudgeFactor/infoScale">
+    </app-thumbnail>
   </div>
   <div>
-    <span *ngIf="portalFrame.d <= Const.CONFIDENCE_GREEN" class="inTheGreen">
-      Your in the Green; good to HACK Now!
-    </span>
     <br>
     <div *ngIf="hintMsg.length !== 0">
-    <mat-hint class="cautionHint"><strong>{{hintMsg}}
+      <mat-hint class="cautionHint"><strong>{{ hintMsg }}
       </strong></mat-hint>
     </div>
-    <mat-form-field [style.width.%]="64" appearance="outline">
-      <mat-label>{{getHint(portalFrame.info.type)}}</mat-label>
+    <mat-form-field [style.width.%]="50" appearance="outline" class="frm">
+      <mat-label>{{ getHint(portalFrame.info.type) }}</mat-label>
       <input (ngModelChange)="validate($event, portalFrame.info)"
-             matInput [(ngModel)]="label" [disabled]="!portalFrame.canEdit"
+             matInput
+             [type]="portalFrame.info.type === Const.NUMBER_CODE ? 'number' : 'text' "
+             [(ngModel)]="label" [disabled]="!portalFrame.canEdit"
              class="charInput" autocomplete="off">
     </mat-form-field>
     <button *ngIf="testDeleteConditions(label, portalFrame.info)"
-            (click)="delete(portalFrame.info, label, ingressName)"
-      mat-icon-button color="warn" aria-label="Delete Forever">
+            (click)="delete(portalFrame,label,ingressName)"
+            mat-icon-button color="warn" aria-label="Delete Forever">
       <mat-icon>delete_forever</mat-icon>
     </button>
-    <button *ngIf="portalFrame.d > Const.CONFIDENCE_GREEN" (click)="toggleEdit(portalFrame)"
-      mat-icon-button class="btnSpacingLeft">
+    <button *ngIf="portalFrame.dstToPrtl > Const.CONFIDENCE_GREEN" (click)="toggleEdit(portalFrame)"
+            mat-icon-button class="btnSpacingLeft">
       <span class="iconGreen">
         <mat-icon class="icon-display">edit</mat-icon>
       </span>
     </button>
-
     <!--
     <button (click)="openStreetView(portalFrame.info)"
             mat-icon-button aria-label="Open Street View">
@@ -50,6 +47,12 @@
               mat-raised-button color="primary"
               (click)="saveChar(portalFrame, label, ingressName)">Save
       </button>
+      <button *ngIf="portalFrame.info.type === Const.GLYPH_CODE
+        && !isValidChar && label.length > 0"
+              mat-raised-button color="accent"
+              (click)="forceSaveGlyph(portalFrame, label, ingressName)">Force Save?
+      </button>
+
     </div>
   </div>
 </div>

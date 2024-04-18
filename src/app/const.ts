@@ -2,7 +2,9 @@ export class Const {
   public static SIDE_BAR_RIGHT_PADDING = 56;
   public static BUTTON_WIDTH = 56;
 
-  public static CONFIDENCE_GREEN = 40;
+  public static CONFIDENCE_GREEN = 40; // 40
+  public static CONFIDENCE_YELLOW = 240;
+  public static CONFIDENCE_RED = 99999999;
 
 
   // thumbnail defaults
@@ -17,7 +19,7 @@ export class Const {
   public static DIM_ROW_COUNT = 11;
   public static DIM_ROW_HEIGHT = 299;
   public static HDR_HEIGHT = 144;
-  public static LEFT_MARGIN = 120;
+  public static LEFT_MARGIN = 110;
 
   public static DEBUG_PUZZLE = false;
   public static DEBUG_FILE_UPLOAD = false;

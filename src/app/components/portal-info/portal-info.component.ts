@@ -26,6 +26,8 @@ export class PortalInfoComponent implements AfterViewInit{
   dirty = false;
   isValidChar = false;
   protected readonly Const = Const;
+  inputType = 'text';
+
   constructor(private trustmanService: TrustmanService) {
 
   }
@@ -35,11 +37,23 @@ export class PortalInfoComponent implements AfterViewInit{
       // called only once when map initializes
     }
   }
-
+  forceSaveGlyph(portalFrame: PortalFrame, label: string, ingressName: string): void {
+    if (confirm(label + ' is NOT a known Glyph!\nAre you sure you want to force save?')) {
+      this.saveChar(portalFrame, label, ingressName);
+    }
+  }
   saveChar(frame: PortalFrame, label: string, ingressName: string): void {
     frame.canEdit = false;
     if (this.trustmanService.confirmLabel(frame.info, label)){
-      this.trustmanService.saveChar(frame.info, label, ingressName);
+      // Test distance to portal
+      let dst = Const.CONFIDENCE_RED;
+      if (frame.info.latLng){
+        dst = this.trustmanService.distanceBetween(
+          this.pegPosition, frame.info.latLng
+        );
+      }
+      frame.info.distance = dst;
+      this.trustmanService.saveChar(frame, label, ingressName);
       this.parentFun.emit(frame.info);
     }
   }
@@ -71,13 +85,14 @@ export class PortalInfoComponent implements AfterViewInit{
     this.dirty = false;
     this.isValidChar = false;
   }
-  delete(info: PortalInfo, label: string, ingressName: string): void {
+
+  delete(portalFrame: PortalFrame, label: string, ingressName: string): void {
     if (confirm('Remove the Value: ' + label )){
       // Wait a bit so snack bar will appear; probably not neccessary on user screen
       // setTimeout(() => {
         console.log('DEBUG delete 1');
-        this.trustmanService.saveChar(info, '', ingressName);
-        this.parentFun.emit(info);
+        this.trustmanService.saveChar(portalFrame, '', ingressName);
+        this.parentFun.emit(portalFrame.info);
       // }, Const.SNACK_WAIT_VERY_SHORT);
     }
   }
@@ -113,8 +128,10 @@ export class PortalInfoComponent implements AfterViewInit{
 
   toggleEdit(portalFrame: PortalFrame): void {
     if (!portalFrame.canEdit){
-      if (confirm('The "Distance to Portal": ' + Math.round(portalFrame.d) +
-        ' meters is TOO far to Hack\nDo you STILL want to edit?')){
+      if (confirm('The Distance to Portal:' + portalFrame.index + ' is ' +
+        Math.round(portalFrame.dstToPrtl) + ' meters.' +
+        '\nMove to within HACKING range for best results!' +
+        '\nOR select OK to edit anyways.')){
         portalFrame.canEdit = !portalFrame.canEdit;
       }
     }else{

@@ -65,7 +65,7 @@
         <mat-icon>logout</mat-icon>
       </button>
     </span>
-      <span>W:{{imagePageWidth}} w: {{w}}</span>
+      <!--<span>W:{{imagePageWidth}} w: {{w}}</span>-->
     <div *ngIf="isAdmin">
       <button *ngIf="!validated" class="projButton" mat-fab extended (click)="newFSProject()">
         New Proj.
@@ -231,7 +231,7 @@
         <div mat-dialog-actions align="start">
           <button *ngIf="currentPortalFrame && !currentPortalFrame.isTarget"
                   (click)="drawDirectionsTo(currentPortalFrame)"
-                  mat-icon-button>
+                  mat-icon-button class="runner-button">
               <span class="iconGreen">
                 <mat-icon  class="icon-display">directions_run</mat-icon>
               </span>
@@ -277,7 +277,8 @@
       <span matListItemIcon>
         <button mat-icon-button (click)="action(msgData)"
                 [color]="getAccent(msgData)" aria-label="Example icon button with a heart icon">
-          <mat-icon>play_circle_filled</mat-icon>
+          <mat-icon *ngIf="msgData.latLng && msgData.pegLatLng">directions_run</mat-icon>
+          <mat-icon *ngIf="!msgData.pegLatLng">play_circle_filled</mat-icon>
         </button>
       </span>
       <span matListItemTitle>Time {{msgData.time}}

@@ -17,6 +17,12 @@ export interface PortalVisiter {
 export interface PortalVisiters {
   visiters: PortalVisiter[];
 }
+export interface HistoryItem {
+  timeStamp: number;
+  ingressName: string;
+  action: string;
+  value: string;
+}
 ///////////////////////////////  PUZZLE ////////////////////////////////////
 export interface PortalInfo {
   projectId?: string; // Used to pass project Id to Dialog
@@ -31,6 +37,9 @@ export interface PortalInfo {
   comment?: string;
   type: string;
   isActive?: boolean; // TODO remove if unused
+  confidenceLevel?: number;
+  history: HistoryItem[];
+  distance: number;
 }
 export interface RetVal {
   hintMsg: string;
@@ -49,9 +58,10 @@ export interface PortalFrame {
   marker?: MapMarker;
   canEdit: boolean;
   isTarget: boolean;
-  d: number;
+  dstToPrtl: number;
   opts?: google.maps.MarkerOptions;
   iconLabel?: string;
+  pegLatLng: LatLng;
 }
 export interface LocalMetadata {
   id: string;
@@ -99,6 +109,8 @@ export interface MsgData {
   prtlId: string;
   url?: string;
   latLng?: LatLng;
+  pegLatLng: LatLng;
+  distance: number;
 }
 export interface LogMessages {
   id?: string;

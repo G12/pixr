@@ -8,17 +8,7 @@
   background-color: orange;
   width: 90%;
 }
-.inTheGreen {
-  border: black solid 4px;
-  background-color: lightgray;
-  min-width: 24px;
-  min-height: 24px;
-  width: fit-content;
-  height: fit-content;
-  border-radius: 4px;
-  padding: 12px;
-  color: lawngreen;
-  text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+.charInput {
+  text-overflow-ellipsis: true;
+  min-height: 40px;
 }
-
-

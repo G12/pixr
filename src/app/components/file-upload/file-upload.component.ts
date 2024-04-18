@@ -1,12 +1,13 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {UploadService} from '../../services/upload.service';
-import {LocalMetadata, PzBootParam, PzProjectList, UploadResponse} from '../../data';
-import {MsgDat} from '../../project.data';
+import {LocalMetadata, MsgData, PzBootParam, PzProjectList, UploadResponse} from '../../data';
+
 import {TrustmanService} from '../../services/trustman.service';
 import {ProjectService} from '../../services/project.service';
 import {AuthService} from '../../services/auth.service';
 import {Const} from '../../const';
+import {MsgDat} from '../../project.data';
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
@@ -134,9 +135,17 @@ export class FileUploadComponent implements OnInit{
         project_id: localStorage.projectID,
         folder: name
       };
-      const msgDat: MsgDat = {
+      const msgDat: MsgData = {
         msg: 'Started Project: ' + name,
-        time: JSON.stringify(new Date())
+        time: JSON.stringify(new Date()),
+        ingressName: '',
+        portalLabel: '',
+        portalIndex: null,
+        tStamp: Date.now(),
+        prtlId: null,
+        url: null,
+        pegLatLng: null,
+        distance: Const.CONFIDENCE_GREEN
       };
       const messagesDoc = {messages: []};
       messagesDoc.messages.push(msgDat);

@@ -22,9 +22,9 @@
     <div *ngIf="showUrlPage" mat-dialog-actions align="end">
       <button *ngIf="this.isValidUrl"
               mat-raised-button color="primary"
-              (click)="saveUrl(portalInfo)">Save URL
+              (click)="saveUrl(portalFrame)">Save URL
       </button>
-      <button *ngIf="savedUrl" mat-button color="warn" (click)="deleteUrl(portalInfo)">
+      <button *ngIf="savedUrl" mat-button color="warn" (click)="deleteUrl(portalFrame)">
         <mat-icon matSuffix>delete_forever</mat-icon>
         REMOVE
       </button>
@@ -52,48 +52,55 @@
     </mat-form-field>
     <div class="verticalSpace"></div>
   </div>
-  <span *ngIf="savedUrl">
-    <!-- TODO archive Google Maps code for future use
-    <button mat-button color="primary" (click)="openGoogleMaps(portalInfo)"
-            matTooltip="Open Google Maps for directions to this portal">
-      <mat-icon matSuffix>directions_walk</mat-icon>
-      Directions
-    </button>-->
-    <!--<button *ngIf="savedUrl" mat-button color="primary" (click)="openMap(portalInfo)"
-          matTooltip="Close Side Bar and Zoom into this portal">
-        <mat-icon matSuffix>arrow_left</mat-icon>
-      MAP
-    </button>-->
-  </span>
-  <mat-divider></mat-divider>
-  <p><br></p>
-  <div *ngIf="hintMsg.length !== 0">
-    <mat-hint class="cautionHint"><strong>{{hintMsg}}
-    </strong></mat-hint>
+
+  <div *ngIf="trustmanService.isAdmin">
+    <span *ngIf="savedUrl">
+      <!-- TODO archive Google Maps code for future use
+      <button mat-button color="primary" (click)="openGoogleMaps(portalInfo)"
+              matTooltip="Open Google Maps for directions to this portal">
+        <mat-icon matSuffix>directions_walk</mat-icon>
+        Directions
+      </button>-->
+      <!--<button *ngIf="savedUrl" mat-button color="primary" (click)="openMap(portalInfo)"
+            matTooltip="Close Side Bar and Zoom into this portal">
+          <mat-icon matSuffix>arrow_left</mat-icon>
+        MAP
+      </button>-->
+    </span>
+    <mat-divider></mat-divider>
+    <p><br></p>
+    <div *ngIf="hintMsg.length !== 0">
+      <mat-hint class="cautionHint"><strong>{{hintMsg}}
+      </strong></mat-hint>
+    </div>
+    <mat-form-field [style.width.%]="48" appearance="outline">
+      <!--<mat-hint class="cautionHint"><strong>{{hintMsg}}</strong></mat-hint>-->
+      <mat-label>{{getHint(portalInfo.type)}}</mat-label>
+      <input (ngModelChange)="validate($event, portalInfo)"
+             matInput [(ngModel)]="label" [disabled]="!portalFrame.canEdit"
+             [type]="portalInfo.type === Const.NUMBER_CODE ? 'number' : 'text' "
+             class="charInput" autocomplete="off">
+    </mat-form-field>
+    <button *ngIf="testDeleteConditions(label, portalInfo)"
+            (click)="delete(portalFrame,label,ingressName)"
+            mat-icon-button color="warn" aria-label="Delete Forever">
+      <mat-icon>delete_forever</mat-icon>
+    </button>
+    <button *ngIf="portalFrame.dstToPrtl > Const.CONFIDENCE_GREEN" (click)="toggleEdit(portalFrame)"
+            mat-icon-button class="btnSpacingLeft">
+        <span class="iconGreen">
+          <mat-icon class="icon-display">edit</mat-icon>
+        </span>
+    </button>
   </div>
-  <mat-form-field [style.width.%]="48" appearance="outline">
-    <!--<mat-hint class="cautionHint"><strong>{{hintMsg}}</strong></mat-hint>-->
-    <mat-label>{{getHint(portalInfo.type)}}</mat-label>
-    <input (ngModelChange)="validate($event, portalInfo)" matInput [(ngModel)]="label"
-           class="charInput" autocomplete="off">
-  </mat-form-field>
-  <button *ngIf="testDeleteConditions(label, portalInfo)"
-          (click)="delete(portalInfo, label, ingressName)"
-          mat-icon-button color="warn" aria-label="Delete Forever">
-    <mat-icon>delete_forever</mat-icon>
-  </button>
 </div>
 <div mat-dialog-actions align="end">
-  <button *ngIf="label !== portalInfo.label && isValidChar && label.length !== 0"
-          mat-raised-button color="primary"
-          (click)="saveChar(portalInfo, label)">Save
-  </button>
-  <!--
-  <button *ngIf="savedUrl" mat-button color="primary" (click)="openMap(portalInfo)"
-          matTooltip="Close Side Bar and Zoom into this portal">
-    <mat-icon matSuffix>arrow_right</mat-icon>
-    Go to MAP
-  </button>-->
+  <div *ngIf="trustmanService.isAdmin">
+    <button *ngIf="label !== portalInfo.label && isValidChar && label.length !== 0"
+            mat-raised-button color="primary"
+            (click)="saveChar(portalFrame,label)">Save
+    </button>
+  </div>
   <button mat-button (click)="onCancelClick(portalInfo)">
     <span *ngIf="dirty">Cancel</span>
     <span *ngIf="!dirty">Close</span>

@@ -35,7 +35,7 @@ import {SnackbarService} from '../../services/snackbar.service';
 import {ThemePalette} from '@angular/material/core';
 import {PortalInfoComponent} from '../portal-info/portal-info.component';
 import {MatDrawer} from '@angular/material/sidenav';
-import * as googlemaps from 'googlemaps';
+// import * as googlemaps from 'googlemaps';
 
 @Component({
   selector: 'app-puzzle',
@@ -264,6 +264,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         }
         // this.isAdmin = !!test;
         this.isAdmin = isAdmin;
+        this.trustmanService.isAdmin = isAdmin;
         // let id;
         if (this.isAdmin) {
           this.id = this.fsAdmin.project_id;
@@ -364,14 +365,16 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         const portalFrame: PortalFrame = {
           // colHeight is optional - will be neccessary if colHeights are not uniform
           index: i, height: this.rowHeight,
-          canEdit: false, isTarget: false, d: 0,
+          canEdit: false, isTarget: false, dstToPrtl: null, pegLatLng: null,
           info: {
             index: i,
             id: 'P:' + i,
             published: false,
             label: '',
             type,
+            history: [],
             // isActive: false,
+            distance: null,
           },
           opts: {}
         };
@@ -422,8 +425,23 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       // this.initCanvas();
       this.bannerInfo = '  @ ' + name + ' started working!' + this.bannerInfo;
       if (this.localMetadata) {
-        this.trustmanService.setLogMsg(this.ingressName, this.localMetadata.id,
-          this.ingressName + ' Logged In', null);
+        // TODO work out steps at the server to avoid this
+        const portalFrame: PortalFrame = {
+          index: null,
+          info: {id: this.localMetadata.projectID, label: 'login',
+            published: false, distance: Const.CONFIDENCE_GREEN,
+            index: null, type: null, history: null
+          },
+          canEdit: null,
+          isTarget: null,
+          dstToPrtl: null,
+          pegLatLng: null
+        };
+        if (!this.isAdmin){
+          this.trustmanService.setLogMsg(
+            this.ingressName, this.localMetadata.projectID, this.ingressName +
+            ' Logged In', portalFrame);
+        }
       }
       this.showDebug = false;
     }
@@ -566,6 +584,20 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   /////////////////////////////////////////////////////////////////////
   popUpDialog(portalFrame: PortalFrame): void {
     portalFrame.info.projectId = this.localMetadata.projectID;
+    // The dstToPrtl value is used to determine confidence level
+    // when a character value is set
+    // This value may change if user sets a value for latLng
+    // while dialog is still open
+    if (portalFrame.info.latLng){
+      portalFrame.dstToPrtl = this.trustmanService.distanceBetween(
+        this.pegPosition, portalFrame.info.latLng
+      );
+      portalFrame.pegLatLng = this.pegPosition;
+      portalFrame.canEdit = portalFrame.dstToPrtl <= Const.CONFIDENCE_GREEN;
+    }else{
+      portalFrame.dstToPrtl = Const.CONFIDENCE_RED;
+      portalFrame.canEdit = false;
+    }
     const dialogPackage: DialogPackage = {
       ingressName: this.ingressName,
       localMetadata: this.localMetadata,
@@ -619,18 +651,28 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     });
   }
   sendMessage(): void {
+    // TODO work out steps at the server to avoid this
+    const portalFrame: PortalFrame = {
+      index: null,
+      info: {id: this.localMetadata.projectID, label: 'login',
+        published: false, distance: Const.CONFIDENCE_GREEN,
+        index: null, type: null, history: null
+      },
+      canEdit: null,
+      isTarget: null,
+      dstToPrtl: null,
+      pegLatLng: null
+    };
     let str = '@' + this.ingressName + ' sent a Message: ';
     const msg = prompt('Send Message?');
     if (msg != null) {
       str += msg;
-      this.trustmanService.setLogMsg(this.ingressName,
-        this.localMetadata.projectID, str, null);
+      this.trustmanService.setLogMsg(this.ingressName, this.localMetadata.projectID, str, portalFrame);
     }
   }
   testStuff(): void {
     const str = 'CLEAR_ALL_MESSAGES';
-    this.trustmanService.setLogMsg(this.ingressName,
-      this.localMetadata.projectID, str, this.currentPortalFrame.info);
+    this.trustmanService.setLogMsg(this.ingressName, this.localMetadata.projectID, str, this.currentPortalFrame);
     this.snackbarService.openSnackBarTop
       (str, 'Close', 5000);
   }
@@ -745,7 +787,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       const d = this.trustmanService.distanceBetween(this.pegPosition, portalFrame.info.latLng);
       portalFrame.canEdit = d <= Const.CONFIDENCE_GREEN;
       portalFrame.isTarget = isTarget;
-      portalFrame.d = d;
+      portalFrame.dstToPrtl = d;
+      portalFrame.pegLatLng = this.pegPosition;
       this.currentPortalFrame = portalFrame;
       this.label = portalFrame.info.label;
       this.dirty = false;
@@ -767,16 +810,13 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   }
   // called by map-info-window (closeclick)
   infoClosed(): void {
-    console.log('infoClosed() called by map-info-window (closeclick)');
   }
   closeWindow(): void {
     this.currentPortalFrame.canEdit = false;
-    console.log('closeWindow() portal: ' + this.currentPortalFrame.index);
     this.infoWindow.close();
   }
   // event call from app-portal-info
   closeInfoWindow($event: any): void {
-    console.log('closeInfoWindow($event: any) from app-portal-info');
     this.closeWindow();
   }
 
@@ -848,15 +888,21 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.isHome = true;
   }
   getAccent(msgData: MsgData): ThemePalette {
-    if (msgData.latLng){
-      return 'warn';
+    if (msgData.distance){
+      if (msgData.distance <= Const.CONFIDENCE_GREEN){
+        return 'primary';
+      }else if (msgData.distance < Const.CONFIDENCE_YELLOW){
+        return 'accent';
+      }else{
+        return 'warn';
+      }
     }
-    return 'accent';
+    return 'primary';
   }
   action(msgData: MsgData): void {
-    if (msgData.latLng){
+    if (msgData.latLng && msgData.pegLatLng){
       const dest = msgData.latLng;
-      const orig = this.pegPosition;
+      const orig = msgData.pegLatLng;
       const url = 'https://www.google.com/maps/dir/?api=1&origin='
         + orig.lat + ',' + orig.lng + '&destination='
         + dest.lat + ',' + dest.lng + '&travelmode=walking';
@@ -940,9 +986,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     let dlt = 0;
     if (zoom > 14) {
       switch (zoom) {
-        case 22: dlt = 4;
+        case 22: dlt = 5;
                  break;
-        case 21: dlt = 3;
+        case 21: dlt = 4;
                  break;
         case 20: dlt = 2;
                  break;
@@ -950,11 +996,11 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
                  break;
         case 18: dlt = 1;
                  break;
-        case 17: dlt = 0;
+        case 17: dlt = -1;
                  break;
-        case 16: dlt = -6;
+        case 16: dlt = -3;
                  break;
-        case 15: dlt = -10;
+        case 15: dlt = -5;
                  break;
         default: dlt = 0;
                  break;

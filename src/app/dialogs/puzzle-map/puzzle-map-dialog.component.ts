@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {MapDialogComponent} from '../map/map-dialog.component';
-import {DialogPackage, LocalMetadata, PortalInfo} from '../../data';
+import {DialogPackage, LocalMetadata, PortalFrame, PortalInfo} from '../../data';
 import {TrustmanService} from '../../services/trustman.service';
 import {LatLng} from '../../project.data';
 import {Clipboard} from '@angular/cdk/clipboard';
@@ -14,6 +14,7 @@ import {Const} from '../../const';
 export class PuzzleMapDialogComponent {
   hintMsg = '';
   portalInfo: PortalInfo;
+  portalFrame: PortalFrame;
   localMetadata: LocalMetadata;
   ingressName: string;
 
@@ -29,15 +30,17 @@ export class PuzzleMapDialogComponent {
   savedUrl = false;
   dirty = false;
   pegPosition: LatLng;
+  protected readonly Const = Const;
   constructor(
     public dialogRef: MatDialogRef<MapDialogComponent>,
     private clipboard: Clipboard,
     @Inject(MAT_DIALOG_DATA) public dialogPackage: DialogPackage,
-    private trustmanService: TrustmanService) {
+    public trustmanService: TrustmanService) {
     this.ingressName = dialogPackage.ingressName;
     this.localMetadata = dialogPackage.localMetadata;
     this.portalInfo = dialogPackage.portalFrame.info;
     this.pegPosition = dialogPackage.pegPosition;
+    this.portalFrame = dialogPackage.portalFrame;
     if (this.portalInfo) {
       this.label = this.portalInfo.label;
     }
@@ -52,12 +55,36 @@ export class PuzzleMapDialogComponent {
   getUrlPrompt(): string{
     return this.savedUrl ? 'To edit the Intel url' : 'If you know the Intel url';
   }
+  convertToIITC(url: string): string {
+    console.log('url: ' + url);
+    if (-1 !== url.indexOf('https://intel.ingress.com', 0)){
+      return url;
+    }else { // Convert Google Maps to IITC format
+      const arr = url.split('dir', 2);
+      console.log('arr = ' + arr + ' arr[1] = ' + arr[1]);
+      if ('\/\/' === arr[1].substring(0, 2)){
+        // https://www.google.com/maps/dir//45.42268,-75.693955/@45.4078781,-75.7584253,12z?entry=ttu
+        let str = arr[1].substring(2);
+        const n = str.indexOf('\/@');
+        str = str.substring(0, n);
+        return 'https://intel.ingress.com/?pll=' + str;
+      }else{
+        console.log('// NOT found');
+        // https://www.google.com/maps/dir/45.4088403,-75.642488/45.42268,-75.693955/
+        // @45.4146821,-75.6822055,14z/data=!3m1!4b1!4m4!4m3!1m1!4e1!1m0?entry=ttu
+        const arr2 = arr[1].split('\/', 3);
+        console.log('arr2[2] = ' + arr2[2]);
+        return 'https://intel.ingress.com/?pll=' + arr2[2];
+      }
+    }
+  }
   validateUrl(url: string): void {
     this.isValidUrl = false;
-    // console.log(url);
     this.msg = 'Not a Valid Intel URL';
     if (this.testForValidURL(url)){
       this.msg = 'Missing URL location parameters ie: ?pll=45.5,-75.6';
+      // If this is a Google maps URL convert it to IITC
+      url = this.convertToIITC(url);
       const latLng = this.makeLatLng(url);
       if (latLng){
         this.msg = '';
@@ -100,33 +127,35 @@ export class PuzzleMapDialogComponent {
     }
     return null;
   }
-  saveUrl(portalInfo: PortalInfo): void {
-    const projectID = portalInfo.projectId;
-    const portalInfoID = portalInfo.id;
+
+  saveUrl(portalFrame: PortalFrame): void {
+    const projectID = portalFrame.info.projectId;
+    const portalInfoID = portalFrame.info.id;
     if (this.isValidUrl) {
-      portalInfo.url = this.url;
-      portalInfo.latLng = this.latLng;
+      portalFrame.info.url = this.url;
+      portalFrame.info.latLng = this.latLng;
     }
     // console.log('Publishing: ' + JSON.stringify(portalInfo));
     this.trustmanService.setPortalInfo
-    (projectID, portalInfoID, portalInfo).then(value => {
+    (projectID, portalInfoID, portalFrame.info).then(value => {
       console.log('setPortalInfo return value: ' + JSON.stringify(value));
       let msg = this.ingressName;
-      msg = msg + ' SET intel url: ' + portalInfo.url;
-      this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);
+      msg = msg + ' SET intel url: ' + portalFrame.info.url;
+      this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalFrame);
     }).catch(reason => {
       alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
-      portalInfo.published = false;
+      portalFrame.info.published = false;
     });
     this.showUrlPage = false;
     this.savedUrl = true;
   }
-  saveChar(portalInfo: PortalInfo, label: string): void {
-    if (this.trustmanService.confirmLabel(portalInfo, label)){
+
+  saveChar(portalFrame: PortalFrame, label: string): void {
+    if (this.trustmanService.confirmLabel(portalFrame.info, label)){
       // const d = this.trustmanService.distanceBetween(
       //                  this.pegPosition, portalInfo.latLng);
 
-      this.trustmanService.saveChar(portalInfo, label, this.ingressName);
+      this.trustmanService.saveChar(portalFrame, label, this.ingressName);
       this.dialogRef.close();
     }
   }
@@ -137,7 +166,9 @@ export class PuzzleMapDialogComponent {
   }
   // TODO broaden the search scope of test ( removed intel from ...ingress.com/intel )
   private testForValidURL(url: string): boolean {
-    return (-1 !== url.indexOf('https://intel.ingress.com', 0));
+    return (-1 !== url.indexOf('https://intel.ingress.com', 0)
+      || -1 !== url.indexOf('https://www.google.com/maps/dir', 0)
+    );
   }
   toggleSetUrl(): void {
     this.showUrlPage = !this.showUrlPage;
@@ -175,12 +206,13 @@ export class PuzzleMapDialogComponent {
       window.open(url, 'google-maps');
     }
   }
-  delete(portalInfo: PortalInfo, label: string, ingressName: string): void {
+
+  delete(portalFrame: PortalFrame, label: string, ingressName: string): void {
     if (confirm('Remove the Value: ' + label )){
       this.label = '';
       // Wait a bit so snack bar will appear; probably not necessary on user screen
       setTimeout(() => {
-        this.trustmanService.saveChar(portalInfo, '', ingressName);
+        this.trustmanService.saveChar(portalFrame, '', ingressName);
       }, Const.SNACK_WAIT_VERY_SHORT);
     }
   }
@@ -190,27 +222,28 @@ export class PuzzleMapDialogComponent {
   testDeleteConditions(label: string, portalInfo: PortalInfo): boolean {
     return this.trustmanService.testDeleteConditions(label, portalInfo);
   }
-  deleteUrl(portalInfo: PortalInfo): void {
+
+  deleteUrl(portalFrame: PortalFrame): void {
     if (confirm('Remove the url?')){
-      const projectID = portalInfo.projectId;
-      const portalInfoID = portalInfo.id;
+      const projectID = portalFrame.info.projectId;
+      const portalInfoID = portalFrame.info.id;
       // if (this.isValidUrl) {
-      portalInfo.url = '';
-      portalInfo.latLng = null;
+      portalFrame.info.url = '';
+      portalFrame.info.latLng = null;
       this.url = '';
       // }
       // console.log('Publishing: ' + JSON.stringify(portalInfo));
       this.trustmanService.setPortalInfo
-      (projectID, portalInfoID, portalInfo).then(value => {
+      (projectID, portalInfoID, portalFrame.info).then(value => {
         if (Const.DEBUG_PUZZLE_MAP_DIALOG){
           console.log('setPortalInfo return value: ' + JSON.stringify(value));
         }
         let msg = this.ingressName;
-        msg = msg + ' REMOVED intel url: ' + portalInfo.url;
-        this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalInfo);
+        msg = msg + ' REMOVED intel url: ' + portalFrame.info.url;
+        this.trustmanService.setLogMsg(this.ingressName, projectID, msg, portalFrame);
       }).catch(reason => {
         alert('setPortalInfo ERROR reason: ' + JSON.stringify(reason));
-        portalInfo.published = false;
+        portalFrame.info.published = false;
       });
       this.showUrlPage = false;
       this.savedUrl = false;
@@ -218,5 +251,22 @@ export class PuzzleMapDialogComponent {
   }
   openMap(portalInfo: PortalInfo): void {
     this.dialogRef.close(portalInfo);
+  }
+  toggleEdit(portalFrame: PortalFrame): void {
+    if (!portalFrame.canEdit){
+      let str = '';
+      let str2 = 'First determine the location of Portal:' + portalFrame.index;
+      if (portalFrame.info.latLng){
+        str = 'The Distance to Portal:' + portalFrame.index + ' is '
+          + Math.round(portalFrame.dstToPrtl) + ' meters.';
+        str2 = '';
+      }
+      if (confirm(str2 + str + '\nMove to within HACKING range for best results!' +
+        '\nOR select OK to edit anyways.')){
+        portalFrame.canEdit = !portalFrame.canEdit;
+      }
+    }else{
+      portalFrame.canEdit = !portalFrame.canEdit;
+    }
   }
 }
