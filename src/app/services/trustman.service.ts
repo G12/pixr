@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import {AngularFirestore, AngularFirestoreDocument} from '@angular/fire/compat/firestore';
-import {GlyphData, LatLng, LocalMetadata, LogMessages, MsgData, PortalFrame, PortalInfo, PortalVisiter, RetVal} from '../data';
+import {GlyphData, LocalMetadata, LogMessages, MsgData, PortalFrame, PortalInfo, PortalVisiter, RetVal} from '../data';
 import {SnackbarService} from './snackbar.service';
 import {Const} from '../const';
 import {MapDirectionsResponse, MapDirectionsService} from '@angular/google-maps';
 import {Observable} from 'rxjs';
-import {GeolocationService} from '@ng-web-apis/geolocation';
 @Injectable({
   providedIn: 'root'
 })
@@ -15,6 +14,7 @@ export class TrustmanService {
   pzUserBootParamDocRef: AngularFirestoreDocument;
   projectListBootDocRef: AngularFirestoreDocument;
   iconBase = 'https://geopad.ca/pixr2/assets/';
+  public pegPosition: google.maps.LatLngLiteral;
   constructor(private firestore: AngularFirestore,
               private snackbarService: SnackbarService,
               private mapDirectionsService: MapDirectionsService) {

@@ -7,7 +7,6 @@ import {TrustmanService} from '../../services/trustman.service';
 import {ProjectService} from '../../services/project.service';
 import {AuthService} from '../../services/auth.service';
 import {Const} from '../../const';
-import {MsgDat} from '../../project.data';
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',

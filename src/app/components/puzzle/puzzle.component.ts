@@ -747,6 +747,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   dynamicGeolocation(): void {
     this.geolocation$.subscribe(position => {
       this.pegPosition = {lat: position.coords.latitude,  lng: position.coords.longitude};
+      this.trustmanService.pegPosition = this.pegPosition;
       this.heading = Math.round(position.coords.heading);
       this.speed = position.coords.speed; // meters per second
       // TODO why is device orientation unpredictable?
@@ -788,6 +789,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       portalFrame.canEdit = d <= Const.CONFIDENCE_GREEN;
       portalFrame.isTarget = isTarget;
       portalFrame.dstToPrtl = d;
+      // pegPosition will be stale if user leaves info window open
+      // TODO fix by using trustman pegPosition which is updated by geolocation service
       portalFrame.pegLatLng = this.pegPosition;
       this.currentPortalFrame = portalFrame;
       this.label = portalFrame.info.label;

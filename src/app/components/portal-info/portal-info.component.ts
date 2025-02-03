@@ -45,6 +45,8 @@ export class PortalInfoComponent implements AfterViewInit{
   saveChar(frame: PortalFrame, label: string, ingressName: string): void {
     frame.canEdit = false;
     if (this.trustmanService.confirmLabel(frame.info, label)){
+      // Get latest peg position TODO test this
+      this.pegPosition = this.trustmanService.pegPosition;
       // Test distance to portal
       let dst = Const.CONFIDENCE_RED;
       if (frame.info.latLng){
@@ -52,6 +54,7 @@ export class PortalInfoComponent implements AfterViewInit{
           this.pegPosition, frame.info.latLng
         );
       }
+      frame.pegLatLng = this.pegPosition;
       frame.info.distance = dst;
       this.trustmanService.saveChar(frame, label, ingressName);
       this.parentFun.emit(frame.info);

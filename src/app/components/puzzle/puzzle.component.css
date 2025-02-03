@@ -140,7 +140,7 @@ input[type="text"]
 }
 .msgRow {
   overflow: auto;
-  text-wrap:normal;
+  text-wrap: auto;
 }
 .header{
   position:fixed;
