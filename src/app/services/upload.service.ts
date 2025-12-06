@@ -7,7 +7,8 @@ import {Observable} from 'rxjs';
 })
 export class UploadService {
 
-  SERVER_URL = 'https://geopad.ca';
+  // SERVER_URL = 'https://geopad.ca';
+  SERVER_URL = 'https://g12mo.ca';
   constructor(private httpClient: HttpClient) { }
 
   // Returns an observable

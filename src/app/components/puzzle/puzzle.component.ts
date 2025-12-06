@@ -414,7 +414,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     // this.openStatsDialog(this.makeStats());
   }
   setIngressName(): void {
-    const testMsg = ''; // ' testing testing: Image dimensions: ' + this.width + ' x ' + this.height;
+    const testMsg = ''; // ' testing: Image dimensions: ' + this.width + ' x ' + this.height;
 
     const name = prompt('Please enter a Name' + testMsg, this.SavedIngressName);
     if (name && name !== '') {
@@ -618,7 +618,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.isMap = false; // Display map related tools
     if (this.imagePage.nativeElement){
       this.imagePageWidth = this.imagePage.nativeElement.clientWidth;
-      this.buttonOffset = this.imagePageWidth - Const.BUTTON_WIDTH;
+      this.buttonOffset = this.imagePageWidth - Const.BUTTON_WIDTH * 2;
     }
   }
   drawerClosed(): void {

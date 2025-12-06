@@ -107,7 +107,9 @@ export class PixrComponent implements OnInit, AfterViewInit {
   // imgUrl = 'assets/FirstSatBlackSmall.jpg'; // 'assets/FirstSatBlack.jpg';
   // imgUrl: string; // assigned after project data aquired from Firebase
   src: string; // TODO make constants for = 'https://geopad.ca/fs_pics/' + folder + '/black.jpg';
-  path = 'https://geopad.ca/fs_pics/';
+  // path = 'https://geopad.ca/fs_pics/';
+  path = 'https://g12mo.ca/fs_pics/';
+
   // realWidth = 4887;
   // realHeight = 2699;
   logBuffer = '';

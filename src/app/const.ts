@@ -29,7 +29,9 @@ export class Const {
   public static LAT_LNG_OTTAWA = { lat: 45.423502, lng: -75.691320};
   public static STATIC_LOCATION = 1;
   public static DYNAMIC_LOCATION = 2;
-  public static IMAGE_FOLDER = 'https://geopad.ca/pixr2/assets/puzzle_images/';
+  public static IMAGE_FOLDER = 'https://g12mo.ca/pixr2/assets/puzzle_images/';
+  // public static IMAGE_FOLDER = 'https://geopad.ca/pixr2/assets/puzzle_images/';
+
   public static ZOOM_POSTAGE_STAMP = 22;
   public static ZOOM_BACKYARD = 20;
   public static ZOOM_TO_PORTAL = 18;
@@ -61,9 +63,9 @@ export class Const {
   public static SCALE_H = 60;
   public static DISPLAY_THRESHOLD = 17;
 
-  public static URL_SMURF_GIF = 'https://geopad.ca/pixr2/assets/smurf.gif';
-  public static URL_GREY_PIN = 'https://geopad.ca/pixr2/assets/WhitePin.png';
-  public static URL_GREEN_PIN = 'https://geopad.ca/pixr2/assets/GreenPin.png';
+  public static URL_SMURF_GIF = 'https://g12mo.ca/pixr2/assets/smurf.gif';
+  public static URL_GREY_PIN = 'https://g12mo.ca/pixr2/assets/WhitePin.png';
+  public static URL_GREEN_PIN = 'https://g12mo.ca/pixr2/assets/GreenPin.png';
 
   public static CIRCLE_FILL_1 = '#ff9c00';
   public static CIRCLE_STROKE_1 = '#704500';
