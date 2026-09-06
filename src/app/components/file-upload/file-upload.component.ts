@@ -111,6 +111,7 @@ export class FileUploadComponent implements OnInit{
     // Create template partially filled
     const date = new Date().toISOString();
     const projId = name + ':' + date;
+    // TODO LocalMetadata never used at this time
     const localStorage: LocalMetadata = {
       id: '_metadata',
       projectName: name,

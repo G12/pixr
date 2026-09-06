@@ -8,18 +8,18 @@ export class Const {
 
 
   // thumbnail defaults
-  public static THUMB_WIDTH = 500;
-  public static THUMB_HEIGHT = 299;
-  public static THUMB_SIZE = 500;
+  public static THUMB_WIDTH = 500; // set to 164 for mobile
+  public static THUMB_HEIGHT = 299; // set to 95 for mobile
+  public static THUMB_SIZE = 500; // not used
   public static FUDGE_FACTOR = 1;
   public static IMG_SCALE = 1.25;
-  public static INFO_SCALE = 2.5;
+  public static INFO_SCALE = 1.25; // 2.5;
 
   // FS Image Defaults
   public static DIM_ROW_COUNT = 11;
-  public static DIM_ROW_HEIGHT = 299;
-  public static HDR_HEIGHT = 144;
-  public static LEFT_MARGIN = 110;
+  public static DIM_ROW_HEIGHT = 299; // set to 400 for mobile
+  public static HDR_HEIGHT = 144; // set to 50 for mobile
+  public static LEFT_MARGIN = 110; // set to 35 for mobile
 
   public static DEBUG_PUZZLE = false;
   public static DEBUG_FILE_UPLOAD = false;
@@ -29,7 +29,8 @@ export class Const {
   public static LAT_LNG_OTTAWA = { lat: 45.423502, lng: -75.691320};
   public static STATIC_LOCATION = 1;
   public static DYNAMIC_LOCATION = 2;
-  public static IMAGE_FOLDER = 'https://g12mo.ca/pixr2/assets/puzzle_images/';
+  public static IMAGE_FOLDER = 'https://g12mo.ca/pixr2.001/assets/puzzle_images/';
+  // public static IMAGE_FOLDER = 'https://g12mo.ca/pixr2/assets/puzzle_images/';
   // public static IMAGE_FOLDER = 'https://geopad.ca/pixr2/assets/puzzle_images/';
 
   public static ZOOM_POSTAGE_STAMP = 22;
@@ -63,9 +64,9 @@ export class Const {
   public static SCALE_H = 60;
   public static DISPLAY_THRESHOLD = 17;
 
-  public static URL_SMURF_GIF = 'https://g12mo.ca/pixr2/assets/smurf.gif';
-  public static URL_GREY_PIN = 'https://g12mo.ca/pixr2/assets/WhitePin.png';
-  public static URL_GREEN_PIN = 'https://g12mo.ca/pixr2/assets/GreenPin.png';
+  public static URL_SMURF_GIF = 'https://g12mo.ca/pixr2.001/assets/smurf.gif';
+  public static URL_GREY_PIN = 'https://g12mo.ca/pixr2.001/assets/WhitePin.png';
+  public static URL_GREEN_PIN = 'https://g12mo.ca/pixr2.001/assets/GreenPin.png';
 
   public static CIRCLE_FILL_1 = '#ff9c00';
   public static CIRCLE_STROKE_1 = '#704500';
