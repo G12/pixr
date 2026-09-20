@@ -14,7 +14,6 @@ export class ThumbnailComponent {
   @Input() leftMargin: number;
   @Input() imgWidth: number;
   @Input() fudgeFactor: number;
-  // @Input() infoScale: number;
   getYPosition(): string {
     const n = ((this.index - 1) * (this.thumbHeight))
       + (this.hdrHeight) + (this.index * this.fudgeFactor);

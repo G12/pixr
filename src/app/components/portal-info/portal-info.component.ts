@@ -18,6 +18,7 @@ export class PortalInfoComponent implements AfterViewInit{
   @Input() map: GoogleMap;
   @Input() imgWidth: number;
   @Input() infoScale: number;
+  @Input() isMobile: boolean;
   @Output('parentFun') parentFun: EventEmitter<any> = new EventEmitter();
   // colHeight = Const.DIM_COL_HEIGHT;
   // fudgeFactor = Const.DIM_FUDGE_FACTOR;
@@ -28,8 +29,32 @@ export class PortalInfoComponent implements AfterViewInit{
   protected readonly Const = Const;
   inputType = 'text';
 
-  constructor(private trustmanService: TrustmanService) {
+  thumbWidth: number;
+  thumbHeight: number;
+  hdrHeight: number;
+  leftMargin: number;
+  fudgeFactor: number;
 
+  constructor(private trustmanService: TrustmanService) {
+    // Mobile Google Maps InfoDialog thumbnail can be dynamically adjusted
+    if (this.isMobile){
+      // this.thumbWidth = this.localMetadata.thumbWidth / this.infoScale;
+      // this.thumbHeight = this.localMetadata.thumbHeight / this.infoScale;
+      // this.hdrHeight = this.localMetadata.hdrHeight / this.infoScale;
+      // this.leftMargin = this.localMetadata.lefMargin / this.infoScale;
+      // this.fudgeFactor = this.localMetadata.fudgeFactor / this.infoScale;
+      this.thumbWidth = Const.MOBILE_THUMB_WIDTH;
+      this.thumbHeight = Const.MOBILE_THUMB_HEIGHT;
+      this.hdrHeight = Const.MOBILE_HDR_HEIGHT;
+      this.leftMargin = Const.MOBILE_LEFT_MARGIN;
+      this.fudgeFactor = Const.MOBILE_FUDGE_FACTOR;
+    }else{
+      this.thumbWidth = Const.INFO_THUMB_WIDTH;
+      this.thumbHeight = Const.THUMB_HEIGHT;
+      this.hdrHeight = Const.INFO_HDR_HEIGHT;
+      this.leftMargin = Const.LEFT_MARGIN;
+      this.fudgeFactor = Const.FUDGE_FACTOR;
+    }
   }
   ngAfterViewInit(): void {
     if (Const.DEBUG_PORTAL_INFO){

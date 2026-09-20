@@ -1,14 +1,14 @@
 <div *ngIf="portalFrame">
-  <h4>Portal:{{ portalFrame.info.index }} value: {{ portalFrame.info.label }}</h4>
+  <h4>Portal:{{ portalFrame.info.index }}: {{ portalFrame.info.label }} [{{isMobile}}]</h4>
   <div class="thumbFrame">
     <app-thumbnail
       [src]="src" [index]="portalFrame.index"
-      [thumbWidth]="localMetadata.thumbWidth/infoScale"
-      [thumbHeight]="localMetadata.thumbHeight/infoScale"
-      [hdrHeight]="localMetadata.hdrHeight/infoScale"
-      [imgWidth]="imgWidth/infoScale"
-      [leftMargin]="localMetadata.lefMargin/infoScale"
-      [fudgeFactor]="localMetadata.fudgeFactor/infoScale">
+      [thumbWidth]="thumbWidth"
+      [thumbHeight]="thumbHeight"
+      [hdrHeight]="hdrHeight"
+      [imgWidth]="imgWidth"
+      [leftMargin]="leftMargin"
+      [fudgeFactor]="fudgeFactor">
     </app-thumbnail>
   </div>
   <div>

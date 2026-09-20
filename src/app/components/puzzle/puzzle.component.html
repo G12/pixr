@@ -88,7 +88,7 @@
       <button class="toolButton" mat-icon-button (click)="sendMessage()"
               matTooltip="Chat">
         <mat-icon>chat</mat-icon>
-        <span class="tiny">Chat 1.0</span>
+        <span class="tiny">Chat {{isMobile}}</span>
       </button>
     </div>
   </mat-toolbar>
@@ -193,7 +193,7 @@
         <div *ngIf="currentPortalFrame">
           <app-portal-info [portalFrame]="currentPortalFrame"
             [src]="src" [localMetadata]="localMetadata"
-            [imgWidth]="width" [infoScale]="infoScale"
+            [imgWidth]="width" [infoScale]="infoScale" [isMobile]="isMobile"
             [ingressName]="ingressName" [pegPosition]="pegPosition"
             [map]="map"  (parentFun)="closeInfoWindow($event)">
           </app-portal-info>
@@ -246,7 +246,7 @@
     </map-info-window>
   </google-map>
     <div  *ngIf="!drawer.opened">
-      <div (click)="drawer.toggle()"
+      <div *ngIf="isAdmin" (click)="drawer.toggle()"
             matTooltip="Open Side Bar to SET locations"
             class="side-bar-button-for-map">
         <button

@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, ElementRef, Inject, OnInit, ViewChild, OnDestroy} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
 import {ProjectService} from '../../services/project.service';
 import {UsersService} from '../../services/users.service';
@@ -22,7 +22,7 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {PuzzleMapDialogComponent} from '../../dialogs/puzzle-map/puzzle-map-dialog.component';
 import {HttpClient} from '@angular/common/http';
 import {GEOLOCATION_SUPPORT, GeolocationService} from '@ng-web-apis/geolocation';
-import {async, take} from 'rxjs';
+import {async, Subscription, take} from 'rxjs';
 import {
   GoogleMap,
   MapDirectionsRenderer,
@@ -35,6 +35,7 @@ import {SnackbarService} from '../../services/snackbar.service';
 import {ThemePalette} from '@angular/material/core';
 import {PortalInfoComponent} from '../portal-info/portal-info.component';
 import {MatDrawer} from '@angular/material/sidenav';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 // import * as googlemaps from 'googlemaps';
 
 @Component({
@@ -42,7 +43,8 @@ import {MatDrawer} from '@angular/material/sidenav';
   templateUrl: './puzzle.component.html',
   styleUrls: ['./puzzle.component.css'],
 })
-export class PuzzleComponent implements OnInit, AfterViewInit {
+export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
+
   ////////////////////////// PUZZLE
   createNewProject = false;
   loggedIn = false;
@@ -82,7 +84,11 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   projectList: PzProjectList;
   debugMsgs = 'START: ';
   showDebug = true;
+
   isMobile = false;
+  // TODO 2026-09-16
+  private layoutSub!: Subscription;
+
   // canvas: HTMLCanvasElement;
   image: HTMLImageElement;
   /** Template reference to the canvas element */
@@ -166,13 +172,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   // directionsResults$: Observable<google.maps.DirectionsResult|undefined>;
   googleMapsDirectionResult: google.maps.DirectionsResult = null;
   directions: google.maps.DirectionsResult[] = [];
-  protected readonly async = async;
-  result: google.maps.DirectionsResult;
+  // protected readonly async = async; // TODO why did I
   destination: LatLng;
-  directionsRenderer: MapDirectionsRenderer;
-  renderOps: google.maps.DirectionsRendererOptions;
-
-  ////////////////////// Image Scale ////////////////////
+////////////////////// Image Scale // TODO why d I use this?
   imagePageWidth: number;
   buttonOffset: number;
   imgScale = Const.IMG_SCALE;
@@ -185,7 +187,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
   protected readonly Math = Math; // mistake by Webstorm!
 
   constructor(httpClient: HttpClient,
-              private mapDirectionsService: MapDirectionsService,
+              private breakpointObserver: BreakpointObserver,
               private changeDetectionRef: ChangeDetectorRef,
               public snackbarService: SnackbarService,
               public authService: AuthService,
@@ -197,11 +199,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
               private readonly geolocation$: GeolocationService,
               @Inject(GEOLOCATION_SUPPORT) private readonly geolocationSupport: boolean)
   {
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      // true for mobile device
-      this.isMobile = true;
-    } else {
-    }
     ////////////////////   MAP
     this.mapHeight = (window.innerHeight - 96) + 'px';
     this.mapWidth = (window.innerWidth - 4) + 'px';
@@ -222,6 +219,20 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     this.getBootParams();
   }
   ngOnInit(): void {
+    this.layoutSub = this.breakpointObserver
+      .observe([Breakpoints.Handset])
+      .subscribe(result => {
+        this.isMobile = result.matches;
+        console.log('isMobile', this.isMobile);
+        if (this.isMobile) {
+          // TODO: adjust homeHeight and homeWidth for mobile
+          // this.homeHeight = window.innerHeight - 48 - 48 - 64 - 57 - 4;
+          // this.homeWidth = window.innerWidth - 4;
+        }else {
+          // TODO this.infoScale = 2.5; wrong
+        }
+      });
+
     this.authService.afAuth.currentUser.then(value => {
       this.googleUID = value.uid;
       this.debugMsgs += value.displayName + 'Logged In, ';
@@ -229,6 +240,9 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     if (this.isDynamicLocation){
       this.getLocation(Const.DYNAMIC_LOCATION);
     }
+  }
+  ngOnDestroy(): void {
+    this.layoutSub.unsubscribe();
   }
   getBootParams(): void {
     // TODO add UI procedure for assigning admin status this.setAdmin('G12mo', '1KYU0BdE0rXTly5Y5KZslOvxpow2');
@@ -307,13 +321,34 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         this.localMetadata = unknown as LocalMetadata;
         this.localTemplateArray = this.localMetadata.localTemplateArray;
         this.rowHeight = this.localMetadata.rowHeight;
-        this.hdrHeight = this.localMetadata.hdrHeight;
         this.rowCount = this.localMetadata.rowCount;
+        this.hdrHeight = this.localMetadata.hdrHeight;
         this.lefMargin = this.localMetadata.lefMargin;
         this.thumbWidth = this.localMetadata.thumbWidth;
         this.thumbHeight = this.localMetadata.thumbHeight;
         this.imgWidth = this.localMetadata.thumbSize;
         this.fudgeFactor = this.localMetadata.fudgeFactor;
+
+        console.log('isMobile: ' + this.isMobile);
+        if (this.isMobile) {
+          this.infoScale = 1;
+        }else{
+          this.hdrHeight = 96; // Const.HDR_HEIGHT;
+          this.lefMargin = Const.LEFT_MARGIN;
+          this.thumbWidth = Const.THUMB_WIDTH;
+          this.thumbHeight = Const.THUMB_HEIGHT;
+          this.imgWidth = Const.THUMB_SIZE;
+          this.fudgeFactor = Const.FUDGE_FACTOR;
+          this.imgScale = 1.0;
+          this.infoScale = 0.5;
+        }
+        console.log('hdrHeight: ' + this.hdrHeight);
+        console.log('rowHeight: ' + this.rowHeight);
+        console.log('thumbWidth: ' + this.thumbWidth);
+        console.log('thumbHeight: ' + this.thumbHeight);
+        console.log('imgWidth: ' + this.imgWidth);
+        console.log('fudgeFactor: ' + this.fudgeFactor);
+
 
         this.trustmanService.getMsgLog(id).get().subscribe(doc2 => {
           if (doc2.exists) {
@@ -363,7 +398,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
       for (let i = 1; i < this.rowCount + 1; i++) {
         const type = this.localTemplateArray[i - 1];
         const portalFrame: PortalFrame = {
-          // colHeight is optional - will be neccessary if colHeights are not uniform
+          // TODO rowHeight is optional - will be neccessary if rowHeights are not uniform (not used yet)
           index: i, height: this.rowHeight,
           canEdit: false, isTarget: false, dstToPrtl: null, pegLatLng: null,
           info: {
@@ -396,7 +431,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    // TODO test if this is safe
+    // Concatenate portal characters to display at top line of app
     this.makeSummary();
   }
   logger(msg: string): void {
@@ -414,7 +449,7 @@ export class PuzzleComponent implements OnInit, AfterViewInit {
     // this.openStatsDialog(this.makeStats());
   }
   setIngressName(): void {
-    const testMsg = ''; // ' testing: Image dimensions: ' + this.width + ' x ' + this.height;
+    const testMsg = '';
 
     const name = prompt('Please enter a Name' + testMsg, this.SavedIngressName);
     if (name && name !== '') {

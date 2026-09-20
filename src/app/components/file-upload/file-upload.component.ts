@@ -111,19 +111,20 @@ export class FileUploadComponent implements OnInit{
     // Create template partially filled
     const date = new Date().toISOString();
     const projId = name + ':' + date;
-    // TODO LocalMetadata never used at this time
+    // TODO LocalMetadata used to set initial values for mobile Info Dialog
+    // TODO these values can be changed dynamically by admin
     const localStorage: LocalMetadata = {
       id: '_metadata',
       projectName: name,
       projectID: projId,
       rowCount: Const.DIM_ROW_COUNT,
       rowHeight: Const.DIM_ROW_HEIGHT,
-      hdrHeight: Const.HDR_HEIGHT,
-      lefMargin: Const.LEFT_MARGIN,
-      thumbWidth: Const.THUMB_WIDTH,
-      thumbHeight: Const.THUMB_HEIGHT,
-      thumbSize: Const.THUMB_SIZE,
-      fudgeFactor: Const.FUDGE_FACTOR,
+      hdrHeight: Const.MOBILE_HDR_HEIGHT,
+      lefMargin: Const.MOBILE_LEFT_MARGIN,
+      thumbWidth: Const.MOBILE_THUMB_WIDTH,
+      thumbHeight: Const.MOBILE_THUMB_HEIGHT,
+      thumbSize: Const.MOBILE_THUMB_SIZE,
+      fudgeFactor: Const.MOBILE_FUDGE_FACTOR,
       localTemplateArray: this.localTemplateArray,
     };
     // create new ColRec collection and set it's _metadata document

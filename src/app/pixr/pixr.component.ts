@@ -170,9 +170,9 @@ export class PixrComponent implements OnInit, AfterViewInit {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
       // true for mobile device
       this.isMobile = true;
-      // console.log('Mobile Device');
+       //console.log('Mobile Device');
     } else {
-      // console.log('NOT a Mobile Device!');
+       //console.log('NOT a Mobile Device!');
     }
   }
 
