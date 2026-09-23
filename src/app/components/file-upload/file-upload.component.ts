@@ -68,7 +68,7 @@ export class FileUploadComponent implements OnInit{
   ///////////////////  Start of New Project Area
   ///////////////////////////////////////////////////////////////////////////////
   startNewProject(adminOnly: boolean = false): void {
-    if (confirm('Start a NEW project using Image File: ' + this.projectName)){
+    if (confirm('Start a NEW project using Name: ' + this.projectName)){
       this.newProjectInProgress = false;
       if (adminOnly) {
         if (confirm('Proceed to Admin Only')){
@@ -117,14 +117,14 @@ export class FileUploadComponent implements OnInit{
       id: '_metadata',
       projectName: name,
       projectID: projId,
-      rowCount: Const.DIM_ROW_COUNT,
-      rowHeight: Const.DIM_ROW_HEIGHT,
-      hdrHeight: Const.MOBILE_HDR_HEIGHT,
-      lefMargin: Const.MOBILE_LEFT_MARGIN,
-      thumbWidth: Const.MOBILE_THUMB_WIDTH,
-      thumbHeight: Const.MOBILE_THUMB_HEIGHT,
-      thumbSize: Const.MOBILE_THUMB_SIZE,
-      fudgeFactor: Const.MOBILE_FUDGE_FACTOR,
+      // rowCount: Const.DIM_ROW_COUNT,
+      // rowHeight: Const.DIM_ROW_HEIGHT,
+      // hdrHeight: Const.MOBILE_HDR_HEIGHT,
+      // lefMargin: Const.MOBILE_LEFT_MARGIN,
+      // thumbWidth: Const.MOBILE_THUMB_WIDTH,
+      // thumbHeight: Const.MOBILE_THUMB_HEIGHT,
+      // thumbSize: Const.MOBILE_THUMB_SIZE,
+      // fudgeFactor: Const.MOBILE_FUDGE_FACTOR,
       localTemplateArray: this.localTemplateArray,
     };
     // create new ColRec collection and set it's _metadata document
@@ -189,6 +189,12 @@ export class FileUploadComponent implements OnInit{
     this.authService.logout();
   }
   setPasscodeTemplate(): void {
+    const projectName = prompt('Enter Project Name');
+    if (projectName && projectName !== '') {
+      this.projectName = projectName;
+    } else {
+      return;
+    }
     const pattern = '***##keyword###**';
     const value = prompt(
       'Passcode Template where * = letters and # = numbers', pattern);

@@ -1,16 +1,7 @@
 <div *ngIf="portalFrame">
-  <h4>Portal:{{ portalFrame.info.index }}: {{ portalFrame.info.label }} [{{isMobile}}]</h4>
-  <div class="thumbFrame">
-    <app-thumbnail
-      [src]="src" [index]="portalFrame.index"
-      [thumbWidth]="thumbWidth"
-      [thumbHeight]="thumbHeight"
-      [hdrHeight]="hdrHeight"
-      [imgWidth]="imgWidth"
-      [leftMargin]="leftMargin"
-      [fudgeFactor]="fudgeFactor">
-    </app-thumbnail>
-  </div>
+  <h4>Portal:{{ portalFrame.info.index }}: {{ portalFrame.info.label }}</h4>
+  <img [src]="url + portalFrame.info.index + '.jpg'"  [alt]="'portal:' + portalFrame.info.index + ' image'"
+      width="40%">
   <div>
     <br>
     <div *ngIf="hintMsg.length !== 0">
@@ -36,12 +27,6 @@
         <mat-icon class="icon-display">edit</mat-icon>
       </span>
     </button>
-    <!--
-    <button (click)="openStreetView(portalFrame.info)"
-            mat-icon-button aria-label="Open Street View">
-      <mat-icon>streetview</mat-icon>
-    </button>
-    -->
     <div mat-dialog-actions align="end">
       <button *ngIf="isValidChar"
               mat-raised-button color="primary"
@@ -52,7 +37,6 @@
               mat-raised-button color="accent"
               (click)="forceSaveGlyph(portalFrame, label, ingressName)">Force Save?
       </button>
-
     </div>
   </div>
 </div>

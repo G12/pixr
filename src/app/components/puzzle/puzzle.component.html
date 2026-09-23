@@ -39,12 +39,6 @@
         <mat-icon>border_horizontal</mat-icon>
         <span>Set Thumb Width</span>
       </button>
-      <!--
-      <button mat-menu-item [disabled]="!loggedIn"
-              (click)="setThumbSize()">
-        <mat-icon>border_right</mat-icon>
-        <span>Set Thumb Size (%)</span>
-      </button>-->
       <button mat-menu-item [disabled]="!loggedIn"
               (click)="setFudgeFactor()">
         <mat-icon>compare_arrows</mat-icon>
@@ -65,7 +59,6 @@
         <mat-icon>logout</mat-icon>
       </button>
     </span>
-      <!--<span>W:{{imagePageWidth}} w: {{w}}</span>-->
     <div *ngIf="isAdmin">
       <button *ngIf="!validated" class="projButton" mat-fab extended (click)="newFSProject()">
         New Proj.
@@ -105,7 +98,6 @@
   <mat-drawer #drawer (closed)="drawerClosed()"
              (opened)="drawerOpened()" class="example-sidenav" mode="side">
       <div #imagePage class="imagePage">
-        <!--<h1>{{ folder }}</h1>-->
         <div class="portalFrame" *ngFor="let portalFrame of portalFrames">
           <div class="indexWrapper">
             <h1 *ngIf="portalFrame.info.label.length > 0"
@@ -127,13 +119,7 @@
             </button>
           </div>
           <app-thumbnail
-            [src]="src" [index]="portalFrame.index"
-            [thumbWidth]="thumbWidth/imgScale"
-            [thumbHeight]="thumbHeight/imgScale"
-            [hdrHeight]="hdrHeight/imgScale"
-            [imgWidth]="width/imgScale"
-            [leftMargin]="lefMargin/imgScale"
-            [fudgeFactor]="fudgeFactor/imgScale">
+            [src]="Const.IMAGE_FOLDER + localMetadata.projectName +  '/prtl' + portalFrame.index + '.jpg'" >
           </app-thumbnail>
         </div>
       </div>
@@ -173,8 +159,6 @@
       [radius]="40" [options]="Const.PEG_CIRCLE_OPTIONS">
     </map-circle>
 
-    <!--[options]="getAndProccessOptons(portalFrame, portalMarker)"-->
-    <!--[label]="portalFrame.info.index.toString()"-->
     <map-marker #portalMarker="mapMarker"
                 *ngFor="let portalFrame of portalFrames"
                 [label]="portalFrame.iconLabel"
@@ -197,18 +181,6 @@
             [ingressName]="ingressName" [pegPosition]="pegPosition"
             [map]="map"  (parentFun)="closeInfoWindow($event)">
           </app-portal-info>
-          <!-- TODO solve info window jiggle problem before using this
-          <button mat-button
-                  (click)="showStreetview
-                  (currentPortalFrame.info.latLng, currentPortalFrame.info)">
-            Street View
-          </button>
-          -->
-          <!-- TODO iframe embed of streetview 360 image
-          <div>
-            <iframe src="https://www.google.com/maps/embed?pb=!4v1710693246144!6m8!1m7!1sCAoSLEFGMVFpcE5zQ1haR0o5bTJxMmotWEpObFJNdnVYWkVoZ085azFvZXFMZFQw!2m2!1d45.4560438!2d-75.681788!3f297.6851778027556!4f-0.4107078254452716!5f0.7820865974627469" width="500" height="375" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-          </div>
-          -->
         </div>
         <div *ngIf="!currentPortalFrame">
           <mat-card>
@@ -222,20 +194,6 @@
               Hello {{ ingressName }}; this is where you are!
             </mat-card-content>
           </mat-card>
-          <!-- TODO test if this causes the jiggles! YES it does -->
-          <!--<button mat-button
-                  (click)="showStreetview(pegPosition,null, heading)">
-            Street View
-          </button>-->
-        </div>
-        <div mat-dialog-actions align="start">
-          <button *ngIf="currentPortalFrame && !currentPortalFrame.isTarget"
-                  (click)="drawDirectionsTo(currentPortalFrame)"
-                  mat-icon-button class="runner-button">
-              <span class="iconGreen">
-                <mat-icon  class="icon-display">directions_run</mat-icon>
-              </span>
-          </button>
         </div>
         <div mat-dialog-actions align="end">
           <button mat-button (click)="closeWindow()">
@@ -289,38 +247,3 @@
     </cdk-virtual-scroll-viewport>
   </mat-list>
 </div>
-
-
-
-<!-- ///////////////////// CODE STORAGE OBSOLITE ////////////// -->
-<!--<div *ngIf="false" class="overlay">
-    <div class="hdr" [ngStyle]="{'height.px': hdrHeight - 16}">
-      <span (click)="openMap()" matTooltip="Open Google Map">
-        <button class="backButton" [style.left.px]="pageXOffset"
-                mat-icon-button aria-label="Open Google Map">
-          <mat-icon>map</mat-icon>
-        </button>
-        <button class="vert-align" mat-flat-button>Map</button>
-      </span>
-      <span (click)="openLog()" matTooltip="Open Log">
-        <button [style.left.px]="pageXOffset"
-                mat-icon-button aria-label="Open Log">
-          <mat-icon>list</mat-icon>
-        </button>
-        <button class="vert-align" mat-flat-button>Log</button>
-      </span>
-    </div>
-    <div *ngFor="let portalFrame of portalFrames" class="row"
-         [ngStyle]="{'height.px': colHeight}">
-      <div *ngIf="colHeight" class="imageWidthClickArea"
-           (click)="popUpDialog(portalFrame)"
-           [ngStyle]="{'height.px': colHeight-80}">
-        <div [ngStyle]="{'height.px': colHeight-80}"
-             class="indexWrapper">
-          <h1 class="indexNumber">{{ portalFrame.info.label }}</h1>
-          <h1 class="indexNmbr">{{ portalFrame.index }}
-            <span *ngIf="hasUrl(portalFrame.info)"><mat-icon>map</mat-icon></span></h1>
-        </div>
-      </div>
-    </div>
-</div>-->

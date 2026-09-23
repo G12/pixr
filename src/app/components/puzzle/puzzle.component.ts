@@ -22,11 +22,9 @@ import {Clipboard} from '@angular/cdk/clipboard';
 import {PuzzleMapDialogComponent} from '../../dialogs/puzzle-map/puzzle-map-dialog.component';
 import {HttpClient} from '@angular/common/http';
 import {GEOLOCATION_SUPPORT, GeolocationService} from '@ng-web-apis/geolocation';
-import {async, Subscription, take} from 'rxjs';
+import {Subscription, take} from 'rxjs';
 import {
   GoogleMap,
-  MapDirectionsRenderer,
-  MapDirectionsService,
   MapInfoWindow,
   MapMarker
 } from '@angular/google-maps';
@@ -287,7 +285,6 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.id = this.fsUser.project_id;
           this.folder = this.fsUser.folder;
         }
-        this.src = this.path + this.folder + '.jpg';
         // Once we have default project id we can subscribe
         this.debugMsgs += 'src: ' + this.src + ', ';
         this.subscribeToFsProject(this.id);
@@ -320,14 +317,14 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
         const unknown: any = test;
         this.localMetadata = unknown as LocalMetadata;
         this.localTemplateArray = this.localMetadata.localTemplateArray;
-        this.rowHeight = this.localMetadata.rowHeight;
-        this.rowCount = this.localMetadata.rowCount;
-        this.hdrHeight = this.localMetadata.hdrHeight;
-        this.lefMargin = this.localMetadata.lefMargin;
-        this.thumbWidth = this.localMetadata.thumbWidth;
-        this.thumbHeight = this.localMetadata.thumbHeight;
-        this.imgWidth = this.localMetadata.thumbSize;
-        this.fudgeFactor = this.localMetadata.fudgeFactor;
+        // this.rowHeight = this.localMetadata.rowHeight;
+        // this.rowCount = this.localMetadata.rowCount;
+        // this.hdrHeight = this.localMetadata.hdrHeight;
+        // this.lefMargin = this.localMetadata.lefMargin;
+        // this.thumbWidth = this.localMetadata.thumbWidth;
+        // this.thumbHeight = this.localMetadata.thumbHeight;
+        // this.imgWidth = this.localMetadata.thumbSize;
+        // this.fudgeFactor = this.localMetadata.fudgeFactor;
 
         console.log('isMobile: ' + this.isMobile);
         if (this.isMobile) {
@@ -489,8 +486,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.rowCount = parseInt(strCount, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.rowCount = this.rowCount;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.rowCount = this.rowCount;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   setHdrHeight(): void {
@@ -500,8 +497,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.hdrHeight = parseInt(height, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.hdrHeight = this.hdrHeight;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.hdrHeight = this.hdrHeight;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   setLeftMargin(): void {
@@ -511,8 +508,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.lefMargin = parseInt(width, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.lefMargin = this.lefMargin;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.lefMargin = this.lefMargin;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   setRowHeight(): void {
@@ -522,8 +519,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.rowHeight = parseInt(height, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.rowHeight = this.rowHeight;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.rowHeight = this.rowHeight;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   setThumbHeight(): void {
@@ -533,8 +530,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.thumbHeight = parseInt(height, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.thumbHeight = this.thumbHeight;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.thumbHeight = this.thumbHeight;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   setThumbSize(): void {
@@ -544,8 +541,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.imgWidth = parseInt(width, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.thumbSize = this.imgWidth;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.thumbSize = this.imgWidth;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   setThumbWidth(): void {
@@ -555,8 +552,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.thumbWidth = parseInt(width, 10);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.thumbWidth = this.thumbWidth;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.thumbWidth = this.thumbWidth;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   setFudgeFactor(): void {
@@ -566,8 +563,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.fudgeFactor = parseFloat(width);
       // Update metadata
       // getPortalRecs subscription will thence be called
-      this.localMetadata.fudgeFactor = this.fudgeFactor;
-      this.trustmanService.updateMetaData(this.localMetadata);
+      // this.localMetadata.fudgeFactor = this.fudgeFactor;
+      // this.trustmanService.updateMetaData(this.localMetadata);
     }
   }
   makeSummary(): void {
@@ -837,6 +834,8 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
         if (Const.DEBUG_PUZZLE) {
           console.log('Setting PortalInfoComponent label: '
             + portalFrame.info.label);
+          console.log('portalFrame info: '
+            + portalFrame.info);
         }
       }, this.Const.WAIT_300);
       this.infoWindow?.open(marker);

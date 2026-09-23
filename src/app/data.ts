@@ -67,14 +67,6 @@ export interface LocalMetadata {
   id: string;
   projectName: string;
   projectID: string;
-  rowCount: number;
-  rowHeight: number;
-  hdrHeight: number;
-  lefMargin: number;
-  thumbWidth: number;
-  thumbHeight: number;
-  thumbSize: number;
-  fudgeFactor: number;
   localTemplateArray: string[];
 }
 export interface UploadResponse {

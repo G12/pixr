@@ -6,9 +6,6 @@ export class Const {
   public static CONFIDENCE_YELLOW = 240;
   public static CONFIDENCE_RED = 99999999;
 
-  // fudgeFactor 1 hdrHeight	50 leftMargin	35 rowCount	11
-  // rowHeight	300 thumbHeight	95 thumbSize	500 thumbWidth	164
-
   // desk top Left Drawer setup thumbnail defaults
   public static THUMB_WIDTH = 500;
   public static THUMB_HEIGHT = 192;
@@ -30,7 +27,6 @@ export class Const {
   // Mobile Info Dialog thumbnail defaults
   public static MOBILE_THUMB_WIDTH = Const.THUMB_WIDTH / 2;
   public static MOBILE_THUMB_HEIGHT = 192; // 95
-  public static MOBILE_THUMB_SIZE = 500; // not used
   public static MOBILE_FUDGE_FACTOR = 1;
   public static MOBILE_HDR_HEIGHT = 96;
   public static MOBILE_LEFT_MARGIN = 110; // 35
@@ -45,8 +41,6 @@ export class Const {
   public static STATIC_LOCATION = 1;
   public static DYNAMIC_LOCATION = 2;
   public static IMAGE_FOLDER = 'https://g12mo.ca/pixr3/assets/puzzle_images/';
-  // public static IMAGE_FOLDER = 'https://g12mo.ca/pixr2/assets/puzzle_images/';
-  // public static IMAGE_FOLDER = 'https://geopad.ca/pixr2/assets/puzzle_images/';
 
   public static ZOOM_POSTAGE_STAMP = 22;
   public static ZOOM_BACKYARD = 20;

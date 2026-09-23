@@ -20,29 +20,22 @@ export class PortalInfoComponent implements AfterViewInit{
   @Input() infoScale: number;
   @Input() isMobile: boolean;
   @Output('parentFun') parentFun: EventEmitter<any> = new EventEmitter();
-  // colHeight = Const.DIM_COL_HEIGHT;
-  // fudgeFactor = Const.DIM_FUDGE_FACTOR;
   label = '';
   hintMsg = '';
   dirty = false;
   isValidChar = false;
   protected readonly Const = Const;
-  inputType = 'text';
-
   thumbWidth: number;
   thumbHeight: number;
   hdrHeight: number;
   leftMargin: number;
   fudgeFactor: number;
+  url: string;
 
   constructor(private trustmanService: TrustmanService) {
     // Mobile Google Maps InfoDialog thumbnail can be dynamically adjusted
+    // TODO these values are deprecated
     if (this.isMobile){
-      // this.thumbWidth = this.localMetadata.thumbWidth / this.infoScale;
-      // this.thumbHeight = this.localMetadata.thumbHeight / this.infoScale;
-      // this.hdrHeight = this.localMetadata.hdrHeight / this.infoScale;
-      // this.leftMargin = this.localMetadata.lefMargin / this.infoScale;
-      // this.fudgeFactor = this.localMetadata.fudgeFactor / this.infoScale;
       this.thumbWidth = Const.MOBILE_THUMB_WIDTH;
       this.thumbHeight = Const.MOBILE_THUMB_HEIGHT;
       this.hdrHeight = Const.MOBILE_HDR_HEIGHT;
@@ -57,6 +50,8 @@ export class PortalInfoComponent implements AfterViewInit{
     }
   }
   ngAfterViewInit(): void {
+    this.url = Const.IMAGE_FOLDER + this.localMetadata.projectName + '/prtl';
+
     if (Const.DEBUG_PORTAL_INFO){
       console.log('ngAfterViewInit');
       // called only once when map initializes
@@ -107,13 +102,6 @@ export class PortalInfoComponent implements AfterViewInit{
   onCancelClick(): void {
     this.parentFun.emit(null);
   }
-  setInfo(label: string): void {
-    this.label = label;
-    this.hintMsg = '';
-    this.dirty = false;
-    this.isValidChar = false;
-  }
-
   delete(portalFrame: PortalFrame, label: string, ingressName: string): void {
     if (confirm('Remove the Value: ' + label )){
       // Wait a bit so snack bar will appear; probably not neccessary on user screen

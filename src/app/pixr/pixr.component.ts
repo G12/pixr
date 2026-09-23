@@ -29,32 +29,6 @@ import {ClipboardComponent} from '../dialogs/clipboard/clipboard.component';
 import {StatsComponent} from '../dialogs/stats/stats.component';
 import {WarningComponent} from '../dialogs/warning/warning.component';
 
-// https://fevgames.net/ifs/ifsathome/2021-03/17631729871888592910113823558419958.jpg
-// https://fevgames.net/ifs/ifsathome/2021-05/1173967923183847241117575464520523.jpg
-// https://fevgames.net/ifs/ifsathome/2021-06/139507609158036861345453685320764.jpg
-// https://fevgames.net/ifs/ifsathome/2021-07/1639139716102680798452289230520979.jpg
-// https://fevgames.net/ifs/ifsathome/2021-09/16607234082109943015158217965621400.jpg
-// https://fevgames.net/ifs/ifsathome/2021-10/532177229195500548340666012721637.jpg
-// https://fevgames.net/ifs/ifsathome/2021-11/431133399121684360034806937521929.jpg
-// https://fevgames.net/ifs/ifsathome/2021-12/1852696932136631550472357448122084.jpg
-// https://fevgames.net/ifs/ifsathome/2022-02/1633965338100015720168087755322546.jpg
-// https://fevgames.net/ifs/ifsathome/2022-03/156974431251988002029752900622730.jpg
-// https://fevgames.net/ifs/ifsathome/2022-06/1141846103460896867175933259923304.jpg
-// https://fevgames.net/ifs/ifsathome/2022-09/4912206392082515141135149681023827.jpg
-// https://fevgames.net/ifs/ifsathome/2022-10/150687395671621484065049753124000.jpg
-// https://fevgames.net/ifs/ifsathome/2022-11/237931934137780912994223986724172.jpg
-// https://fevgames.net/ifs/ifsathome/2023-01/46012155109606461202836680724599.jpg
-// https://fevgames.net/ifs/ifsathome/2023-02/16659414603368184187485608224617.jpg
-
-// TODO OC Transpo
-// https://api.octranspo1.com/v2.0/GetRouteSummaryForStop?appID=a689165d&apiKey=5889c474f9af925a3b8e7fe2372a35dc&stopNo=7145
-// https://api.octranspo1.com/v2.0/GetNextTripsForStop?appID=a689165d&apiKey=5889c474f9af925a3b8e7fe2372a35dc&stopNo=7145&routeNo=46
-// https://api.octranspo1.com/v2.0/GetNextTripsForStopAllRoutes?appID=a689165d&apiKey=5889c474f9af925a3b8e7fe2372a35dc&stopNo=3034
-
-// TODO Rolf
-// http://haidagwaiimuseum.ca/wp-content/uploads/2022/01/Hlkyakii-Catalogue.pdf
-// lets talk with maria
-
 @Component({
   selector: 'app-pixr',
   templateUrl: './pixr.component.html',
@@ -170,9 +144,9 @@ export class PixrComponent implements OnInit, AfterViewInit {
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
       // true for mobile device
       this.isMobile = true;
-       //console.log('Mobile Device');
+       // console.log('Mobile Device');
     } else {
-       //console.log('NOT a Mobile Device!');
+       // console.log('NOT a Mobile Device!');
     }
   }
 

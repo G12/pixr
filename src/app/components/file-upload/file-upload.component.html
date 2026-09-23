@@ -1,7 +1,10 @@
 <mat-card class="homeFrame">
   <mat-card-header>
+    <!--
     <mat-card-subtitle *ngIf="!showProgress">Upload new image file then Create New Project</mat-card-subtitle>
     <mat-card-subtitle *ngIf="showProgress">Upload In Progress</mat-card-subtitle>
+    -->
+    <mat-card-subtitle>First attempt to stat a new project</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <button  *ngIf="!newProjectInProgress" class="extendedFab" mat-fab extended (click)="logOut()">
@@ -12,6 +15,7 @@
       <mat-icon>logout</mat-icon>
       Log Out to Open New Project
     </button>
+    <!--
     <div *ngIf="uploadComplete">
       <p *ngIf="uploadResponse && uploadResponse.status === 'error'">
         {{ uploadResponse.message }}
@@ -20,29 +24,40 @@
         target_file: {{ uploadResponse.target_file }}<br>
       </p>
     </div>
+    -->
     <mat-divider></mat-divider>
   </mat-card-content>
   <mat-card-actions>
     <button *ngIf="!templateSet" class="newProjButton"
-            (click)="setPasscodeTemplate()">Set Passcode Template</button>
+            (click)="setPasscodeTemplate()">Set projectName and Passcode Template</button>
     <div *ngIf="templateSet">
+      <button class="newProjButton"
+              [disabled]="newProjectInProgress"
+              (click)="startNewProject()">New Project
+      </button>
+    </div>
+  </mat-card-actions>
+  <mat-card-footer>
+    <!--
+    <mat-progress-bar *ngIf="showProgress" mode="indeterminate"></mat-progress-bar>
+    -->
+    <mat-card-subtitle>footer info goes here</mat-card-subtitle>
+  </mat-card-footer>
+</mat-card>
+
+<!--
       <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <input [disabled]="uploadComplete" type="file" name="puzzle_img" (change)="onFileSelect($event)"/>
         <button class="subButton" type="submit"
           [disabled]="uploadComplete || !fileChosen">Upload</button><br>
-        <!--<button *ngIf="uploadComplete" class="newProjButton"
-                [disabled]="newProjectInProgress"
-                (click)="startNewProject()">New Project</button>-->
-        <button class="newProjButton"
+        <button *ngIf="uploadComplete" class="newProjButton"
                 [disabled]="newProjectInProgress"
                 (click)="startNewProject()">New Project</button>
-        <button class="newProjButton"
-                [disabled]="newProjectInProgress"
-                (click)="startNewProject(true)">New Admin Project</button>
-      </form>
-    </div>
-  </mat-card-actions>
-  <mat-card-footer>
-    <mat-progress-bar *ngIf="showProgress" mode="indeterminate"></mat-progress-bar>
-  </mat-card-footer>
-</mat-card>
+<button class="newProjButton"
+        [disabled]="newProjectInProgress"
+        (click)="startNewProject()">New Project</button>
+<button class="newProjButton"
+        [disabled]="newProjectInProgress"
+        (click)="startNewProject(true)">New Admin Project</button>
+</form>
+-->
