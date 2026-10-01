@@ -339,12 +339,12 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
           this.imgScale = 1.0;
           this.infoScale = 0.5;
         }
-        console.log('hdrHeight: ' + this.hdrHeight);
-        console.log('rowHeight: ' + this.rowHeight);
-        console.log('thumbWidth: ' + this.thumbWidth);
-        console.log('thumbHeight: ' + this.thumbHeight);
-        console.log('imgWidth: ' + this.imgWidth);
-        console.log('fudgeFactor: ' + this.fudgeFactor);
+        // console.log('hdrHeight: ' + this.hdrHeight);
+        // console.log('rowHeight: ' + this.rowHeight);
+        // console.log('thumbWidth: ' + this.thumbWidth);
+        // console.log('thumbHeight: ' + this.thumbHeight);
+        // console.log('imgWidth: ' + this.imgWidth);
+        // console.log('fudgeFactor: ' + this.fudgeFactor);
 
 
         this.trustmanService.getMsgLog(id).get().subscribe(doc2 => {
@@ -603,8 +603,11 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loggedIn = false;
         return;
       }
+    }else{
+      alert('Resizing Options are Under Construction');
+      return;
     }
-    this.loggedIn = true;
+    // this.loggedIn = true;
   }
   copyToClipBoard(): void {
     if (confirm('Copy to Clipboard')){
@@ -828,16 +831,17 @@ export class PuzzleComponent implements OnInit, AfterViewInit, OnDestroy {
       this.label = portalFrame.info.label;
       this.dirty = false;
       // this.setActiveCircle(portalFrame.info);
-      setTimeout(() => {
+      // TODO removed call to non-existent method setInfo - Check that there is no after effect from removing setTimeOut
+      // setTimeout(() => {
         // populate the PortalInfoComponent ngModel values
-        this.PortalInfoComponent.setInfo(portalFrame.info.label);
-        if (Const.DEBUG_PUZZLE) {
-          console.log('Setting PortalInfoComponent label: '
-            + portalFrame.info.label);
-          console.log('portalFrame info: '
-            + portalFrame.info);
-        }
-      }, this.Const.WAIT_300);
+        // this.PortalInfoComponent.setInfo(portalFrame.info.label);
+        // if (Const.DEBUG_PUZZLE) {
+        //  console.log('Setting PortalInfoComponent label: '
+        //    + portalFrame.info.label);
+        //  console.log('portalFrame info: '
+        //    + portalFrame.info);
+        // }
+      // }, this.Const.WAIT_300);
       this.infoWindow?.open(marker);
     }else{
       // This is the pegMarker

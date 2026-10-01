@@ -11,6 +11,6 @@ export class ThumbnailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('src:' + this.src);
+    // console.log('src:' + this.src);
   }
 }
