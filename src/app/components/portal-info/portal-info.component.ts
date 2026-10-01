@@ -78,6 +78,8 @@ export class PortalInfoComponent implements AfterViewInit{
       frame.info.distance = dst;
       this.trustmanService.saveChar(frame, label, ingressName);
       this.parentFun.emit(frame.info);
+      this.dirty = false;
+      this.label = '';
     }
   }
   validate(char: string, portalInfo: PortalInfo): void {

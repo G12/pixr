@@ -362,6 +362,7 @@ export class TrustmanService {
           hintMsg = 'Not a Glyph Name!';
           isValidChar = false;
         }
+        dirty = true;
         break;
       case Const.NUMBER_CODE:
         const regX = /^-?\d+$/;
@@ -369,6 +370,7 @@ export class TrustmanService {
           hintMsg = 'Only Numbers!';
           isValidChar = false;
         }
+        dirty = true;
         break;
       case Const.LETTER_CODE:
         const regex = /^[a-zA-Z]+$/;
@@ -376,9 +378,11 @@ export class TrustmanService {
           hintMsg = 'Only Letters A-Z!';
           isValidChar = false;
         }
+        dirty = true;
         break;
     }
-    dirty = true;
+    // DONE dirty should not be set here
+    // dirty = true;
     retVal.dirty = dirty;
     retVal.isValidChar = isValidChar;
     retVal.hintMsg = hintMsg;
@@ -426,7 +430,9 @@ export class TrustmanService {
     return true;
   }
   testDeleteConditions(label: string, portalInfo: PortalInfo): boolean {
-    return label.length !== 0 && portalInfo.label && label === portalInfo.label;
+    // TODO remove unused parameter label after testing
+    // return label.length !== 0 && portalInfo.label && label === portalInfo.label;
+    return portalInfo.label && portalInfo.label.length !== 0;
   }
   distanceBetween(origin: google.maps.LatLngLiteral, dest: google.maps.LatLngLiteral): number{
     return google.maps.geometry.spherical.computeDistanceBetween(

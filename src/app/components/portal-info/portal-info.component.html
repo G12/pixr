@@ -1,7 +1,7 @@
 <div *ngIf="portalFrame">
   <h4>Portal:{{ portalFrame.info.index }}: {{ portalFrame.info.label }}</h4>
   <img [src]="url + portalFrame.info.index + '.jpg'"  [alt]="'portal:' + portalFrame.info.index + ' image'"
-      width="40%">
+      width="25%">
   <div>
     <br>
     <div *ngIf="hintMsg.length !== 0">
@@ -16,19 +16,19 @@
              [(ngModel)]="label" [disabled]="!portalFrame.canEdit"
              class="charInput" autocomplete="off">
     </mat-form-field>
+    <button *ngIf="portalFrame.dstToPrtl > Const.CONFIDENCE_GREEN " (click)="toggleEdit(portalFrame)"
+            mat-icon-button class="btnSpacingLeft">
+      <span class="iconGreen">
+        <mat-icon class="icon-display">edit</mat-icon>
+      </span>
+    </button><br>
     <button *ngIf="testDeleteConditions(label, portalFrame.info)"
             (click)="delete(portalFrame,label,ingressName)"
             mat-icon-button color="warn" aria-label="Delete Forever">
       <mat-icon>delete_forever</mat-icon>
     </button>
-    <button *ngIf="portalFrame.dstToPrtl > Const.CONFIDENCE_GREEN" (click)="toggleEdit(portalFrame)"
-            mat-icon-button class="btnSpacingLeft">
-      <span class="iconGreen">
-        <mat-icon class="icon-display">edit</mat-icon>
-      </span>
-    </button>
     <div mat-dialog-actions align="end">
-      <button *ngIf="isValidChar"
+      <button *ngIf="isValidChar && dirty"
               mat-raised-button color="primary"
               (click)="saveChar(portalFrame, label, ingressName)">Save
       </button>

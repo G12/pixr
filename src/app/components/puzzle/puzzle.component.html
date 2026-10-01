@@ -154,10 +154,10 @@
                 [options]="getPegMarkerOptions(pegMarker)"
                 (mapClick)="reCenterRoute(directions, destination)">
     </map-marker>
-    <map-circle
+    <!--<map-circle
       [center]="pegMarker.getPosition()"
       [radius]="40" [options]="Const.PEG_CIRCLE_OPTIONS">
-    </map-circle>
+    </map-circle>-->
 
     <map-marker #portalMarker="mapMarker"
                 *ngFor="let portalFrame of portalFrames"
@@ -195,11 +195,11 @@
             </mat-card-content>
           </mat-card>
         </div>
-        <div mat-dialog-actions align="end">
+        <!--<div mat-dialog-actions align="end">
           <button mat-button (click)="closeWindow()">
             Close
           </button>
-        </div>
+        </div>-->
       </div>
     </map-info-window>
   </google-map>
