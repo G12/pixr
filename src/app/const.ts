@@ -23,6 +23,9 @@ export class Const {
   public static INFO_THUMB_WIDTH = Const.THUMB_WIDTH / 2;
   public static INFO_HDR_HEIGHT = 96;
 
+  // InfoDialog UI values
+  public static INFO_INPUT_CHAR_WIDTH = 32;
+  public static INFO_INPUT_GLYPH_WIDTH = 50;
 
   // Mobile Info Dialog thumbnail defaults
   public static MOBILE_THUMB_WIDTH = Const.THUMB_WIDTH / 2;

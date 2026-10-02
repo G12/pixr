@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, Input, Output} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TrustmanService} from '../../services/trustman.service';
 import {LocalMetadata, PortalFrame, PortalInfo} from '../../data';
 import {Const} from '../../const';
@@ -9,7 +9,7 @@ import {GoogleMap} from '@angular/google-maps';
   templateUrl: './portal-info.component.html',
   styleUrls: ['./portal-info.component.css']
 })
-export class PortalInfoComponent implements AfterViewInit{
+export class PortalInfoComponent implements AfterViewInit, OnInit{
   @Input() portalFrame: PortalFrame;
   @Input() src: string;
   @Input() localMetadata: LocalMetadata;
@@ -25,6 +25,7 @@ export class PortalInfoComponent implements AfterViewInit{
   dirty = false;
   isValidChar = false;
   protected readonly Const = Const;
+  // TODO develop user controlled values
   thumbWidth: number;
   thumbHeight: number;
   hdrHeight: number;
@@ -49,12 +50,19 @@ export class PortalInfoComponent implements AfterViewInit{
       this.fudgeFactor = Const.FUDGE_FACTOR;
     }
   }
+
+  ngOnInit(): void {
+    if (Const.DEBUG_PORTAL_INFO){
+      console.log('ngOnInit');
+      // called only once when the first instance of this component is created (first dialog opened)
+    }
+  }
   ngAfterViewInit(): void {
     this.url = Const.IMAGE_FOLDER + this.localMetadata.projectName + '/prtl';
 
     if (Const.DEBUG_PORTAL_INFO){
       console.log('ngAfterViewInit');
-      // called only once when map initializes
+      // called after ngOnInit only once when the first instance of this component is created (first dialog opened)
     }
   }
   forceSaveGlyph(portalFrame: PortalFrame, label: string, ingressName: string): void {

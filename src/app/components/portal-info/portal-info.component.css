@@ -11,4 +11,11 @@
 .charInput {
   text-overflow-ellipsis: true;
   min-height: 40px;
+      padding: 0;
+}
+.frmField {
+  height: 52px;
+}
+.btnSpacingTop {
+  margin-top: 8px;
 }
